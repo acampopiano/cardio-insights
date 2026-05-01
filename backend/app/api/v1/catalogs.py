@@ -1,3 +1,5 @@
+"""Endpoints para exponer catalogos consumidos por filtros y selector de KPIs."""
+
 from fastapi import APIRouter, Depends
 
 from app.core.dependencies import get_catalog_service
@@ -13,6 +15,7 @@ def get_filters(
     _: dict = Depends(get_current_claims),
     service: CatalogService = Depends(get_catalog_service),
 ) -> FiltersResponse:
+    """Retorna los filtros disponibles para construir consultas desde la UI."""
     return FiltersResponse(**service.get_filters())
 
 
@@ -21,4 +24,5 @@ def get_kpis_catalog(
     _: dict = Depends(get_current_claims),
     service: CatalogService = Depends(get_catalog_service),
 ) -> KpisCatalogResponse:
+    """Retorna el catalogo de KPIs y su metadata descriptiva."""
     return KpisCatalogResponse(**service.get_kpis_catalog())

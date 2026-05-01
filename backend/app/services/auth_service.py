@@ -8,11 +8,15 @@ from app.repositories.interfaces import AuthRepository
 
 
 class AuthService:
+    """Orquesta autenticacion, emision de token y consulta de perfil del usuario."""
+
     def __init__(self, auth_repository: AuthRepository) -> None:
+        """Inyecta repositorio de autenticacion para desacoplar acceso a datos."""
         self.auth_repository = auth_repository
 
     @staticmethod
     def _password_valid(user: dict[str, Any], password: str) -> bool:
+        """Valida password contra formatos heredados: plano, md5 o hash bcrypt."""
         plain_password = user.get("password_plain")
         if plain_password:
             return str(plain_password) == password
@@ -28,6 +32,7 @@ class AuthService:
         return False
 
     def login(self, username: str, password: str) -> dict[str, Any]:
+        """Autentica usuario y devuelve token JWT con datos publicos de sesion."""
         user = self.auth_repository.get_user_by_username(username)
         if user is None or not self._password_valid(user, password):
             raise ValueError("Invalid username or password")
@@ -54,6 +59,7 @@ class AuthService:
         }
 
     def logout(self, token: str) -> dict[str, Any]:
+        """Revoca token actual agregando su jti a la blocklist en memoria."""
         payload = decode_token(token)
         jti = payload.get("jti")
         if jti:
@@ -61,6 +67,7 @@ class AuthService:
         return {"success": True, "message": "Session closed"}
 
     def me(self, username: str) -> dict[str, Any]:
+        """Obtiene el perfil publico del usuario autenticado por su username."""
         user = self.auth_repository.get_user_by_username(username)
         if user is None:
             raise ValueError("User not found")

@@ -1,3 +1,5 @@
+"""Compone todos los sub-routers de la API v1 en un solo punto."""
+
 from fastapi import APIRouter
 
 from app.api.v1.auth import router as auth_router

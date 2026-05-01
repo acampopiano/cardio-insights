@@ -1,3 +1,5 @@
+"""Endpoints del dashboard para tarjetas resumen, graficos y tabla consolidada."""
+
 from fastapi import APIRouter, Depends
 
 from app.core.dependencies import get_dashboard_service
@@ -17,6 +19,7 @@ def get_summary(
     _: dict = Depends(get_current_claims),
     service: DashboardService = Depends(get_dashboard_service),
 ) -> DashboardSummaryResponse:
+    """Obtiene las metricas de alto nivel mostradas como cards en el dashboard."""
     return DashboardSummaryResponse(**service.get_summary())
 
 
@@ -25,6 +28,7 @@ def get_charts(
     _: dict = Depends(get_current_claims),
     service: DashboardService = Depends(get_dashboard_service),
 ) -> DashboardChartsResponse:
+    """Obtiene series temporales estructuradas para graficos del dashboard."""
     return DashboardChartsResponse(**service.get_charts())
 
 
@@ -33,4 +37,5 @@ def get_table(
     _: dict = Depends(get_current_claims),
     service: DashboardService = Depends(get_dashboard_service),
 ) -> DashboardTableResponse:
+    """Obtiene el detalle tabular para analisis operativo mensual."""
     return DashboardTableResponse(**service.get_table())

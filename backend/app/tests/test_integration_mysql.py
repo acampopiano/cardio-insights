@@ -1,3 +1,5 @@
+"""Prueba de integracion opcional para validar endpoints contra MySQL real."""
+
 import os
 
 import pytest
@@ -12,6 +14,7 @@ from app.main import app
     reason="Set RUN_INTEGRATION_DB_TESTS=1 to run MySQL integration tests.",
 )
 def test_mysql_dashboard_and_kpis_query() -> None:
+    """Ejecuta login, dashboard y query KPI usando backend mysql configurado por entorno."""
     os.environ["REPOSITORY_BACKEND"] = "mysql"
     os.environ.setdefault("MYSQL_HOST", "localhost")
     os.environ.setdefault("MYSQL_PORT", "3306")

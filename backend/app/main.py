@@ -1,3 +1,5 @@
+"""Punto de entrada de FastAPI y composicion principal de middlewares/rutas."""
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 

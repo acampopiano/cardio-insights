@@ -1,3 +1,5 @@
+"""Endpoints de autenticacion: iniciar sesion, cerrar sesion y perfil actual."""
+
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.core.dependencies import get_auth_service
@@ -10,6 +12,7 @@ router = APIRouter(prefix="/auth", tags=["Auth"])
 
 @router.post("/login", response_model=LoginResponse)
 def login(payload: LoginRequest, auth_service: AuthService = Depends(get_auth_service)) -> LoginResponse:
+    """Valida credenciales y devuelve token JWT junto con datos publicos del usuario."""
     try:
         return LoginResponse(**auth_service.login(payload.username, payload.password))
     except ValueError as exc:
@@ -21,6 +24,7 @@ def logout(
     token: str = Depends(get_current_token),
     auth_service: AuthService = Depends(get_auth_service),
 ) -> LogoutResponse:
+    """Revoca el token actual para invalidar la sesion del cliente."""
     return LogoutResponse(**auth_service.logout(token))
 
 
@@ -29,6 +33,7 @@ def me(
     claims: dict = Depends(get_current_claims),
     auth_service: AuthService = Depends(get_auth_service),
 ) -> MeResponse:
+    """Devuelve el perfil del usuario autenticado usando el claim sub del token."""
     username = claims.get("sub")
     if not username:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token payload")

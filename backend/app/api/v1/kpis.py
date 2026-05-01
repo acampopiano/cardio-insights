@@ -1,3 +1,5 @@
+"""Endpoint de consulta dinamica de series KPI con filtros y granularidad."""
+
 from fastapi import APIRouter, Depends
 
 from app.core.dependencies import get_kpi_service
@@ -14,4 +16,5 @@ def query_kpis(
     _: dict = Depends(get_current_claims),
     service: KpiService = Depends(get_kpi_service),
 ) -> KpiQueryResponse:
+    """Ejecuta la consulta de KPIs solicitada y devuelve series normalizadas."""
     return KpiQueryResponse(**service.query(payload.model_dump()))

@@ -1,3 +1,5 @@
+"""Endpoint de chequeo rapido de estado del servicio."""
+
 from fastapi import APIRouter
 
 from app.core.config import get_settings
@@ -8,6 +10,7 @@ router = APIRouter(prefix="/health", tags=["Health"])
 
 @router.get("", response_model=HealthResponse)
 def health_check() -> HealthResponse:
+    """Reporta estado, version y entorno para monitoreo basico."""
     settings = get_settings()
     return HealthResponse(
         status="ok",

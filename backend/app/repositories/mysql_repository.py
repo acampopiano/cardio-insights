@@ -9,7 +9,10 @@ from app.repositories.interfaces import AnalyticsRepository, AuthRepository
 
 
 class MySQLRepository(AuthRepository, AnalyticsRepository):
+    """Implementacion real de acceso a datos usando MySQL para auth y analitica."""
+
     def __init__(self) -> None:
+        """Construye configuracion de conexion y usuarios de fallback para desarrollo."""
         settings = get_settings()
         self._db_config = {
             "host": settings.mysql_host,
@@ -40,6 +43,7 @@ class MySQLRepository(AuthRepository, AnalyticsRepository):
         ]
 
     def _execute(self, query: str, params: tuple[Any, ...] = ()) -> list[dict[str, Any]]:
+        """Ejecuta query SQL y retorna filas como lista de diccionarios."""
         conn = pymysql.connect(**self._db_config)
         try:
             with conn.cursor() as cursor:
@@ -53,6 +57,7 @@ class MySQLRepository(AuthRepository, AnalyticsRepository):
 
     @staticmethod
     def _first_filter_value(filters: list[dict[str, Any]], keys: list[str]) -> str | None:
+        """Obtiene primer valor de filtro cuyo key coincida con alguna clave esperada."""
         key_set = {key.lower() for key in keys}
         for item in filters:
             filter_key = str(item.get("key") or "").lower()
@@ -66,12 +71,14 @@ class MySQLRepository(AuthRepository, AnalyticsRepository):
 
     @staticmethod
     def _valid_iso_date(value: str | None) -> bool:
+        """Valida formato de fecha simple YYYY-MM-DD para evitar filtros invalidos."""
         if value is None or len(value) != 10:
             return False
         yyyy, mm, dd = value[0:4], value[5:7], value[8:10]
         return value[4] == "-" and value[7] == "-" and yyyy.isdigit() and mm.isdigit() and dd.isdigit()
 
     def _date_clause(self, column_name: str, filters: list[dict[str, Any]]) -> str:
+        """Construye clausula AND de rango de fechas segura para la columna indicada."""
         date_from = self._first_filter_value(filters, ["date_from", "from", "start_date"])
         date_to = self._first_filter_value(filters, ["date_to", "to", "end_date"])
         clauses: list[str] = []
@@ -87,6 +94,7 @@ class MySQLRepository(AuthRepository, AnalyticsRepository):
 
     @staticmethod
     def _normalize_act_type(filters: list[dict[str, Any]]) -> str:
+        """Normaliza filtro act_type a valores soportados: all, surgery o ptca."""
         act_type = "all"
         for item in filters:
             if str(item.get("key") or "").lower() != "act_type":
@@ -100,6 +108,7 @@ class MySQLRepository(AuthRepository, AnalyticsRepository):
         return act_type
 
     def _period_expr(self, column_name: str, granularity: str) -> str:
+        """Devuelve expresion SQL de periodo segun granularidad day/week/month."""
         if granularity == "day":
             return f"DATE_FORMAT({column_name}, '%Y-%m-%d')"
         if granularity == "week":
@@ -107,6 +116,7 @@ class MySQLRepository(AuthRepository, AnalyticsRepository):
         return f"DATE_FORMAT({column_name}, '%Y-%m')"
 
     def _monthly_surgery_volume(self, limit: int = 12) -> list[dict[str, Any]]:
+        """Calcula volumen de cirugias mensual para cards y graficos de actividad."""
         rows = self._execute(
             f"""
             SELECT DATE_FORMAT(f.FechaRealizado, '%Y-%m') AS period,
@@ -123,6 +133,7 @@ class MySQLRepository(AuthRepository, AnalyticsRepository):
         return rows
 
     def _monthly_ptca_volume(self, limit: int = 12) -> list[dict[str, Any]]:
+        """Calcula volumen de PTCA mensual para comparativa de actividad."""
         rows = self._execute(
             f"""
             SELECT DATE_FORMAT(f.FechaRealizado, '%Y-%m') AS period,
@@ -139,6 +150,7 @@ class MySQLRepository(AuthRepository, AnalyticsRepository):
         return rows
 
     def _monthly_mortality_pct(self, limit: int = 12) -> list[dict[str, Any]]:
+        """Calcula porcentaje mensual de fallecidos al egreso."""
         rows = self._execute(
             f"""
             SELECT DATE_FORMAT(p.FechaEgreso, '%Y-%m') AS period,
@@ -158,6 +170,7 @@ class MySQLRepository(AuthRepository, AnalyticsRepository):
         return rows
 
     def _monthly_wait_days(self, limit: int = 12) -> list[dict[str, Any]]:
+        """Calcula espera promedio mensual entre coordinacion y acto realizado."""
         rows = self._execute(
             f"""
             SELECT DATE_FORMAT(f.FechaRealizado, '%Y-%m') AS period,
@@ -175,11 +188,13 @@ class MySQLRepository(AuthRepository, AnalyticsRepository):
         return rows
 
     def _latest_value(self, series: list[dict[str, Any]]) -> float:
+        """Obtiene el ultimo valor de una serie o 0.0 cuando esta vacia."""
         if not series:
             return 0.0
         return float(series[-1].get("value") or 0.0)
 
     def get_user_by_username(self, username: str) -> dict[str, Any] | None:
+        """Busca usuario en tablas INCC, mapea permisos y aplica fallback local si falta."""
         rows = self._execute(
             """
             SELECT u.k_id AS id,
@@ -235,6 +250,7 @@ class MySQLRepository(AuthRepository, AnalyticsRepository):
         return None
 
     def get_filters(self) -> dict[str, Any]:
+        """Retorna filtros funcionales que consume el frontend para consultas KPI."""
         return {
             "filters": [
                 {
@@ -279,6 +295,7 @@ class MySQLRepository(AuthRepository, AnalyticsRepository):
         }
 
     def get_kpis_catalog(self) -> dict[str, Any]:
+        """Retorna catalogo KPI soportado por la implementacion MySQL actual."""
         return {
             "kpis": [
                 {
@@ -315,6 +332,7 @@ class MySQLRepository(AuthRepository, AnalyticsRepository):
         }
 
     def get_dashboard_summary(self) -> dict[str, Any]:
+        """Arma cards de resumen combinando series mensuales y variaciones."""
         surgery_series = self._monthly_surgery_volume(limit=2)
         ptca_series = self._monthly_ptca_volume(limit=2)
         mortality_series = self._monthly_mortality_pct(limit=2)
@@ -332,6 +350,7 @@ class MySQLRepository(AuthRepository, AnalyticsRepository):
         icu_value = float((icu_rows[0].get("value") if icu_rows else 0) or 0)
 
         def delta(series: list[dict[str, Any]]) -> float | None:
+            """Calcula variacion porcentual entre los dos ultimos puntos de una serie."""
             if len(series) < 2:
                 return None
             prev = float(series[-2].get("value") or 0)
@@ -381,6 +400,7 @@ class MySQLRepository(AuthRepository, AnalyticsRepository):
         }
 
     def get_dashboard_charts(self) -> dict[str, Any]:
+        """Arma datasets de graficos mensuales para actividad y desenlaces."""
         surgery_series = self._monthly_surgery_volume(limit=12)
         ptca_series = self._monthly_ptca_volume(limit=12)
         mortality_series = self._monthly_mortality_pct(limit=12)
@@ -426,6 +446,7 @@ class MySQLRepository(AuthRepository, AnalyticsRepository):
         }
 
     def get_dashboard_table(self) -> dict[str, Any]:
+        """Construye tabla mensual consolidada con volumenes y promedios clinicos."""
         rows = self._execute(
             """
             SELECT DATE_FORMAT(f.FechaRealizado, '%Y-%m') AS period,
@@ -472,6 +493,7 @@ class MySQLRepository(AuthRepository, AnalyticsRepository):
         }
 
     def query_kpis(self, payload: dict[str, Any]) -> dict[str, Any]:
+        """Ejecuta consultas KPI dinamicas segun claves, filtros y granularidad solicitada."""
         kpi_keys = payload.get("kpi_keys", [])
         filters = payload.get("filters", [])
         granularity = str(payload.get("granularity") or "month").lower()

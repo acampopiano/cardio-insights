@@ -12,6 +12,7 @@ from app.services.kpi_service import KpiService
 
 @lru_cache
 def get_repository() -> AuthRepository | AnalyticsRepository:
+    """Selecciona repositorio activo segun configuracion: mysql o mock."""
     settings = get_settings()
     if settings.repository_backend.lower() == "mysql":
         return MySQLRepository()
@@ -19,20 +20,24 @@ def get_repository() -> AuthRepository | AnalyticsRepository:
 
 
 def get_auth_service() -> AuthService:
+    """Construye AuthService con el repositorio actualmente configurado."""
     repository = get_repository()
     return AuthService(auth_repository=repository)
 
 
 def get_catalog_service() -> CatalogService:
+    """Construye CatalogService para exponer filtros y catalogos de KPIs."""
     repository = get_repository()
     return CatalogService(analytics_repository=repository)
 
 
 def get_dashboard_service() -> DashboardService:
+    """Construye DashboardService para endpoints de summary/charts/table."""
     repository = get_repository()
     return DashboardService(analytics_repository=repository)
 
 
 def get_kpi_service() -> KpiService:
+    """Construye KpiService para consultas de series KPI."""
     repository = get_repository()
     return KpiService(analytics_repository=repository)

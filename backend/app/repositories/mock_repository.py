@@ -5,7 +5,10 @@ from app.repositories.interfaces import AnalyticsRepository, AuthRepository
 
 
 class MockRepository(AuthRepository, AnalyticsRepository):
+    """Implementacion en memoria para desarrollo local sin dependencia de base real."""
+
     def __init__(self) -> None:
+        """Inicializa usuarios y respuestas mock para endpoints de negocio."""
         self._users = [
             {
                 "id": 1,
@@ -26,12 +29,14 @@ class MockRepository(AuthRepository, AnalyticsRepository):
         ]
 
     def get_user_by_username(self, username: str) -> dict[str, Any] | None:
+        """Busca usuario mock por username para pruebas de autenticacion."""
         for user in self._users:
             if user["username"] == username:
                 return user
         return None
 
     def get_filters(self) -> dict[str, Any]:
+        """Devuelve filtros mock usados por la UI cuando se trabaja offline."""
         return {
             "filters": [
                 {
@@ -65,6 +70,7 @@ class MockRepository(AuthRepository, AnalyticsRepository):
         }
 
     def get_kpis_catalog(self) -> dict[str, Any]:
+        """Devuelve definiciones KPI mock para poblar selector de metricas."""
         return {
             "kpis": [
                 {
@@ -95,6 +101,7 @@ class MockRepository(AuthRepository, AnalyticsRepository):
         }
 
     def get_dashboard_summary(self) -> dict[str, Any]:
+        """Devuelve cards mock para renderizar resumen del dashboard."""
         return {
             "cards": [
                 {
@@ -129,6 +136,7 @@ class MockRepository(AuthRepository, AnalyticsRepository):
         }
 
     def get_dashboard_charts(self) -> dict[str, Any]:
+        """Devuelve series mock para graficos de dashboard."""
         return {
             "charts": [
                 {
@@ -169,6 +177,7 @@ class MockRepository(AuthRepository, AnalyticsRepository):
         }
 
     def get_dashboard_table(self) -> dict[str, Any]:
+        """Devuelve tabla mock para escenarios de desarrollo sin MySQL."""
         rows = [
             {
                 "values": {
@@ -207,6 +216,7 @@ class MockRepository(AuthRepository, AnalyticsRepository):
         }
 
     def query_kpis(self, payload: dict[str, Any]) -> dict[str, Any]:
+        """Genera series mock para las claves KPI solicitadas en el payload."""
         kpi_keys = payload.get("kpi_keys", [])
         base_series = {
             "mortality_30d": [2.4, 2.3, 2.2, 2.1, 2.0],

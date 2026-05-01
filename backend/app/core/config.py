@@ -5,6 +5,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
+    """Configuracion central de la app cargada desde variables de entorno."""
+
     app_name: str = "Cardio Insights API"
     app_version: str = "0.1.0"
     api_v1_prefix: str = "/api/v1"
@@ -33,4 +35,5 @@ class Settings(BaseSettings):
 
 @lru_cache
 def get_settings() -> Settings:
+    """Construye y cachea Settings para reutilizar la misma config en toda la app."""
     return Settings()

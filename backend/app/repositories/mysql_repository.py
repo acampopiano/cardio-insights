@@ -4,6 +4,7 @@ import pymysql
 from pymysql.cursors import DictCursor
 
 from app.core.config import get_settings
+from app.core.kpi_registry import DynamicKpi, kpi_registry
 from app.core.security import get_password_hash
 from app.repositories.interfaces import AnalyticsRepository, AuthRepository
 
@@ -38,6 +39,83 @@ class MySQLRepository(AuthRepository, AnalyticsRepository):
                 "hashed_password": get_password_hash("Admin1234!"),
             },
         ]
+        self._ensure_dynamic_kpi_table()
+
+    def _ensure_dynamic_kpi_table(self) -> None:
+        """Crea tabla de KPIs dinamicos si no existe para persistencia runtime."""
+        try:
+            self._execute(
+                """
+                CREATE TABLE IF NOT EXISTS cardio_dynamic_kpis (
+                    kpi_key VARCHAR(120) PRIMARY KEY,
+                    label VARCHAR(255) NOT NULL,
+                    description TEXT NOT NULL,
+                    sql_query_template LONGTEXT NOT NULL,
+                    default_granularity VARCHAR(16) NOT NULL DEFAULT 'month',
+                    is_active TINYINT(1) NOT NULL DEFAULT 1,
+                    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+                )
+                """
+            )
+        except Exception:
+            # Si el usuario no tiene permisos DDL, mantenemos funcionamiento en memoria.
+            return
+
+    def upsert_dynamic_kpi(self, item: DynamicKpi) -> None:
+        """Inserta o actualiza un KPI dinamico en la tabla de persistencia."""
+        self._execute(
+            """
+            INSERT INTO cardio_dynamic_kpis
+                (kpi_key, label, description, sql_query_template, default_granularity, is_active)
+            VALUES
+                (%s, %s, %s, %s, %s, 1)
+            ON DUPLICATE KEY UPDATE
+                label = VALUES(label),
+                description = VALUES(description),
+                sql_query_template = VALUES(sql_query_template),
+                default_granularity = VALUES(default_granularity),
+                is_active = 1
+            """,
+            (
+                item.key,
+                item.label,
+                item.description,
+                item.sql_query_template,
+                item.default_granularity,
+            ),
+        )
+
+    def _dynamic_kpis_by_key(self) -> dict[str, DynamicKpi]:
+        """Retorna KPIs dinamicos activos combinando BD (persistente) y memoria (runtime)."""
+        result: dict[str, DynamicKpi] = {}
+
+        try:
+            rows = self._execute(
+                """
+                SELECT kpi_key, label, description, sql_query_template, default_granularity
+                FROM cardio_dynamic_kpis
+                WHERE is_active = 1
+                """
+            )
+            for row in rows:
+                key = str(row.get("kpi_key") or "").strip()
+                if not key:
+                    continue
+                result[key] = DynamicKpi(
+                    key=key,
+                    label=str(row.get("label") or key),
+                    description=str(row.get("description") or ""),
+                    sql_query_template=str(row.get("sql_query_template") or ""),
+                    default_granularity=str(row.get("default_granularity") or "month"),
+                )
+        except Exception:
+            pass
+
+        for item in kpi_registry.list_all():
+            result[item.key] = item
+
+        return result
 
     def _execute(self, query: str, params: tuple[Any, ...] = ()) -> list[dict[str, Any]]:
         conn = pymysql.connect(**self._db_config)
@@ -105,6 +183,23 @@ class MySQLRepository(AuthRepository, AnalyticsRepository):
         if granularity == "week":
             return f"DATE_FORMAT({column_name}, '%x-W%v')"
         return f"DATE_FORMAT({column_name}, '%Y-%m')"
+
+    @staticmethod
+    def _infer_dynamic_date_column(sql_template: str) -> str:
+        """Infiere columna de fecha para placeholders dinamicos segun alias detectados en SQL."""
+        sql_lower = sql_template.lower()
+        candidates = [
+            ("p.fechaegreso", "p.FechaEgreso"),
+            ("p.fecharealizado", "p.FechaRealizado"),
+            ("f.fechaegreso", "f.FechaEgreso"),
+            ("f.fecharealizado", "f.FechaRealizado"),
+            ("fechaegreso", "p.FechaEgreso"),
+            ("fecharealizado", "f.FechaRealizado"),
+        ]
+        for needle, resolved in candidates:
+            if needle in sql_lower:
+                return resolved
+        return "f.FechaRealizado"
 
     def _monthly_surgery_volume(self, limit: int = 12) -> list[dict[str, Any]]:
         rows = self._execute(
@@ -279,8 +374,7 @@ class MySQLRepository(AuthRepository, AnalyticsRepository):
         }
 
     def get_kpis_catalog(self) -> dict[str, Any]:
-        return {
-            "kpis": [
+        kpis = [
                 {
                     "key": "surgery_volume",
                     "label": "Volumen de cirugias",
@@ -311,8 +405,27 @@ class MySQLRepository(AuthRepository, AnalyticsRepository):
                     "unit": "dias",
                     "description": "Promedio de estadia UCI en cirugia con datos validos",
                 },
+                {
+                    "key": "ptca_share_pct",
+                    "label": "Participacion PTCA",
+                    "unit": "%",
+                    "description": "Porcentaje de PTCA sobre el total de actividad (PTCA + cirugias)",
+                },
             ]
-        }
+
+        for dynamic_kpi in self._dynamic_kpis_by_key().values():
+            if any(item.get("key") == dynamic_kpi.key for item in kpis):
+                continue
+            kpis.append(
+                {
+                    "key": dynamic_kpi.key,
+                    "label": dynamic_kpi.label,
+                    "unit": "valor",
+                    "description": dynamic_kpi.description,
+                }
+            )
+
+        return {"kpis": kpis}
 
     def get_dashboard_summary(self) -> dict[str, Any]:
         surgery_series = self._monthly_surgery_volume(limit=2)
@@ -471,6 +584,152 @@ class MySQLRepository(AuthRepository, AnalyticsRepository):
             "total": len(rows),
         }
 
+    def query_analytics(self, payload: dict[str, Any]) -> dict[str, Any]:
+        widget_type = str(payload.get("widget_type") or "table").lower()
+        filters = payload.get("filters", [])
+        granularity = str(payload.get("granularity") or "month").lower()
+        if granularity not in {"day", "week", "month"}:
+            granularity = "month"
+        limit = int(payload.get("limit") or 10)
+        if limit < 1:
+            limit = 1
+        if limit > 100:
+            limit = 100
+
+        if widget_type == "ranking":
+            metric_key = str(payload.get("metric_key") or "surgery_volume").lower()
+            if metric_key == "ptca_volume":
+                date_expr = self._period_expr("f.FechaRealizado", granularity)
+                date_filter = self._date_clause("f.FechaRealizado", filters)
+                rows = self._execute(
+                    f"""
+                    SELECT {date_expr} AS label,
+                           COUNT(*) AS value
+                    FROM call_ptcamaster c
+                    JOIN flow_coordina f ON f.Cod = c.CodCoordina
+                    WHERE f.FechaRealizado > '1900-01-01'{date_filter}
+                    GROUP BY {date_expr}
+                    ORDER BY value DESC
+                    LIMIT {limit}
+                    """
+                )
+            elif metric_key == "mortality_egreso_pct":
+                date_expr = self._period_expr("p.FechaEgreso", granularity)
+                date_filter = self._date_clause("p.FechaEgreso", filters)
+                rows = self._execute(
+                    f"""
+                    SELECT {date_expr} AS label,
+                           ROUND(
+                                100.0 * SUM(CASE WHEN p.FechaFallece > '1900-01-01' THEN 1 ELSE 0 END)
+                                / NULLIF(COUNT(*), 0),
+                                2
+                           ) AS value
+                    FROM flow_procedimientocardiologia p
+                    WHERE p.FechaEgreso > '1900-01-01'{date_filter}
+                    GROUP BY {date_expr}
+                    ORDER BY value DESC
+                    LIMIT {limit}
+                    """
+                )
+            else:
+                metric_key = "surgery_volume"
+                date_expr = self._period_expr("f.FechaRealizado", granularity)
+                date_filter = self._date_clause("f.FechaRealizado", filters)
+                rows = self._execute(
+                    f"""
+                    SELECT {date_expr} AS label,
+                           COUNT(*) AS value
+                    FROM dat_cirugia d
+                    JOIN flow_coordina f ON f.Cod = d.CodCoordina
+                    WHERE f.FechaRealizado > '1900-01-01'{date_filter}
+                    GROUP BY {date_expr}
+                    ORDER BY value DESC
+                    LIMIT {limit}
+                    """
+                )
+
+            formatted_rows = [
+                {
+                    "rank": idx,
+                    "label": str(row.get("label") or "-"),
+                    "value": float(row.get("value") or 0),
+                }
+                for idx, row in enumerate(rows, start=1)
+            ]
+            return {
+                "widget_type": "ranking",
+                "title": "Ranking por periodo",
+                "columns": [
+                    {"key": "rank", "label": "Posicion"},
+                    {"key": "label", "label": "Periodo"},
+                    {"key": "value", "label": "Valor"},
+                ],
+                "rows": formatted_rows,
+                "meta": {
+                    "metric_key": metric_key,
+                    "granularity": granularity,
+                    "limit": limit,
+                },
+            }
+
+        date_expr = self._period_expr("f.FechaRealizado", granularity)
+        date_filter = self._date_clause("f.FechaRealizado", filters)
+        rows = self._execute(
+            f"""
+            SELECT {date_expr} AS period,
+                   COUNT(DISTINCT d.k_id) AS surgeries,
+                   COUNT(DISTINCT c.Cod) AS ptca,
+                   ROUND(AVG(CASE WHEN d.POestadiaUCI >= 0 THEN d.POestadiaUCI END), 2) AS icu_los_avg,
+                   ROUND(AVG(CASE
+                       WHEN f.FechaCoordina > '1900-01-01'
+                        AND DATEDIFF(f.FechaRealizado, f.FechaCoordina) >= 0
+                       THEN DATEDIFF(f.FechaRealizado, f.FechaCoordina)
+                   END), 2) AS avg_wait_days,
+                    ROUND(
+                        100.0 * COUNT(DISTINCT c.Cod)
+                        / NULLIF(COUNT(DISTINCT d.k_id) + COUNT(DISTINCT c.Cod), 0),
+                        2
+                    ) AS ptca_share_pct
+            FROM flow_coordina f
+            LEFT JOIN dat_cirugia d ON d.CodCoordina = f.Cod
+            LEFT JOIN call_ptcamaster c ON c.CodCoordina = f.Cod
+            WHERE f.FechaRealizado > '1900-01-01'{date_filter}
+            GROUP BY {date_expr}
+            ORDER BY period DESC
+            LIMIT {limit}
+            """
+        )
+
+        rows.reverse()
+        formatted_rows = [
+            {
+                "period": str(row.get("period") or "-"),
+                "surgeries": int(row.get("surgeries") or 0),
+                "ptca": int(row.get("ptca") or 0),
+                "icu_los_avg": float(row.get("icu_los_avg") or 0),
+                "avg_wait_days": float(row.get("avg_wait_days") or 0),
+                "ptca_share_pct": float(row.get("ptca_share_pct") or 0),
+            }
+            for row in rows
+        ]
+        return {
+            "widget_type": "table",
+            "title": "Tabla enriquecida por periodo",
+            "columns": [
+                {"key": "period", "label": "Periodo"},
+                {"key": "surgeries", "label": "Cirugias"},
+                {"key": "ptca", "label": "PTCA"},
+                {"key": "icu_los_avg", "label": "UCI prom. (dias)"},
+                {"key": "avg_wait_days", "label": "Espera prom. (dias)"},
+                {"key": "ptca_share_pct", "label": "Participacion PTCA (%)"},
+            ],
+            "rows": formatted_rows,
+            "meta": {
+                "granularity": granularity,
+                "limit": limit,
+            },
+        }
+
     def query_kpis(self, payload: dict[str, Any]) -> dict[str, Any]:
         kpi_keys = payload.get("kpi_keys", [])
         filters = payload.get("filters", [])
@@ -489,12 +748,38 @@ class MySQLRepository(AuthRepository, AnalyticsRepository):
             "mortality_egreso_pct": "mortality_egreso_pct",
             "icu_los_avg": "icu_los_avg",
             "mortality_30d": "mortality_30d",
-            "readmission_30d": "readmission_30d",
+            "readmission_30d": "readmission_30d", 
+            "ptca_share_pct": "ptca_share_pct",
         }
+
+        dynamic_kpis = self._dynamic_kpis_by_key()
 
         series: list[dict[str, Any]] = []
         for requested_key in kpi_keys:
             normalized_key = alias_map.get(requested_key, requested_key)
+            dynamic_kpi = dynamic_kpis.get(normalized_key)
+            if dynamic_kpi is not None:
+                dynamic_sql = dynamic_kpi.sql_query_template
+                if "{period_expr}" in dynamic_sql or "{date_clause}" in dynamic_sql:
+                    date_column_dynamic = self._infer_dynamic_date_column(dynamic_sql)
+                    period_expr_dynamic = self._period_expr(date_column_dynamic, granularity)
+                    date_clause_dynamic = self._date_clause(date_column_dynamic, filters)
+                    dynamic_sql = (
+                        dynamic_sql
+                        .replace("{period_expr}", period_expr_dynamic)
+                        .replace("{date_clause}", date_clause_dynamic)
+                    )
+                rows = self._execute(dynamic_sql)
+                points = [
+                    {
+                        "period": str(row["period"]),
+                        "value": float(row["value"] or 0),
+                    }
+                    for row in rows
+                ]
+                series.append({"kpi_key": requested_key, "points": points})
+                continue
+
             if normalized_key == "readmission_30d":
                 series.append({"kpi_key": requested_key, "points": []})
                 continue
@@ -567,6 +852,22 @@ class MySQLRepository(AuthRepository, AnalyticsRepository):
                     JOIN flow_coordina f ON f.Cod = d.CodCoordina
                     WHERE f.FechaRealizado > '1900-01-01'
                       AND d.POestadiaUCI >= 0{extra_where}
+                    GROUP BY {period_realizado}
+                    ORDER BY period
+                """
+            elif normalized_key == "ptca_share_pct":
+                extra_where = self._date_clause("f.FechaRealizado", filters)
+                query = f"""
+                    SELECT {period_realizado} AS period,
+                           ROUND(
+                                100.0 * COUNT(DISTINCT c.Cod)
+                                / NULLIF(COUNT(DISTINCT d.k_id) + COUNT(DISTINCT c.Cod), 0),
+                                2
+                           ) AS value
+                    FROM flow_coordina f
+                    LEFT JOIN dat_cirugia d ON d.CodCoordina = f.Cod
+                    LEFT JOIN call_ptcamaster c ON c.CodCoordina = f.Cod
+                    WHERE f.FechaRealizado > '1900-01-01'{extra_where}
                     GROUP BY {period_realizado}
                     ORDER BY period
                 """

@@ -64,6 +64,7 @@ backend/
 - GET /api/v1/dashboard/charts
 - GET /api/v1/dashboard/table
 - POST /api/v1/kpis/query
+- POST /api/v1/analytics/query
 
 Todos salvo health requieren Authorization: Bearer <token>.
 
@@ -121,6 +122,33 @@ Autenticacion en modo mysql:
 - Se intenta login contra `use_usuarios` (Alias + Clave/MD5text) y permisos desde `use_permiso`.
 - Si el usuario no existe en BD, queda fallback a usuarios de desarrollo (`clinician`, `admin`) para no frenar el MVP.
 - Recomendado: crear usuario tecnico de pruebas en `use_usuarios` y usarlo para integracion.
+
+## KPI Designer (interfaz no-code para equipo funcional)
+
+Si la persona que define KPIs no programa en Python, puede usar un formulario simple que genera snippets de codigo listos para pegar.
+
+1. Inicia sesion normalmente para obtener un token JWT.
+2. Abre en navegador: `http://localhost:8000/api/v1/kpi-designer/ui`
+3. Pega el token cuando lo pida la pantalla.
+4. Completa solo estos 4 campos:
+
+- nombre del KPI
+- descripcion
+- granularidad (`day`, `week`, `month`)
+- SQL asociada (debe devolver `period` y `value`)
+
+5. Presiona "Generar snippets".
+6. Copia `registration_payload` de la respuesta.
+7. En Swagger, pega ese JSON en `POST /api/v1/kpi-designer/register`.
+8. Usa `query_payload_example` para consultar en `POST /api/v1/kpis/query`.
+
+La salida incluye:
+
+- `registration_payload` (para registrar KPI sin tocar codigo)
+- `query_payload_example` (para probar el KPI en query)
+- snippets de apoyo para equipo tecnico (opcionales)
+
+Nota: si `REPOSITORY_BACKEND=mysql`, el endpoint `/kpi-designer/register` persiste el KPI en MySQL y sobrevive reinicios. En modo mock, queda en memoria.
 
 ## Credenciales mock
 
@@ -240,6 +268,47 @@ Response 200:
       "points": [{ "period": "2025-11", "value": 180.0 }]
     }
   ]
+}
+```
+
+### Analytics Query (table/ranking)
+
+Request:
+
+```http
+POST /api/v1/analytics/query
+Authorization: Bearer <jwt>
+Content-Type: application/json
+
+{
+  "widget_type": "ranking",
+  "metric_key": "surgery_volume",
+  "granularity": "month",
+  "limit": 5,
+  "filters": [
+    { "key": "date_from", "values": ["2026-01-01"] },
+    { "key": "date_to", "values": ["2026-03-31"] }
+  ]
+}
+```
+
+Response 200:
+
+```json
+{
+  "widget_type": "ranking",
+  "title": "Ranking por periodo",
+  "columns": [
+    { "key": "rank", "label": "Posicion" },
+    { "key": "label", "label": "Periodo" },
+    { "key": "value", "label": "Valor" }
+  ],
+  "rows": [{ "rank": 1, "label": "2026-03", "value": 214 }],
+  "meta": {
+    "metric_key": "surgery_volume",
+    "granularity": "month",
+    "limit": 5
+  }
 }
 ```
 

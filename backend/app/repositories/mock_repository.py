@@ -91,6 +91,24 @@ class MockRepository(AuthRepository, AnalyticsRepository):
                     "unit": "casos",
                     "description": "Total de cirugias realizadas en el periodo",
                 },
+                {
+                    "key": "ptca_volume",
+                    "label": "Volumen de PTCA",
+                    "unit": "casos",
+                    "description": "Total de angioplastias realizadas en el periodo",
+                },
+                {
+                    "key": "mortality_egreso_pct",
+                    "label": "Mortalidad al egreso",
+                    "unit": "%",
+                    "description": "Porcentaje de pacientes fallecidos al egreso hospitalario",
+                },
+                {
+                    "key": "ptca_share_pct",
+                    "label": "Participacion PTCA",
+                    "unit": "%",
+                    "description": "Porcentaje de PTCA sobre el total de actividad (PTCA + cirugias)",
+                },
             ]
         }
 
@@ -213,6 +231,7 @@ class MockRepository(AuthRepository, AnalyticsRepository):
             "icu_los_avg": [4.1, 4.0, 3.9, 3.8, 3.8],
             "readmission_30d": [6.1, 6.0, 5.9, 5.8, 5.7],
             "surgery_volume": [180, 192, 201, 208, 214],
+            "ptca_share_pct": [31.2, 30.8, 29.9, 30.5, 31.0],
         }
         periods = ["2025-11", "2025-12", "2026-01", "2026-02", "2026-03"]
 
@@ -225,3 +244,49 @@ class MockRepository(AuthRepository, AnalyticsRepository):
             series.append({"kpi_key": key, "points": points})
 
         return {"series": series}
+
+    def query_analytics(self, payload: dict[str, Any]) -> dict[str, Any]:
+        widget_type = str(payload.get("widget_type") or "table").lower()
+        limit = int(payload.get("limit") or 10)
+        if limit < 1:
+            limit = 1
+        if limit > 100:
+            limit = 100
+
+        if widget_type == "ranking":
+            rows = [
+                {"rank": 1, "label": "CABG", "value": 96},
+                {"rank": 2, "label": "VALVE", "value": 72},
+                {"rank": 3, "label": "CONGENITAL", "value": 46},
+                {"rank": 4, "label": "AORTA", "value": 31},
+            ]
+            return {
+                "widget_type": "ranking",
+                "title": "Ranking mock por tipo de cirugia",
+                "columns": [
+                    {"key": "rank", "label": "Posicion"},
+                    {"key": "label", "label": "Dimension"},
+                    {"key": "value", "label": "Valor"},
+                ],
+                "rows": rows[:limit],
+                "meta": {"metric_key": str(payload.get("metric_key") or "surgery_volume")},
+            }
+
+        rows = [
+            {"period": "2026-01", "surgeries": 201, "ptca": 88, "mortality_pct": 2.2, "avg_wait_days": 4.5},
+            {"period": "2026-02", "surgeries": 208, "ptca": 92, "mortality_pct": 2.1, "avg_wait_days": 4.3},
+            {"period": "2026-03", "surgeries": 214, "ptca": 97, "mortality_pct": 2.0, "avg_wait_days": 4.1},
+        ]
+        return {
+            "widget_type": "table",
+            "title": "Tabla enriquecida mensual (mock)",
+            "columns": [
+                {"key": "period", "label": "Periodo"},
+                {"key": "surgeries", "label": "Cirugias"},
+                {"key": "ptca", "label": "PTCA"},
+                {"key": "mortality_pct", "label": "Mortalidad egreso (%)"},
+                {"key": "avg_wait_days", "label": "Espera promedio (dias)"},
+            ],
+            "rows": rows[:limit],
+            "meta": {"granularity": str(payload.get("granularity") or "month")},
+        }

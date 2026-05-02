@@ -32,3 +32,7 @@ class AnalyticsRepository(ABC):
     @abstractmethod
     def query_kpis(self, payload: dict[str, Any]) -> dict[str, Any]:
         raise NotImplementedError
+
+    @abstractmethod
+    def query_analytics(self, payload: dict[str, Any]) -> dict[str, Any]:
+        raise NotImplementedError

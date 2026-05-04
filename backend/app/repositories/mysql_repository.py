@@ -184,6 +184,40 @@ class MySQLRepository(AuthRepository, AnalyticsRepository):
             return f"DATE_FORMAT({column_name}, '%x-W%v')"
         return f"DATE_FORMAT({column_name}, '%Y-%m')"
 
+    def _cube_dimension_expr(self, dimension: str, date_column: str, granularity: str) -> str:
+        normalized = dimension.lower()
+        if normalized == "year":
+            return f"DATE_FORMAT({date_column}, '%Y')"
+        if normalized == "quarter":
+            return f"CONCAT('T', QUARTER({date_column}))"
+        if normalized == "month":
+            return f"DATE_FORMAT({date_column}, '%m')"
+        if normalized == "granularity":
+            return f"'{granularity}'"
+        return self._period_expr(date_column, granularity)
+
+    @staticmethod
+    def _cube_period_dimension_expr(period_column: str, dimension: str, granularity: str) -> str:
+        """Dimension expression when source rows already expose a `period` string."""
+        normalized = dimension.lower()
+        if normalized == "period":
+            return period_column
+        if normalized == "year":
+            return f"SUBSTRING({period_column}, 1, 4)"
+        if normalized == "quarter":
+            if granularity == "week":
+                return (
+                    f"CONCAT('T', CEIL(CAST(SUBSTRING_INDEX({period_column}, 'W', -1) AS UNSIGNED) / 13))"
+                )
+            return f"CONCAT('T', CEIL(CAST(SUBSTRING({period_column}, 6, 2) AS UNSIGNED) / 3))"
+        if normalized == "month":
+            if granularity == "week":
+                return "'-'"
+            return f"SUBSTRING({period_column}, 6, 2)"
+        if normalized == "granularity":
+            return f"'{granularity}'"
+        return period_column
+
     @staticmethod
     def _infer_dynamic_date_column(sql_template: str) -> str:
         """Infiere columna de fecha para placeholders dinamicos segun alias detectados en SQL."""
@@ -595,6 +629,132 @@ class MySQLRepository(AuthRepository, AnalyticsRepository):
             limit = 1
         if limit > 100:
             limit = 100
+
+        if widget_type == "cube":
+            metric_key = str(payload.get("metric_key") or "surgery_volume").lower()
+            row_dimension = str(payload.get("row_dimension") or "period").lower()
+            column_dimension = str(payload.get("column_dimension") or "quarter").lower()
+            aggregation = str(payload.get("aggregation") or "sum").lower()
+            if aggregation not in {"sum", "avg", "min", "max"}:
+                aggregation = "sum"
+            dynamic_kpi = self._dynamic_kpis_by_key().get(metric_key)
+
+            if metric_key == "mortality_egreso_pct":
+                date_column = "p.FechaEgreso"
+                row_expr = self._cube_dimension_expr(row_dimension, date_column, granularity)
+                col_expr = self._cube_dimension_expr(column_dimension, date_column, granularity)
+                date_filter = self._date_clause(date_column, filters)
+                rows = self._execute(
+                    f"""
+                    SELECT {row_expr} AS row_key,
+                           {col_expr} AS column_key,
+                           ROUND(
+                                100.0 * SUM(CASE WHEN p.FechaFallece > '1900-01-01' THEN 1 ELSE 0 END)
+                                / NULLIF(COUNT(*), 0),
+                                2
+                           ) AS value
+                    FROM flow_procedimientocardiologia p
+                    WHERE p.FechaEgreso > '1900-01-01'{date_filter}
+                    GROUP BY {row_expr}, {col_expr}
+                    ORDER BY row_key, column_key
+                    LIMIT {limit}
+                    """
+                )
+            elif dynamic_kpi is not None:
+                dynamic_sql = dynamic_kpi.sql_query_template.strip().rstrip(";")
+                if "{period_expr}" in dynamic_sql or "{date_clause}" in dynamic_sql:
+                    date_column_dynamic = self._infer_dynamic_date_column(dynamic_sql)
+                    period_expr_dynamic = self._period_expr(date_column_dynamic, granularity)
+                    date_clause_dynamic = self._date_clause(date_column_dynamic, filters)
+                    dynamic_sql = (
+                        dynamic_sql
+                        .replace("{period_expr}", period_expr_dynamic)
+                        .replace("{date_clause}", date_clause_dynamic)
+                    )
+
+                row_expr = self._cube_period_dimension_expr("src.period", row_dimension, granularity)
+                col_expr = self._cube_period_dimension_expr("src.period", column_dimension, granularity)
+                aggregate_fn = aggregation.upper()
+                value_expr = f"ROUND({aggregate_fn}(src.value), 2)"
+
+                rows = self._execute(
+                    f"""
+                    SELECT {row_expr} AS row_key,
+                           {col_expr} AS column_key,
+                           {value_expr} AS value
+                    FROM ({dynamic_sql}) src
+                    GROUP BY {row_expr}, {col_expr}
+                    ORDER BY row_key, column_key
+                    LIMIT {limit}
+                    """
+                )
+            else:
+                date_column = "f.FechaRealizado"
+                row_expr = self._cube_dimension_expr(row_dimension, date_column, granularity)
+                col_expr = self._cube_dimension_expr(column_dimension, date_column, granularity)
+                date_filter = self._date_clause(date_column, filters)
+
+                metric_expr_map = {
+                    "surgery_volume": "COUNT(DISTINCT d.k_id)",
+                    "ptca_volume": "COUNT(DISTINCT c.Cod)",
+                    "avg_wait_days": "CASE WHEN f.FechaCoordina > '1900-01-01' AND DATEDIFF(f.FechaRealizado, f.FechaCoordina) >= 0 THEN DATEDIFF(f.FechaRealizado, f.FechaCoordina) END",
+                    "ptca_share_pct": "100.0 * COUNT(DISTINCT c.Cod) / NULLIF(COUNT(DISTINCT d.k_id) + COUNT(DISTINCT c.Cod), 0)",
+                }
+                if metric_key not in metric_expr_map:
+                    metric_key = "surgery_volume"
+                metric_expr = metric_expr_map[metric_key]
+
+                aggregate_fn = aggregation.upper()
+                if metric_key in {"surgery_volume", "ptca_volume", "ptca_share_pct"}:
+                    aggregate_fn = ""
+
+                if aggregate_fn:
+                    value_expr = f"ROUND({aggregate_fn}({metric_expr}), 2)"
+                else:
+                    value_expr = f"ROUND({metric_expr}, 2)"
+
+                rows = self._execute(
+                    f"""
+                    SELECT {row_expr} AS row_key,
+                           {col_expr} AS column_key,
+                           {value_expr} AS value
+                    FROM flow_coordina f
+                    LEFT JOIN dat_cirugia d ON d.CodCoordina = f.Cod
+                    LEFT JOIN call_ptcamaster c ON c.CodCoordina = f.Cod
+                    WHERE f.FechaRealizado > '1900-01-01'{date_filter}
+                    GROUP BY {row_expr}, {col_expr}
+                    ORDER BY row_key, column_key
+                    LIMIT {limit}
+                    """
+                )
+
+            formatted_rows = [
+                {
+                    "row_key": str(row.get("row_key") or "-"),
+                    "column_key": str(row.get("column_key") or "-"),
+                    "value": float(row.get("value") or 0),
+                }
+                for row in rows
+            ]
+            return {
+                "widget_type": "cube",
+                "title": "Cubo analitico por dimensiones",
+                "columns": [
+                    {"key": "row_key", "label": row_dimension},
+                    {"key": "column_key", "label": column_dimension},
+                    {"key": "value", "label": metric_key},
+                ],
+                "rows": formatted_rows,
+                "meta": {
+                    "granularity": granularity,
+                    "limit": limit,
+                    "metric_key": metric_key,
+                    "row_dimension": row_dimension,
+                    "column_dimension": column_dimension,
+                    "aggregation": aggregation,
+                    "query_preview": f"SELECT {row_dimension}, {column_dimension}, {aggregation.upper()}({metric_key}) AS value FROM source GROUP BY {row_dimension}, {column_dimension}",
+                },
+            }
 
         if widget_type == "ranking":
             metric_key = str(payload.get("metric_key") or "surgery_volume").lower()

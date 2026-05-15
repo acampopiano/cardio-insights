@@ -75,3 +75,99 @@ def test_analytics_query_ranking() -> None:
     data = response.json()
     assert data["widget_type"] == "ranking"
     assert len(data["rows"]) <= 3
+
+
+def test_analytics_query_cube() -> None:
+    token = _get_token()
+    response = client.post(
+        "/api/v1/analytics/query",
+        json={
+            "widget_type": "cube",
+            "metric_key": "surgery_volume",
+            "granularity": "month",
+            "row_dimension": "period",
+            "column_dimension": "quarter",
+            "aggregation": "sum",
+            "limit": 20,
+        },
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["widget_type"] == "cube"
+    assert "rows" in data
+    assert "meta" in data
+
+
+def test_analytics_query_cube_avg_wait_days() -> None:
+    token = _get_token()
+    response = client.post(
+        "/api/v1/analytics/query",
+        json={
+            "widget_type": "cube",
+            "metric_key": "avg_wait_days",
+            "granularity": "month",
+            "row_dimension": "period",
+            "column_dimension": "quarter",
+            "aggregation": "avg",
+            "limit": 20,
+        },
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["widget_type"] == "cube"
+    assert data["meta"]["metric_key"] == "avg_wait_days"
+
+
+def test_kpi_designer_create_one_click() -> None:
+    token = _get_token()
+    response = client.post(
+        "/api/v1/kpi-designer/create",
+        json={
+            "kpi_name": "KPI prueba one click",
+            "description": "KPI de prueba para flujo generar-validar-registrar",
+            "granularity": "month",
+            "sql_query": (
+                "SELECT {period_expr} AS period, COUNT(*) AS value "
+                "FROM flow_coordina f "
+                "WHERE f.Realizado = 255 {date_clause} "
+                "GROUP BY {period_expr} ORDER BY period"
+            ),
+        },
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["success"] is True
+    assert data["generated_kpi_key"] == "kpi_prueba_one_click"
+
+
+def test_natural_query_trend() -> None:
+    token = _get_token()
+    response = client.post(
+        "/api/v1/natural-query/run",
+        json={"question": "Como viene la espera promedio en 2026?"},
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["success"] is True
+    assert data["intent"] == "trend"
+    assert data["endpoint_used"] == "/api/v1/kpis/query"
+    assert "result" in data
+
+
+def test_natural_query_ranking() -> None:
+    token = _get_token()
+    response = client.post(
+        "/api/v1/natural-query/run",
+        json={"question": "Top centros que mas envian pacientes este ano"},
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["success"] is True
+    assert data["intent"] == "ranking"
+    assert data["endpoint_used"] == "/api/v1/analytics/query"
+    assert "result" in data

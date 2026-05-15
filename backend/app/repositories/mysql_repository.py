@@ -86,6 +86,17 @@ class MySQLRepository(AuthRepository, AnalyticsRepository):
             ),
         )
 
+    def deactivate_dynamic_kpi(self, key: str) -> None:
+        """Marca un KPI dinamico como inactivo para rollback/depuracion."""
+        self._execute(
+            """
+            UPDATE cardio_dynamic_kpis
+            SET is_active = 0
+            WHERE kpi_key = %s
+            """,
+            (key,),
+        )
+
     def _dynamic_kpis_by_key(self) -> dict[str, DynamicKpi]:
         """Retorna KPIs dinamicos activos combinando BD (persistente) y memoria (runtime)."""
         result: dict[str, DynamicKpi] = {}

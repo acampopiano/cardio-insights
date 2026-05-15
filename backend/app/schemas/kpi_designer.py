@@ -77,3 +77,14 @@ class KpiRegisterRequest(BaseModel):
     description: str = Field(min_length=5)
     sql_query_template: str = Field(min_length=20)
     default_granularity: str = Field(default="month", examples=["day", "week", "month"])
+
+
+class KpiCreateResponse(BaseModel):
+    success: bool
+    message: str
+    persisted_in_db: bool
+    generated_kpi_key: str
+    registration_payload: dict[str, str]
+    query_payload_example: dict[str, object]
+    validation: dict[str, object]
+    query_result_preview: dict[str, object]

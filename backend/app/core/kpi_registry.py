@@ -26,6 +26,10 @@ class KpiRegistry:
         with self._lock:
             return self._items.get(key)
 
+    def remove(self, key: str) -> None:
+        with self._lock:
+            self._items.pop(key, None)
+
     def list_all(self) -> list[DynamicKpi]:
         with self._lock:
             return list(self._items.values())

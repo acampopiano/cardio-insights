@@ -1,0 +1,27 @@
+[
+  {
+    "question": "Como viene la espera promedio en 2026?",
+    "expected_intent": "trend",
+    "expected_endpoint": "/api/v1/kpis/query"
+  },
+  {
+    "question": "Mostrame la tendencia de cirugias este ano",
+    "expected_intent": "trend",
+    "expected_endpoint": "/api/v1/kpis/query"
+  },
+  {
+    "question": "Top centros que mas envian pacientes este ano",
+    "expected_intent": "ranking",
+    "expected_endpoint": "/api/v1/analytics/query"
+  },
+  {
+    "question": "Ranking de PTCA 2025",
+    "expected_intent": "ranking",
+    "expected_endpoint": "/api/v1/analytics/query"
+  },
+  {
+    "question": "Como va la mortalidad de egreso?",
+    "expected_intent": "trend",
+    "expected_endpoint": "/api/v1/kpis/query"
+  }
+]

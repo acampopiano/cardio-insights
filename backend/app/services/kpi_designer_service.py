@@ -1,4 +1,5 @@
 import re
+import unicodedata
 
 from app.schemas.kpi_designer import KpiDesignRequest, KpiDesignResponse
 
@@ -8,7 +9,8 @@ class KpiDesignerService:
 
     @staticmethod
     def _to_kpi_key(name: str) -> str:
-        normalized = re.sub(r"[^a-z0-9]+", "_", name.lower()).strip("_")
+        ascii_name = unicodedata.normalize("NFKD", name.lower()).encode("ascii", "ignore").decode("ascii")
+        normalized = re.sub(r"[^a-z0-9]+", "_", ascii_name).strip("_")
         return normalized or "kpi_nuevo"
 
     @staticmethod

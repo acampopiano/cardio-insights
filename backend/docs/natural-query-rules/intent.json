@@ -1,0 +1,53 @@
+{
+  "ranking": {
+    "peak_markers": [
+      "pico",
+      "techo",
+      "maximo",
+      "maxima",
+      "record",
+      "crecimiento",
+      "disparo",
+      "punta",
+      "pico mas alto",
+      "saturacion"
+    ],
+    "question_markers": [
+      "en que",
+      "cual",
+      "cuando",
+      "que dia",
+      "que mes",
+      "en cuales",
+      "que periodo",
+      "cuanto",
+      "identificar"
+    ],
+    "death_markers": [
+      "mur",
+      "fallec",
+      "mortal",
+      "deces",
+      "letali",
+      "exito",
+      "difunt",
+      "obito"
+    ],
+    "default_markers": [
+      "top",
+      "ranking",
+      "cuales son los",
+      "que meses tuvieron",
+      "cuales fueron los meses",
+      "mes estuvimos peor",
+      "peor con las demoras",
+      "mayor",
+      "mas pacientes",
+      "mas cirug",
+      "mas ptca",
+      "ordenar por",
+      "lista de",
+      "clasificacion"
+    ]
+  }
+}

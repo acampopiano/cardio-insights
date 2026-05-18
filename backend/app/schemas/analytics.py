@@ -6,7 +6,7 @@ from app.schemas.kpis import QueryFilter
 
 
 class AnalyticsQueryRequest(BaseModel):
-    widget_type: Literal["table", "ranking"] = Field(
+    widget_type: Literal["table", "ranking", "cube"] = Field(
         description="Tipo de visualizacion enriquecida",
     )
     metric_key: str = Field(
@@ -16,6 +16,18 @@ class AnalyticsQueryRequest(BaseModel):
     filters: list[QueryFilter] = Field(default_factory=list)
     granularity: str = Field(default="month", examples=["day", "week", "month"])
     limit: int = Field(default=10, ge=1, le=100)
+    row_dimension: str = Field(
+        default="period",
+        description="Dimension de filas para cubo (period, year, quarter, month, granularity)",
+    )
+    column_dimension: str = Field(
+        default="quarter",
+        description="Dimension de columnas para cubo (period, year, quarter, month, granularity)",
+    )
+    aggregation: Literal["sum", "avg", "min", "max"] = Field(
+        default="sum",
+        description="Agregacion para cubo",
+    )
 
 
 class AnalyticsColumn(BaseModel):

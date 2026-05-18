@@ -1,0 +1,61 @@
+{
+  "month_map": {
+    "enero": 1,
+    "febrero": 2,
+    "marzo": 3,
+    "abril": 4,
+    "mayo": 5,
+    "junio": 6,
+    "julio": 7,
+    "agosto": 8,
+    "septiembre": 9,
+    "setiembre": 9,
+    "octubre": 10,
+    "noviembre": 11,
+    "diciembre": 12
+  },
+  "granularity": {
+    "day_tokens": ["diario", "dia", "dias"],
+    "week_tokens": ["semanal", "semana", "semanas"]
+  },
+  "ranking": {
+    "peak_markers": ["pico", "techo", "maximo", "maxima"],
+    "question_markers": ["en que", "cual", "cuando", "que dia", "que mes"],
+    "death_markers": ["mur", "fallec", "mortal"],
+    "default_markers": [
+      "top",
+      "ranking",
+      "cuales son los",
+      "que meses tuvieron",
+      "cuales fueron los meses",
+      "mes estuvimos peor",
+      "peor con las demoras",
+      "mayor",
+      "mas pacientes",
+      "mas cirug",
+      "mas ptca"
+    ]
+  },
+  "metrics": {
+    "reintervenciones_tokens": ["reinterv"],
+    "wait_peak_tokens": ["espera maxima", "maxima espera", "mayor espera"],
+    "wait_tokens": ["espera", "demora"],
+    "death_count_tokens": ["mur", "muert"],
+    "mortality_tokens": ["mortal", "fallec"],
+    "ptca_share_patterns": [
+      ["particip", "ptca"],
+      ["porcentaje", "ptca"],
+      ["proporcion", "ptca"]
+    ],
+    "ptca_share_phrases": ["corresponden a ptca"],
+    "ptca_tokens": ["ptca"],
+    "hemodinamia_tokens": ["hemodinam"],
+    "center_top_tokens": ["centro", "top"],
+    "center_tokens": ["centro"],
+    "surgery_tokens": ["cirug"]
+  },
+  "auto_kpi": {
+    "wait_peak_tokens": ["espera maxima", "maxima espera", "mayor espera"],
+    "total_volume_tokens": ["volumen", "total"]
+  }
+}

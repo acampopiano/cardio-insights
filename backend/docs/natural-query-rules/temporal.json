@@ -1,0 +1,36 @@
+{
+  "month_map": {
+    "enero": 1,
+    "ene": 1,
+    "febrero": 2,
+    "feb": 2,
+    "marzo": 3,
+    "mar": 3,
+    "abril": 4,
+    "abr": 4,
+    "mayo": 5,
+    "may": 5,
+    "junio": 6,
+    "jun": 6,
+    "julio": 7,
+    "jul": 7,
+    "agosto": 8,
+    "ago": 8,
+    "septiembre": 9,
+    "sept": 9,
+    "setiembre": 9,
+    "set": 9,
+    "octubre": 10,
+    "oct": 10,
+    "noviembre": 11,
+    "nov": 11,
+    "diciembre": 12,
+    "dic": 12
+  },
+  "granularity": {
+    "day_tokens": ["diario", "dia", "dias", "fecha", "jornada"],
+    "week_tokens": ["semanal", "semana", "semanas"],
+    "month_tokens": ["mensual", "mes", "meses", "periodo"],
+    "year_tokens": ["anual", "anio", "anios", "ejercicio"]
+  }
+}

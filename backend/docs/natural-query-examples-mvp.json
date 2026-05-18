@@ -1,0 +1,210 @@
+[
+  {
+    "id": 1,
+    "question": "Como viene la espera promedio de los pacientes este ano?",
+    "role": "gestion_medica",
+    "intent": "trend",
+    "endpoint": "/api/v1/kpis/query",
+    "scope": "mvp",
+    "expected_payload": {
+      "intent": "trend",
+      "metric": "avg_wait_days",
+      "granularity": "month",
+      "period": { "type": "current_year" }
+    }
+  },
+  {
+    "id": 2,
+    "question": "Mostrame la evolucion mensual de la espera quirurgica en 2026",
+    "role": "coordinacion",
+    "intent": "trend",
+    "endpoint": "/api/v1/kpis/query",
+    "scope": "mvp",
+    "expected_payload": {
+      "intent": "trend",
+      "metric": "avg_wait_days",
+      "granularity": "month",
+      "period": { "year": 2026 }
+    }
+  },
+  {
+    "id": 3,
+    "question": "La mortalidad de egreso viene subiendo o bajando?",
+    "role": "medico_direccion",
+    "intent": "trend",
+    "endpoint": "/api/v1/kpis/query",
+    "scope": "mvp",
+    "expected_payload": {
+      "intent": "trend",
+      "metric": "mortality_egreso_pct",
+      "granularity": "month",
+      "period": { "type": "current_year" }
+    }
+  },
+  {
+    "id": 4,
+    "question": "Como evolucionaron las cirugias realizadas por mes?",
+    "role": "gestion",
+    "intent": "trend",
+    "endpoint": "/api/v1/kpis/query",
+    "scope": "mvp",
+    "expected_payload": {
+      "intent": "trend",
+      "metric": "surgery_volume",
+      "granularity": "month",
+      "period": { "type": "current_year" }
+    }
+  },
+  {
+    "id": 5,
+    "question": "Mostrame la tendencia de procedimientos de hemodinamia este ano",
+    "role": "hemodinamia",
+    "intent": "trend",
+    "endpoint": "/api/v1/kpis/query",
+    "scope": "mvp",
+    "expected_payload": {
+      "intent": "trend",
+      "metric": "hemodinamia_volumen_mensual",
+      "granularity": "month",
+      "period": { "type": "current_year" }
+    }
+  },
+  {
+    "id": 6,
+    "question": "Como viene el volumen de PTCA en 2026?",
+    "role": "medico_hemodinamia",
+    "intent": "trend",
+    "endpoint": "/api/v1/kpis/query",
+    "scope": "mvp",
+    "expected_payload": {
+      "intent": "trend",
+      "metric": "ptca_volume",
+      "granularity": "month",
+      "period": { "year": 2026 }
+    }
+  },
+  {
+    "id": 7,
+    "question": "Que porcentaje de los procedimientos corresponden a PTCA?",
+    "role": "gestion_clinica",
+    "intent": "trend",
+    "endpoint": "/api/v1/kpis/query",
+    "scope": "mvp",
+    "expected_payload": {
+      "intent": "trend",
+      "metric": "ptca_share_pct",
+      "granularity": "month",
+      "period": { "type": "current_year" }
+    }
+  },
+  {
+    "id": 8,
+    "question": "Como vienen las reintervenciones mes a mes?",
+    "role": "direccion_medica",
+    "intent": "trend",
+    "endpoint": "/api/v1/kpis/query",
+    "scope": "mvp",
+    "expected_payload": {
+      "intent": "trend",
+      "metric": "reintervenciones_mensual",
+      "granularity": "month",
+      "period": { "type": "current_year" }
+    }
+  },
+  {
+    "id": 11,
+    "question": "Cuales son los centros que mas pacientes enviaron este ano?",
+    "role": "gestion",
+    "intent": "ranking",
+    "endpoint": "/api/v1/analytics/query",
+    "scope": "mvp",
+    "expected_payload": {
+      "intent": "ranking",
+      "metric": "centros_que_envian_pacientes",
+      "dimension": "referring_center",
+      "order": "desc",
+      "limit": 10,
+      "period": { "type": "current_year" }
+    }
+  },
+  {
+    "id": 12,
+    "question": "Top 5 centros derivadores en 2026",
+    "role": "direccion",
+    "intent": "ranking",
+    "endpoint": "/api/v1/analytics/query",
+    "scope": "mvp",
+    "expected_payload": {
+      "intent": "ranking",
+      "metric": "centros_que_envian_pacientes",
+      "dimension": "referring_center",
+      "order": "desc",
+      "limit": 5,
+      "period": { "year": 2026 }
+    }
+  },
+  {
+    "id": 13,
+    "question": "Que meses tuvieron mas cirugias?",
+    "role": "gestion",
+    "intent": "ranking",
+    "endpoint": "/api/v1/analytics/query",
+    "scope": "mvp",
+    "expected_payload": {
+      "intent": "ranking",
+      "metric": "surgery_volume",
+      "dimension": "month",
+      "order": "desc",
+      "limit": 12,
+      "period": { "type": "current_year" }
+    }
+  },
+  {
+    "id": 14,
+    "question": "Ranking mensual de PTCA en 2025",
+    "role": "hemodinamia",
+    "intent": "ranking",
+    "endpoint": "/api/v1/analytics/query",
+    "scope": "mvp",
+    "expected_payload": {
+      "intent": "ranking",
+      "metric": "ptca_volume",
+      "dimension": "month",
+      "order": "desc",
+      "limit": 12,
+      "period": { "year": 2025 }
+    }
+  },
+  {
+    "id": 15,
+    "question": "Cuales fueron los meses con mayor espera promedio?",
+    "role": "coordinacion",
+    "intent": "ranking",
+    "endpoint": "/api/v1/analytics/query",
+    "scope": "mvp",
+    "expected_payload": {
+      "intent": "ranking",
+      "metric": "avg_wait_days",
+      "dimension": "month",
+      "order": "desc",
+      "limit": 12,
+      "period": { "type": "current_year" }
+    }
+  },
+  {
+    "id": 20,
+    "question": "Cuales son los meses con mayor mortalidad de egreso?",
+    "role": "direccion_medica",
+    "intent": "ranking",
+    "endpoint": "/api/v1/analytics/query",
+    "scope": "mvp",
+    "expected_payload": {
+      "intent": "ranking",
+      "metric": "mortality_egreso_pct",
+      "dimension": "month",
+      "order": "desc",
+      "limit": 12,
+      "period": { "type": "current_year" }
+    }
+  }
+]

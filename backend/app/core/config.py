@@ -16,6 +16,8 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = Field(default=120)
 
     repository_backend: str = Field(default="mock")
+    natural_query_auto_kpi_mode: str = Field(default="human_approve")
+    natural_query_auto_kpi_approver_roles: str = Field(default="admin,direccion,direccion_medica,medico_direccion")
 
     mysql_host: str = Field(default="localhost")
     mysql_port: int = Field(default=3306)

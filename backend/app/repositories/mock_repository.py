@@ -1,5 +1,6 @@
 from typing import Any
 
+from app.core.kpi_registry import kpi_registry
 from app.core.security import get_password_hash
 from app.repositories.interfaces import AnalyticsRepository, AuthRepository
 
@@ -65,52 +66,64 @@ class MockRepository(AuthRepository, AnalyticsRepository):
         }
 
     def get_kpis_catalog(self) -> dict[str, Any]:
-        return {
-            "kpis": [
+        kpis: list[dict[str, str]] = [
+            {
+                "key": "mortality_30d",
+                "label": "Mortalidad a 30 dias",
+                "unit": "%",
+                "description": "Porcentaje de pacientes fallecidos dentro de 30 dias",
+            },
+            {
+                "key": "icu_los_avg",
+                "label": "Estadia promedio UCI",
+                "unit": "dias",
+                "description": "Promedio de dias de internacion en UCI",
+            },
+            {
+                "key": "readmission_30d",
+                "label": "Reingreso a 30 dias",
+                "unit": "%",
+                "description": "Pacientes readmitidos en los 30 dias posteriores",
+            },
+            {
+                "key": "surgery_volume",
+                "label": "Volumen de cirugias",
+                "unit": "casos",
+                "description": "Total de cirugias realizadas en el periodo",
+            },
+            {
+                "key": "ptca_volume",
+                "label": "Volumen de PTCA",
+                "unit": "casos",
+                "description": "Total de angioplastias realizadas en el periodo",
+            },
+            {
+                "key": "mortality_egreso_pct",
+                "label": "Mortalidad al egreso",
+                "unit": "%",
+                "description": "Porcentaje de pacientes fallecidos al egreso hospitalario",
+            },
+            {
+                "key": "ptca_share_pct",
+                "label": "Participacion PTCA",
+                "unit": "%",
+                "description": "Porcentaje de PTCA sobre el total de actividad (PTCA + cirugias)",
+            },
+        ]
+
+        for item in kpi_registry.list_all():
+            if any(existing.get("key") == item.key for existing in kpis):
+                continue
+            kpis.append(
                 {
-                    "key": "mortality_30d",
-                    "label": "Mortalidad a 30 dias",
-                    "unit": "%",
-                    "description": "Porcentaje de pacientes fallecidos dentro de 30 dias",
-                },
-                {
-                    "key": "icu_los_avg",
-                    "label": "Estadia promedio UCI",
-                    "unit": "dias",
-                    "description": "Promedio de dias de internacion en UCI",
-                },
-                {
-                    "key": "readmission_30d",
-                    "label": "Reingreso a 30 dias",
-                    "unit": "%",
-                    "description": "Pacientes readmitidos en los 30 dias posteriores",
-                },
-                {
-                    "key": "surgery_volume",
-                    "label": "Volumen de cirugias",
-                    "unit": "casos",
-                    "description": "Total de cirugias realizadas en el periodo",
-                },
-                {
-                    "key": "ptca_volume",
-                    "label": "Volumen de PTCA",
-                    "unit": "casos",
-                    "description": "Total de angioplastias realizadas en el periodo",
-                },
-                {
-                    "key": "mortality_egreso_pct",
-                    "label": "Mortalidad al egreso",
-                    "unit": "%",
-                    "description": "Porcentaje de pacientes fallecidos al egreso hospitalario",
-                },
-                {
-                    "key": "ptca_share_pct",
-                    "label": "Participacion PTCA",
-                    "unit": "%",
-                    "description": "Porcentaje de PTCA sobre el total de actividad (PTCA + cirugias)",
-                },
-            ]
-        }
+                    "key": item.key,
+                    "label": item.label,
+                    "unit": "valor",
+                    "description": item.description,
+                }
+            )
+
+        return {"kpis": kpis}
 
     def get_dashboard_summary(self) -> dict[str, Any]:
         return {
@@ -238,6 +251,8 @@ class MockRepository(AuthRepository, AnalyticsRepository):
         series: list[dict[str, Any]] = []
         for key in kpi_keys:
             values = base_series.get(key)
+            if not values and kpi_registry.get(str(key)) is not None:
+                values = [110, 120, 118, 125, 130]
             if not values:
                 continue
             points = [{"period": period, "value": value} for period, value in zip(periods, values)]
@@ -270,6 +285,35 @@ class MockRepository(AuthRepository, AnalyticsRepository):
                 ],
                 "rows": rows[:limit],
                 "meta": {"metric_key": str(payload.get("metric_key") or "surgery_volume")},
+            }
+
+        if widget_type == "cube":
+            row_dimension = str(payload.get("row_dimension") or "period")
+            column_dimension = str(payload.get("column_dimension") or "quarter")
+            metric_key = str(payload.get("metric_key") or "surgery_volume")
+            aggregation = str(payload.get("aggregation") or "sum").lower()
+            rows = [
+                {"row_key": "2026-01", "column_key": "T1", "value": 201},
+                {"row_key": "2026-02", "column_key": "T1", "value": 208},
+                {"row_key": "2026-03", "column_key": "T1", "value": 214},
+                {"row_key": "2026-04", "column_key": "T2", "value": 199},
+            ]
+            return {
+                "widget_type": "cube",
+                "title": "Cubo analitico mock",
+                "columns": [
+                    {"key": "row_key", "label": row_dimension},
+                    {"key": "column_key", "label": column_dimension},
+                    {"key": "value", "label": metric_key},
+                ],
+                "rows": rows[:limit],
+                "meta": {
+                    "row_dimension": row_dimension,
+                    "column_dimension": column_dimension,
+                    "metric_key": metric_key,
+                    "aggregation": aggregation,
+                    "query_preview": f"SELECT {row_dimension}, {column_dimension}, {aggregation.upper()}({metric_key}) AS value FROM kpi_snapshot GROUP BY {row_dimension}, {column_dimension}",
+                },
             }
 
         rows = [

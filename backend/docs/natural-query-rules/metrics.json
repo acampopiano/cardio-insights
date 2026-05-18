@@ -1,0 +1,79 @@
+{
+  "metrics": {
+    "reintervenciones_tokens": [
+      "reinterv",
+      "re-oper",
+      "reoper",
+      "segunda interv"
+    ],
+    "wait_tokens": [
+      "espera",
+      "demora",
+      "retraso",
+      "dias de coordinacion",
+      "tiempo hasta realizado"
+    ],
+    "death_count_tokens": [
+      "mur",
+      "muert",
+      "fallecido",
+      "decesos",
+      "obitos",
+      "bajas"
+    ],
+    "mortality_tokens": [
+      "mortal",
+      "fallec",
+      "letali",
+      "mortalidad postoperatoria",
+      "pct_fallecidos"
+    ],
+    "ptca_share_patterns": [
+      ["particip", "ptca"],
+      ["porcentaje", "ptca"],
+      ["proporcion", "ptca"],
+      ["ratio", "ptca"],
+      ["peso", "ptca"]
+    ],
+    "ptca_share_phrases": [
+      "corresponden a ptca",
+      "cuanto del total es ptca",
+      "cuanto representa ptca"
+    ],
+    "ptca_tokens": [
+      "ptca",
+      "angioplast",
+      "balon",
+      "stent",
+      "procedimiento de hemodinamia"
+    ],
+    "hemodinamia_tokens": ["hemodinam", "cateteris", "cinecoronariog", "ccg"],
+    "center_top_tokens": ["centro", "top"],
+    "center_tokens": [
+      "centro",
+      "mutualista",
+      "iamc",
+      "origen",
+      "prestador",
+      "hospital"
+    ],
+    "surgery_tokens": [
+      "cirug",
+      "quirof",
+      "operac",
+      "quirurg",
+      "block",
+      "bypass",
+      "atc"
+    ]
+  },
+  "auto_kpi": {
+    "wait_peak_tokens": [
+      "espera maxima",
+      "maxima espera",
+      "mayor espera",
+      "demora pico"
+    ],
+    "total_volume_tokens": ["volumen", "total"]
+  }
+}

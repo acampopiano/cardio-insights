@@ -193,6 +193,8 @@ class MySQLRepository(AuthRepository, AnalyticsRepository):
             return f"DATE_FORMAT({column_name}, '%Y-%m-%d')"
         if granularity == "week":
             return f"DATE_FORMAT({column_name}, '%x-W%v')"
+        if granularity == "year":
+            return f"DATE_FORMAT({column_name}, '%Y')"
         return f"DATE_FORMAT({column_name}, '%Y-%m')"
 
     def _cube_dimension_expr(self, dimension: str, date_column: str, granularity: str) -> str:
@@ -633,7 +635,7 @@ class MySQLRepository(AuthRepository, AnalyticsRepository):
         widget_type = str(payload.get("widget_type") or "table").lower()
         filters = payload.get("filters", [])
         granularity = str(payload.get("granularity") or "month").lower()
-        if granularity not in {"day", "week", "month"}:
+        if granularity not in {"day", "week", "month", "year"}:
             granularity = "month"
         limit = int(payload.get("limit") or 10)
         if limit < 1:
@@ -802,6 +804,37 @@ class MySQLRepository(AuthRepository, AnalyticsRepository):
                     LIMIT {limit}
                     """
                 )
+            elif metric_key == "mortality_egreso_count":
+                date_expr = self._period_expr("p.FechaEgreso", granularity)
+                date_filter = self._date_clause("p.FechaEgreso", filters)
+                rows = self._execute(
+                    f"""
+                    SELECT {date_expr} AS label,
+                           COUNT(*) AS value
+                    FROM flow_procedimientocardiologia p
+                    WHERE p.FechaEgreso > '1900-01-01'
+                      AND p.FechaFallece > '1900-01-01'{date_filter}
+                    GROUP BY {date_expr}
+                    ORDER BY value DESC
+                    LIMIT {limit}
+                    """
+                )
+            elif metric_key == "avg_wait_days":
+                date_expr = self._period_expr("f.FechaRealizado", granularity)
+                date_filter = self._date_clause("f.FechaRealizado", filters)
+                rows = self._execute(
+                    f"""
+                    SELECT {date_expr} AS label,
+                           ROUND(AVG(DATEDIFF(f.FechaRealizado, f.FechaCoordina)), 2) AS value
+                    FROM flow_coordina f
+                    WHERE f.FechaRealizado > '1900-01-01'
+                      AND f.FechaCoordina > '1900-01-01'
+                      AND DATEDIFF(f.FechaRealizado, f.FechaCoordina) >= 0{date_filter}
+                    GROUP BY {date_expr}
+                    ORDER BY value DESC
+                    LIMIT {limit}
+                    """
+                )
             else:
                 metric_key = "surgery_volume"
                 date_expr = self._period_expr("f.FechaRealizado", granularity)
@@ -905,7 +938,7 @@ class MySQLRepository(AuthRepository, AnalyticsRepository):
         kpi_keys = payload.get("kpi_keys", [])
         filters = payload.get("filters", [])
         granularity = str(payload.get("granularity") or "month").lower()
-        if granularity not in {"day", "week", "month"}:
+        if granularity not in {"day", "week", "month", "year"}:
             granularity = "month"
         act_type = self._normalize_act_type(filters)
 

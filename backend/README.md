@@ -64,8 +64,35 @@ backend/
 - GET /api/v1/dashboard/charts
 - GET /api/v1/dashboard/table
 - POST /api/v1/kpis/query
+- POST /api/v1/analytics/query
+- POST /api/v1/natural-query/run
+- POST /api/v1/natural-query/feedback
+- POST /api/v1/natural-query/training/export
 
 Todos salvo health requieren Authorization: Bearer <token>.
+
+## Variables de entorno nuevas (LLM Gateway)
+
+Agregar en `.env`:
+
+```env
+LLM_GATEWAY_URL=http://IP_DE_LA_VM:8000
+LLM_GATEWAY_ENABLED=true
+LLM_GATEWAY_TIMEOUT_SECONDS=8
+NATURAL_QUERY_LEARNING_FILE=data/natural_query_learning.jsonl
+NATURAL_QUERY_TRAINING_EXPORT_FILE=data/natural_query_training_dataset.jsonl
+NATURAL_QUERY_AUTO_FEEDBACK_MODE=off
+NATURAL_QUERY_AUTO_FEEDBACK_MIN_CONFIDENCE=0.80
+```
+
+Comportamiento:
+
+- Si `LLM_GATEWAY_ENABLED=true`, el endpoint de natural-query intenta resolver via gateway.
+- Si el gateway falla, expira o responde invalido, el backend hace fallback a reglas locales.
+- Si `LLM_GATEWAY_ENABLED=false`, siempre usa reglas locales.
+- Cada llamada a `POST /api/v1/natural-query/run` guarda una interaccion para aprendizaje continuo.
+- Si `NATURAL_QUERY_AUTO_FEEDBACK_MODE=all_resolved`, cada consulta resuelta se marca automaticamente como aceptada para entrenamiento.
+- Si `NATURAL_QUERY_AUTO_FEEDBACK_MODE=llm_only`, solo auto-aprende respuestas `source=llm` (con umbral opcional `NATURAL_QUERY_AUTO_FEEDBACK_MIN_CONFIDENCE`).
 
 ## Ejecucion local rapida
 
@@ -121,6 +148,33 @@ Autenticacion en modo mysql:
 - Se intenta login contra `use_usuarios` (Alias + Clave/MD5text) y permisos desde `use_permiso`.
 - Si el usuario no existe en BD, queda fallback a usuarios de desarrollo (`clinician`, `admin`) para no frenar el MVP.
 - Recomendado: crear usuario tecnico de pruebas en `use_usuarios` y usarlo para integracion.
+
+## KPI Designer (interfaz no-code para equipo funcional)
+
+Si la persona que define KPIs no programa en Python, puede usar un formulario simple que genera snippets de codigo listos para pegar.
+
+1. Inicia sesion normalmente para obtener un token JWT.
+2. Abre en navegador: `http://localhost:8000/api/v1/kpi-designer/ui`
+3. Pega el token cuando lo pida la pantalla.
+4. Completa solo estos 4 campos:
+
+- nombre del KPI
+- descripcion
+- granularidad (`day`, `week`, `month`)
+- SQL asociada (debe devolver `period` y `value`)
+
+5. Presiona "Generar snippets".
+6. Copia `registration_payload` de la respuesta.
+7. En Swagger, pega ese JSON en `POST /api/v1/kpi-designer/register`.
+8. Usa `query_payload_example` para consultar en `POST /api/v1/kpis/query`.
+
+La salida incluye:
+
+- `registration_payload` (para registrar KPI sin tocar codigo)
+- `query_payload_example` (para probar el KPI en query)
+- snippets de apoyo para equipo tecnico (opcionales)
+
+Nota: si `REPOSITORY_BACKEND=mysql`, el endpoint `/kpi-designer/register` persiste el KPI en MySQL y sobrevive reinicios. En modo mock, queda en memoria.
 
 ## Credenciales mock
 
@@ -243,11 +297,184 @@ Response 200:
 }
 ```
 
+### Analytics Query (table/ranking)
+
+Request:
+
+```http
+POST /api/v1/analytics/query
+Authorization: Bearer <jwt>
+Content-Type: application/json
+
+{
+  "widget_type": "ranking",
+  "metric_key": "surgery_volume",
+  "granularity": "month",
+  "limit": 5,
+  "filters": [
+    { "key": "date_from", "values": ["2026-01-01"] },
+    { "key": "date_to", "values": ["2026-03-31"] }
+  ]
+}
+```
+
+Response 200:
+
+```json
+{
+  "widget_type": "ranking",
+  "title": "Ranking por periodo",
+  "columns": [
+    { "key": "rank", "label": "Posicion" },
+    { "key": "label", "label": "Periodo" },
+    { "key": "value", "label": "Valor" }
+  ],
+  "rows": [{ "rank": 1, "label": "2026-03", "value": 214 }],
+  "meta": {
+    "metric_key": "surgery_volume",
+    "granularity": "month",
+    "limit": 5
+  }
+}
+```
+
 Filtros soportados en `POST /api/v1/kpis/query`:
 
 - `date_from` (YYYY-MM-DD)
 - `date_to` (YYYY-MM-DD)
 - `act_type`: `all`, `surgery`, `ptca`
+
+### Natural Query Run (integrado con LLM Gateway)
+
+Request:
+
+```http
+POST /api/v1/natural-query/run
+Authorization: Bearer <jwt>
+Content-Type: application/json
+
+{
+  "question": "Como viene la espera promedio este ano?",
+  "use_llm_fallback": true
+}
+```
+
+Response 200 (ejemplo):
+
+```json
+{
+  "question": "Como viene la espera promedio este ano?",
+  "resolved": true,
+  "source": "llm",
+  "intent": "trend",
+  "metric": "avg_wait_days",
+  "endpoint": "/api/v1/kpis/query",
+  "translated_payload": {
+    "intent": "trend",
+    "metric": "avg_wait_days",
+    "granularity": "month",
+    "period": { "type": "current_year" }
+  },
+  "assumptions": ["Se interpreto la consulta como tendencia."],
+  "result": {
+    "series": []
+  },
+  "errors": [],
+  "success": true,
+  "endpoint_used": "/api/v1/kpis/query",
+  "payload": {
+    "kpi_keys": ["avg_wait_days"],
+    "granularity": "month",
+    "filters": [
+      { "key": "date_from", "values": ["2026-01-01"] },
+      { "key": "date_to", "values": ["2026-12-31"] }
+    ]
+  },
+  "explanation": "Consulta resuelta por traduccion del LLM Gateway.",
+  "auto_kpi": null
+}
+```
+
+Seguridad aplicada en `natural-query/run`:
+
+- El gateway solo recibe `question` y `use_llm_fallback` (no se envian datos clinicos).
+- Se rechaza `translated_payload` con contenido SQL o claves sospechosas.
+- Solo se aceptan intents: `trend`, `ranking`, `comparison`, `alert`.
+- Solo se aceptan endpoints: `/api/v1/kpis/query`, `/api/v1/analytics/query`.
+- Se valida la metrica contra el catalogo local de KPIs cuando esta disponible.
+
+### Aprendizaje y entrenamiento (human-in-the-loop)
+
+1. Ejecuta `POST /api/v1/natural-query/run` y guarda `interaction_id`.
+2. Registra correccion humana en `POST /api/v1/natural-query/feedback`.
+3. Exporta dataset en `POST /api/v1/natural-query/training/export?approved_only=true`.
+4. Usa el archivo JSONL exportado para entrenar/reentrenar el modelo del gateway.
+
+Ejemplo feedback:
+
+```http
+POST /api/v1/natural-query/feedback
+Authorization: Bearer <jwt>
+Content-Type: application/json
+
+{
+  "interaction_id": "a1b2c3d4",
+  "accepted": true,
+  "corrected_intent": "trend",
+  "corrected_metric": "avg_wait_days",
+  "corrected_endpoint": "/api/v1/kpis/query",
+  "corrected_translated_payload": {
+    "intent": "trend",
+    "metric": "avg_wait_days",
+    "granularity": "month",
+    "period": { "type": "current_year" }
+  },
+  "notes": "Interpretacion validada por analista"
+}
+```
+
+Ejemplo export:
+
+```http
+POST /api/v1/natural-query/training/export?approved_only=true
+Authorization: Bearer <jwt>
+```
+
+Response:
+
+```json
+{
+  "total_samples": 42,
+  "export_path": "C:/.../backend/data/natural_query_training_dataset.jsonl"
+}
+```
+
+## LLM Gateway VM (referencia rapida)
+
+1. Levantar el servicio en la VM con endpoint `POST /llm/nl2kpi/interpret`.
+2. Confirmar conectividad desde el backend (`LLM_GATEWAY_URL`) a la VM.
+3. Configurar variables en `.env` y reiniciar API.
+
+## Probar desde Swagger
+
+1. Ir a `http://localhost:8000/docs`.
+2. Ejecutar `POST /api/v1/auth/login` y copiar `access_token`.
+3. Presionar `Authorize` y pegar `Bearer <token>`.
+4. Ejecutar `POST /api/v1/natural-query/run` con:
+
+```json
+{
+  "question": "Como viene la espera promedio este ano?"
+}
+```
+
+5. Verificar en la respuesta:
+
+- `source` (llm o rules)
+- `translated_payload`
+- `endpoint` + `payload`
+- `result`
+- `errors` (si hubo fallback)
 
 Ejemplo:
 

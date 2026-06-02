@@ -4,7 +4,6 @@ from fastapi.responses import HTMLResponse
 from app.core.dependencies import get_kpi_service, get_repository
 from app.core.kpi_registry import DynamicKpi, kpi_registry
 from app.core.security import get_current_claims
-from app.repositories.mysql_repository import MySQLRepository
 from app.schemas.kpi_designer import (
   KpiCreateResponse,
   KpiDesignRequest,
@@ -19,19 +18,11 @@ router = APIRouter(prefix="/kpi-designer", tags=["KPI Designer"])
 
 def _persist_dynamic_kpi(item: DynamicKpi, repository: object) -> bool:
   kpi_registry.upsert(item)
-  if isinstance(repository, MySQLRepository):
-    repository.upsert_dynamic_kpi(item)
-    return True
   return False
 
 
 def _rollback_dynamic_kpi(key: str, repository: object) -> None:
   kpi_registry.remove(key)
-  if isinstance(repository, MySQLRepository):
-    try:
-      repository.deactivate_dynamic_kpi(key)
-    except Exception:
-      pass
 
 
 @router.get("/ui", response_class=HTMLResponse)
@@ -359,13 +350,6 @@ def create_kpi(
     total_points = sum(len(s.get("points") or []) for s in matched_series)
     first_series = matched_series[0] if matched_series else {}
     sample_points = (first_series.get("points") or [])[:5] if isinstance(first_series, dict) else []
-
-    if isinstance(repository, MySQLRepository) and not matched_series:
-        _rollback_dynamic_kpi(item.key, repository)
-        raise HTTPException(
-            status_code=400,
-            detail="El KPI no devolvio series para su propia key durante la validacion.",
-        )
 
     return KpiCreateResponse(
         success=True,

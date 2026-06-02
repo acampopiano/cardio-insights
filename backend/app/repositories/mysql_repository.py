@@ -508,9 +508,6 @@ class MySQLRepository(AuthRepository, AnalyticsRepository):
         series: list[dict[str, Any]] = []
         for requested_key in kpi_keys:
             normalized_key = alias_map.get(requested_key, requested_key)
-            if normalized_key == "readmission_30d":
-                series.append({"kpi_key": requested_key, "points": []})
-                continue
 
             if act_type == "surgery" and normalized_key == "ptca_volume":
                 series.append({"kpi_key": requested_key, "points": []})
@@ -615,3 +612,160 @@ class MySQLRepository(AuthRepository, AnalyticsRepository):
             series.append({"kpi_key": requested_key, "points": points})
 
         return {"series": series}
+
+    @staticmethod
+    def _quarter_from_period(period: str) -> str:
+        parts = period.split("-")
+        if len(parts) < 2:
+            return "N/A"
+        try:
+            month = int(parts[1])
+        except ValueError:
+            return "N/A"
+        if month < 1 or month > 12:
+            return "N/A"
+        quarter = ((month - 1) // 3) + 1
+        return f"Q{quarter}"
+
+    def query_analytics(self, payload: dict[str, Any]) -> dict[str, Any]:
+        widget_type = str(payload.get("widget_type") or "table").lower()
+        metric_key = str(payload.get("metric_key") or "surgery_volume")
+        granularity = str(payload.get("granularity") or "month").lower()
+        if granularity not in {"day", "week", "month"}:
+            granularity = "month"
+
+        limit = int(payload.get("limit") or 10)
+        if limit < 1:
+            limit = 1
+        if limit > 100:
+            limit = 100
+
+        filters = payload.get("filters") if isinstance(payload.get("filters"), list) else []
+
+        if widget_type == "ranking":
+            metric_result = self.query_kpis(
+                {
+                    "kpi_keys": [metric_key],
+                    "granularity": granularity,
+                    "filters": filters,
+                }
+            )
+            series = metric_result.get("series") if isinstance(metric_result, dict) else []
+            points = []
+            if isinstance(series, list) and series:
+                first = series[0]
+                if isinstance(first, dict):
+                    raw_points = first.get("points")
+                    if isinstance(raw_points, list):
+                        points = raw_points
+
+            ranking_points = sorted(
+                [p for p in points if isinstance(p, dict)],
+                key=lambda p: float(p.get("value") or 0),
+                reverse=True,
+            )[:limit]
+
+            rows = [
+                {
+                    "rank": idx + 1,
+                    "label": str(point.get("period") or "N/A"),
+                    "value": float(point.get("value") or 0),
+                }
+                for idx, point in enumerate(ranking_points)
+            ]
+
+            return {
+                "widget_type": "ranking",
+                "title": f"Ranking por {metric_key}",
+                "columns": [
+                    {"key": "rank", "label": "Posicion"},
+                    {"key": "label", "label": "Dimension"},
+                    {"key": "value", "label": "Valor"},
+                ],
+                "rows": rows,
+                "meta": {
+                    "metric_key": metric_key,
+                    "granularity": granularity,
+                },
+            }
+
+        if widget_type == "cube":
+            row_dimension = str(payload.get("row_dimension") or "period")
+            column_dimension = str(payload.get("column_dimension") or "quarter")
+            aggregation = str(payload.get("aggregation") or "sum").lower()
+
+            metric_result = self.query_kpis(
+                {
+                    "kpi_keys": [metric_key],
+                    "granularity": granularity,
+                    "filters": filters,
+                }
+            )
+            series = metric_result.get("series") if isinstance(metric_result, dict) else []
+            points = []
+            if isinstance(series, list) and series:
+                first = series[0]
+                if isinstance(first, dict):
+                    raw_points = first.get("points")
+                    if isinstance(raw_points, list):
+                        points = raw_points
+
+            rows: list[dict[str, Any]] = []
+            for point in points[:limit]:
+                if not isinstance(point, dict):
+                    continue
+                period = str(point.get("period") or "N/A")
+                row_key = period if row_dimension in {"period", "month", "year", "week", "day"} else period
+                if column_dimension == "quarter":
+                    column_key = self._quarter_from_period(period)
+                else:
+                    column_key = period
+
+                rows.append(
+                    {
+                        "row_key": row_key,
+                        "column_key": column_key,
+                        "value": float(point.get("value") or 0),
+                    }
+                )
+
+            return {
+                "widget_type": "cube",
+                "title": "Cubo analitico",
+                "columns": [
+                    {"key": "row_key", "label": row_dimension},
+                    {"key": "column_key", "label": column_dimension},
+                    {"key": "value", "label": metric_key},
+                ],
+                "rows": rows,
+                "meta": {
+                    "row_dimension": row_dimension,
+                    "column_dimension": column_dimension,
+                    "metric_key": metric_key,
+                    "aggregation": aggregation,
+                    "granularity": granularity,
+                },
+            }
+
+        dashboard = self.get_dashboard_table()
+        columns = dashboard.get("columns") if isinstance(dashboard, dict) else []
+        raw_rows = dashboard.get("rows") if isinstance(dashboard, dict) else []
+        flattened_rows: list[dict[str, Any]] = []
+        if isinstance(raw_rows, list):
+            for row in raw_rows[:limit]:
+                if not isinstance(row, dict):
+                    continue
+                values = row.get("values")
+                if isinstance(values, dict):
+                    flattened_rows.append(values)
+
+        return {
+            "widget_type": "table",
+            "title": "Tabla enriquecida mensual",
+            "columns": columns if isinstance(columns, list) else [],
+            "rows": flattened_rows,
+            "meta": {
+                "granularity": granularity,
+                "metric_key": metric_key,
+            },
+        }

@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import json
+import re
 from datetime import UTC, datetime
+from difflib import SequenceMatcher
 from pathlib import Path
 from typing import Any
 from uuid import uuid4
@@ -74,6 +76,112 @@ class NaturalQueryLearningService:
         }
         self._append_json_line(self._learning_file, row)
         return feedback_id
+
+    @staticmethod
+    def _normalize_question(text: str) -> str:
+        lowered = str(text or "").lower().strip()
+        replacements = {
+            "á": "a",
+            "é": "e",
+            "í": "i",
+            "ó": "o",
+            "ú": "u",
+            "ñ": "n",
+        }
+        for old, new in replacements.items():
+            lowered = lowered.replace(old, new)
+        lowered = re.sub(r"\s+", " ", lowered)
+        return lowered
+
+    @staticmethod
+    def _similarity_score(left: str, right: str) -> float:
+        left_n = NaturalQueryLearningService._normalize_question(left)
+        right_n = NaturalQueryLearningService._normalize_question(right)
+        if not left_n or not right_n:
+            return 0.0
+
+        seq_score = SequenceMatcher(None, left_n, right_n).ratio()
+        left_tokens = set(left_n.split())
+        right_tokens = set(right_n.split())
+        if not left_tokens or not right_tokens:
+            return seq_score
+
+        intersection = len(left_tokens & right_tokens)
+        union = len(left_tokens | right_tokens)
+        token_score = float(intersection / union) if union else 0.0
+        return max(seq_score, token_score)
+
+    def recall_approved_plan(self, question: str, min_score: float = 0.88) -> dict[str, Any] | None:
+        rows = self._read_json_lines(self._learning_file)
+        if not rows:
+            return None
+
+        interactions: dict[str, dict[str, Any]] = {}
+        feedback_rows: list[dict[str, Any]] = []
+        for row in rows:
+            row_type = str(row.get("type") or "").lower()
+            if row_type == "interaction":
+                interaction_id = str(row.get("interaction_id") or "").strip()
+                if interaction_id:
+                    interactions[interaction_id] = row
+            elif row_type == "feedback":
+                feedback_rows.append(row)
+
+        best: dict[str, Any] | None = None
+        best_score = 0.0
+        for feedback in reversed(feedback_rows):
+            if not bool(feedback.get("accepted")):
+                continue
+
+            interaction_id = str(feedback.get("interaction_id") or "").strip()
+            linked_interaction = interactions.get(interaction_id, {})
+
+            sample_question = str(feedback.get("question") or linked_interaction.get("question") or "").strip()
+            if not sample_question:
+                continue
+
+            score = self._similarity_score(question, sample_question)
+            if score < min_score or score < best_score:
+                continue
+
+            corrected_payload = feedback.get("corrected_translated_payload")
+            if not isinstance(corrected_payload, dict):
+                corrected_payload = linked_interaction.get("translated_payload")
+            if not isinstance(corrected_payload, dict):
+                corrected_payload = {}
+
+            intent = str(
+                feedback.get("corrected_intent")
+                or linked_interaction.get("intent")
+                or corrected_payload.get("intent")
+                or ""
+            ).strip()
+            metric = str(
+                feedback.get("corrected_metric")
+                or linked_interaction.get("metric")
+                or corrected_payload.get("metric")
+                or ""
+            ).strip()
+            endpoint = str(
+                feedback.get("corrected_endpoint")
+                or linked_interaction.get("endpoint")
+                or ""
+            ).strip()
+
+            if not intent or not metric or not endpoint:
+                continue
+
+            best = {
+                "intent": intent,
+                "metric": metric,
+                "endpoint": endpoint,
+                "translated_payload": corrected_payload,
+                "matched_question": sample_question,
+                "score": round(score, 4),
+            }
+            best_score = score
+
+        return best
 
     def export_training_dataset(self, approved_only: bool = True) -> tuple[int, str]:
         rows = self._read_json_lines(self._learning_file)

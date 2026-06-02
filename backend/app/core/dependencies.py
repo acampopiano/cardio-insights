@@ -4,6 +4,7 @@ from app.core.config import get_settings
 from app.repositories.interfaces import AnalyticsRepository, AuthRepository
 from app.repositories.mock_repository import MockRepository
 from app.repositories.mysql_repository import MySQLRepository
+from app.services.analytics_service import AnalyticsService
 from app.services.auth_service import AuthService
 from app.services.catalog_service import CatalogService
 from app.services.dashboard_service import DashboardService
@@ -36,3 +37,8 @@ def get_dashboard_service() -> DashboardService:
 def get_kpi_service() -> KpiService:
     repository = get_repository()
     return KpiService(analytics_repository=repository)
+
+
+def get_analytics_service() -> AnalyticsService:
+    repository = get_repository()
+    return AnalyticsService(analytics_repository=repository)

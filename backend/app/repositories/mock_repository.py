@@ -1,5 +1,6 @@
 from typing import Any
 
+from app.core.kpi_registry import kpi_registry
 from app.core.security import get_password_hash
 from app.repositories.interfaces import AnalyticsRepository, AuthRepository
 
@@ -65,34 +66,70 @@ class MockRepository(AuthRepository, AnalyticsRepository):
         }
 
     def get_kpis_catalog(self) -> dict[str, Any]:
-        return {
-            "kpis": [
+        kpis: list[dict[str, str]] = [
+            {
+                "key": "mortality_30d",
+                "label": "Mortalidad a 30 dias",
+                "unit": "%",
+                "description": "Porcentaje de pacientes fallecidos dentro de 30 dias",
+            },
+            {
+                "key": "icu_los_avg",
+                "label": "Estadia promedio UCI",
+                "unit": "dias",
+                "description": "Promedio de dias de internacion en UCI",
+            },
+            {
+                "key": "readmission_30d",
+                "label": "Reingreso a 30 dias",
+                "unit": "%",
+                "description": "Pacientes readmitidos en los 30 dias posteriores",
+            },
+            {
+                "key": "surgery_volume",
+                "label": "Volumen de cirugias",
+                "unit": "casos",
+                "description": "Total de cirugias realizadas en el periodo",
+            },
+            {
+                "key": "ptca_volume",
+                "label": "Volumen de PTCA",
+                "unit": "casos",
+                "description": "Total de angioplastias realizadas en el periodo",
+            },
+            {
+                "key": "mortality_egreso_pct",
+                "label": "Mortalidad al egreso",
+                "unit": "%",
+                "description": "Porcentaje de pacientes fallecidos al egreso hospitalario",
+            },
+            {
+                "key": "ptca_share_pct",
+                "label": "Participacion PTCA",
+                "unit": "%",
+                "description": "Porcentaje de PTCA sobre el total de actividad (PTCA + cirugias)",
+            },
+            {
+                "key": "avg_wait_days",
+                "label": "Espera promedio",
+                "unit": "dias",
+                "description": "Promedio de dias de espera entre coordinacion y realizado",
+            },
+        ]
+
+        for item in kpi_registry.list_all():
+            if any(existing.get("key") == item.key for existing in kpis):
+                continue
+            kpis.append(
                 {
-                    "key": "mortality_30d",
-                    "label": "Mortalidad a 30 dias",
-                    "unit": "%",
-                    "description": "Porcentaje de pacientes fallecidos dentro de 30 dias",
-                },
-                {
-                    "key": "icu_los_avg",
-                    "label": "Estadia promedio UCI",
-                    "unit": "dias",
-                    "description": "Promedio de dias de internacion en UCI",
-                },
-                {
-                    "key": "readmission_30d",
-                    "label": "Reingreso a 30 dias",
-                    "unit": "%",
-                    "description": "Pacientes readmitidos en los 30 dias posteriores",
-                },
-                {
-                    "key": "surgery_volume",
-                    "label": "Volumen de cirugias",
-                    "unit": "casos",
-                    "description": "Total de cirugias realizadas en el periodo",
-                },
-            ]
-        }
+                    "key": item.key,
+                    "label": item.label,
+                    "unit": "valor",
+                    "description": item.description,
+                }
+            )
+
+        return {"kpis": kpis}
 
     def get_dashboard_summary(self) -> dict[str, Any]:
         return {
@@ -213,15 +250,94 @@ class MockRepository(AuthRepository, AnalyticsRepository):
             "icu_los_avg": [4.1, 4.0, 3.9, 3.8, 3.8],
             "readmission_30d": [6.1, 6.0, 5.9, 5.8, 5.7],
             "surgery_volume": [180, 192, 201, 208, 214],
+            "ptca_share_pct": [31.2, 30.8, 29.9, 30.5, 31.0],
+            "avg_wait_days": [5.1, 4.9, 4.7, 4.4, 4.2],
         }
         periods = ["2025-11", "2025-12", "2026-01", "2026-02", "2026-03"]
 
         series: list[dict[str, Any]] = []
         for key in kpi_keys:
             values = base_series.get(key)
+            if not values and kpi_registry.get(str(key)) is not None:
+                values = [110, 120, 118, 125, 130]
             if not values:
                 continue
             points = [{"period": period, "value": value} for period, value in zip(periods, values)]
             series.append({"kpi_key": key, "points": points})
 
         return {"series": series}
+
+    def query_analytics(self, payload: dict[str, Any]) -> dict[str, Any]:
+        widget_type = str(payload.get("widget_type") or "table").lower()
+        limit = int(payload.get("limit") or 10)
+        if limit < 1:
+            limit = 1
+        if limit > 100:
+            limit = 100
+
+        if widget_type == "ranking":
+            rows = [
+                {"rank": 1, "label": "CABG", "value": 96},
+                {"rank": 2, "label": "VALVE", "value": 72},
+                {"rank": 3, "label": "CONGENITAL", "value": 46},
+                {"rank": 4, "label": "AORTA", "value": 31},
+            ]
+            return {
+                "widget_type": "ranking",
+                "title": "Ranking mock por tipo de cirugia",
+                "columns": [
+                    {"key": "rank", "label": "Posicion"},
+                    {"key": "label", "label": "Dimension"},
+                    {"key": "value", "label": "Valor"},
+                ],
+                "rows": rows[:limit],
+                "meta": {"metric_key": str(payload.get("metric_key") or "surgery_volume")},
+            }
+
+        if widget_type == "cube":
+            row_dimension = str(payload.get("row_dimension") or "period")
+            column_dimension = str(payload.get("column_dimension") or "quarter")
+            metric_key = str(payload.get("metric_key") or "surgery_volume")
+            aggregation = str(payload.get("aggregation") or "sum").lower()
+            rows = [
+                {"row_key": "2026-01", "column_key": "T1", "value": 201},
+                {"row_key": "2026-02", "column_key": "T1", "value": 208},
+                {"row_key": "2026-03", "column_key": "T1", "value": 214},
+                {"row_key": "2026-04", "column_key": "T2", "value": 199},
+            ]
+            return {
+                "widget_type": "cube",
+                "title": "Cubo analitico mock",
+                "columns": [
+                    {"key": "row_key", "label": row_dimension},
+                    {"key": "column_key", "label": column_dimension},
+                    {"key": "value", "label": metric_key},
+                ],
+                "rows": rows[:limit],
+                "meta": {
+                    "row_dimension": row_dimension,
+                    "column_dimension": column_dimension,
+                    "metric_key": metric_key,
+                    "aggregation": aggregation,
+                    "query_preview": f"SELECT {row_dimension}, {column_dimension}, {aggregation.upper()}({metric_key}) AS value FROM kpi_snapshot GROUP BY {row_dimension}, {column_dimension}",
+                },
+            }
+
+        rows = [
+            {"period": "2026-01", "surgeries": 201, "ptca": 88, "mortality_pct": 2.2, "avg_wait_days": 4.5},
+            {"period": "2026-02", "surgeries": 208, "ptca": 92, "mortality_pct": 2.1, "avg_wait_days": 4.3},
+            {"period": "2026-03", "surgeries": 214, "ptca": 97, "mortality_pct": 2.0, "avg_wait_days": 4.1},
+        ]
+        return {
+            "widget_type": "table",
+            "title": "Tabla enriquecida mensual (mock)",
+            "columns": [
+                {"key": "period", "label": "Periodo"},
+                {"key": "surgeries", "label": "Cirugias"},
+                {"key": "ptca", "label": "PTCA"},
+                {"key": "mortality_pct", "label": "Mortalidad egreso (%)"},
+                {"key": "avg_wait_days", "label": "Espera promedio (dias)"},
+            ],
+            "rows": rows[:limit],
+            "meta": {"granularity": str(payload.get("granularity") or "month")},
+        }

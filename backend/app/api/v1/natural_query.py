@@ -40,6 +40,61 @@ def run_natural_query(
     errors: list[str] = []
     learning_service = NaturalQueryLearningService()
 
+    if _online_memory_enabled():
+        min_score = float(get_settings().natural_query_online_memory_min_score or 0.88)
+        memory_plan = learning_service.recall_approved_plan(payload.question, min_score=min_score)
+        if memory_plan is not None:
+            try:
+                translated_payload = dict(memory_plan.get("translated_payload") or {})
+                query_payload = _translated_payload_to_internal_query(
+                    endpoint=str(memory_plan.get("endpoint") or ""),
+                    intent=str(memory_plan.get("intent") or "trend"),
+                    metric=str(memory_plan.get("metric") or ""),
+                    translated_payload=translated_payload,
+                )
+                if query_payload is not None:
+                    refined_query_payload = _refine_query_payload_filters_with_question(
+                        question=payload.question,
+                        query_payload=dict(query_payload),
+                    )
+                    result = _execute_internal_query(
+                        endpoint=str(memory_plan["endpoint"]),
+                        query_payload=refined_query_payload,
+                        kpi_service=kpi_service,
+                        analytics_service=analytics_service,
+                    )
+                    response = _build_response(
+                        question=payload.question,
+                        resolved=True,
+                        source="llm",
+                        intent=str(memory_plan["intent"]),
+                        metric=str(memory_plan["metric"]),
+                        endpoint=str(memory_plan["endpoint"]),
+                        translated_payload=translated_payload,
+                        assumptions=[
+                            (
+                                "Resuelta por memoria online de ejemplos aprobados "
+                                f"(similitud={memory_plan.get('score')}, "
+                                f"base='{memory_plan.get('matched_question', '')}')."
+                            )
+                        ],
+                        result=result,
+                        errors=errors,
+                        query_payload=refined_query_payload,
+                        explanation="Consulta resuelta por memoria online de aprendizaje continuo.",
+                        auto_kpi=None,
+                    )
+                    _safe_record_interaction(learning_service, response, payload)
+                    _safe_record_auto_feedback(
+                        service=learning_service,
+                        response=response,
+                        user_claims=claims,
+                        gateway_confidence=1.0,
+                    )
+                    return response
+            except Exception as exc:
+                errors.append(f"Memoria online no pudo resolver la consulta: {exc}")
+
     gateway_execution = _build_gateway_execution_plan(payload, repository)
     errors.extend(gateway_execution["errors"])
 
@@ -125,6 +180,10 @@ def export_natural_query_training_dataset(
     service = NaturalQueryLearningService()
     total_samples, export_path = service.export_training_dataset(approved_only=approved_only)
     return NaturalQueryTrainingExportResponse(total_samples=total_samples, export_path=export_path)
+
+
+def _online_memory_enabled() -> bool:
+    return bool(get_settings().natural_query_online_memory_enabled)
 
 
 def _build_gateway_execution_plan(payload: NaturalQueryRequest, repository: object) -> dict[str, object]:

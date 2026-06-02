@@ -22,6 +22,8 @@ class Settings(BaseSettings):
     natural_query_training_export_file: str = Field(default="data/natural_query_training_dataset.jsonl")
     natural_query_auto_feedback_mode: str = Field(default="off")
     natural_query_auto_feedback_min_confidence: float = Field(default=0.8)
+    natural_query_online_memory_enabled: bool = Field(default=True)
+    natural_query_online_memory_min_score: float = Field(default=0.88)
     dynamic_kpis_file: str = Field(default="shared/dynamic_kpis.json")
     llm_gateway_url: str = Field(default="")
     llm_gateway_enabled: bool = Field(default=False)

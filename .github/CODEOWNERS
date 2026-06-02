@@ -1,0 +1,15 @@
+# Code owners for repository paths
+
+# Requires branch protection option: "Require review from Code Owners"
+
+# Frontend ownership
+
+/frontend/ @csdiego @gervasiojavier
+
+/backend/ @acampopiano
+
+# Optional defaults for shared areas (uncomment if needed)
+
+# /backend/ @acampopiano
+
+# /docs/ @acampopiano

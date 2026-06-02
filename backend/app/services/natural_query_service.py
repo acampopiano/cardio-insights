@@ -199,6 +199,12 @@ class NaturalQueryService:
         week_tokens = granularity_rules.get("week_tokens", ["semanal", "semana", "semanas"])
         month_tokens = granularity_rules.get("month_tokens", ["mensual", "mes", "meses"])
         year_tokens = granularity_rules.get("year_tokens", ["anual", "anio", "anios", "ejercicio"])
+        metric_rules = rules.get("metrics", {})
+        readmission_tokens = metric_rules.get("readmission_tokens", ["reingres", "readmis"])
+
+        # "reingreso a 30 dias" describe la metrica, no la granularidad de salida.
+        if any(token in normalized for token in readmission_tokens):
+            day_tokens = [token for token in day_tokens if token not in {"dia", "dias"}]
 
         if any(word in normalized for word in day_tokens):
             return "day"
@@ -209,7 +215,6 @@ class NaturalQueryService:
         if any(word in normalized for word in year_tokens):
             return "year"
 
-        metric_rules = rules.get("metrics", {})
         surgery_tokens = metric_rules.get("surgery_tokens", ["cirug"])
 
         has_explicit_year = re.search(r"\b20\d{2}\b", normalized) is not None
@@ -239,6 +244,8 @@ class NaturalQueryService:
         rules = NaturalQueryService._rules()
         metric_rules = rules.get("metrics", {})
 
+        if any(token in normalized for token in metric_rules.get("readmission_tokens", ["reingres", "readmis"])):
+            return "readmission_30d"
         if any(token in normalized for token in metric_rules.get("reintervenciones_tokens", ["reinterv"])):
             return "reintervenciones_mensual"
         if (
@@ -514,6 +521,7 @@ class NaturalQueryService:
                 ],
             },
             "metrics": {
+                "readmission_tokens": ["reingres", "readmis"],
                 "reintervenciones_tokens": ["reinterv"],
                 "wait_tokens": ["espera", "demora"],
                 "death_count_tokens": ["mur", "muert"],

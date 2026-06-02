@@ -4,6 +4,7 @@ import pymysql
 from pymysql.cursors import DictCursor
 
 from app.core.config import get_settings
+from app.core.kpi_registry import kpi_registry
 from app.core.security import get_password_hash
 from app.repositories.interfaces import AnalyticsRepository, AuthRepository
 
@@ -279,40 +280,52 @@ class MySQLRepository(AuthRepository, AnalyticsRepository):
         }
 
     def get_kpis_catalog(self) -> dict[str, Any]:
-        return {
-            "kpis": [
+        kpis: list[dict[str, str]] = [
+            {
+                "key": "surgery_volume",
+                "label": "Volumen de cirugias",
+                "unit": "casos",
+                "description": "Cantidad de cirugias por periodo",
+            },
+            {
+                "key": "ptca_volume",
+                "label": "Volumen de PTCA",
+                "unit": "casos",
+                "description": "Cantidad de procedimientos PTCA por periodo",
+            },
+            {
+                "key": "mortality_egreso_pct",
+                "label": "Fallecidos al egreso",
+                "unit": "%",
+                "description": "Porcentaje de egresos con fallecimiento registrado",
+            },
+            {
+                "key": "avg_wait_days",
+                "label": "Espera coordina->realizado",
+                "unit": "dias",
+                "description": "Promedio de dias entre coordinacion y acto realizado",
+            },
+            {
+                "key": "icu_los_avg",
+                "label": "Estadia promedio UCI",
+                "unit": "dias",
+                "description": "Promedio de estadia UCI en cirugia con datos validos",
+            },
+        ]
+
+        for item in kpi_registry.list_all():
+            if any(existing.get("key") == item.key for existing in kpis):
+                continue
+            kpis.append(
                 {
-                    "key": "surgery_volume",
-                    "label": "Volumen de cirugias",
-                    "unit": "casos",
-                    "description": "Cantidad de cirugias por periodo",
-                },
-                {
-                    "key": "ptca_volume",
-                    "label": "Volumen de PTCA",
-                    "unit": "casos",
-                    "description": "Cantidad de procedimientos PTCA por periodo",
-                },
-                {
-                    "key": "mortality_egreso_pct",
-                    "label": "Fallecidos al egreso",
-                    "unit": "%",
-                    "description": "Porcentaje de egresos con fallecimiento registrado",
-                },
-                {
-                    "key": "avg_wait_days",
-                    "label": "Espera coordina->realizado",
-                    "unit": "dias",
-                    "description": "Promedio de dias entre coordinacion y acto realizado",
-                },
-                {
-                    "key": "icu_los_avg",
-                    "label": "Estadia promedio UCI",
-                    "unit": "dias",
-                    "description": "Promedio de estadia UCI en cirugia con datos validos",
-                },
-            ]
-        }
+                    "key": item.key,
+                    "label": item.label,
+                    "unit": "valor",
+                    "description": item.description,
+                }
+            )
+
+        return {"kpis": kpis}
 
     def get_dashboard_summary(self) -> dict[str, Any]:
         surgery_series = self._monthly_surgery_volume(limit=2)
@@ -571,6 +584,24 @@ class MySQLRepository(AuthRepository, AnalyticsRepository):
                     ORDER BY period
                 """
             else:
+                dynamic_kpi = kpi_registry.get(normalized_key)
+                if dynamic_kpi is None:
+                    continue
+
+                sql_query = (
+                    dynamic_kpi.sql_query_template
+                    .replace("{period_expr}", period_realizado)
+                    .replace("{date_clause}", self._date_clause("f.FechaRealizado", filters))
+                )
+                rows = self._execute(sql_query)
+                points = [
+                    {
+                        "period": str(row["period"]),
+                        "value": float(row["value"] or 0),
+                    }
+                    for row in rows
+                ]
+                series.append({"kpi_key": requested_key, "points": points})
                 continue
 
             rows = self._execute(query)

@@ -1,0 +1,72 @@
+[
+  {
+    "key": "kpi_prueba_one_click",
+    "label": "KPI prueba one click",
+    "description": "KPI de prueba para flujo generar-validar-registrar",
+    "sql_query_template": "SELECT {period_expr} AS period, COUNT(*) AS value FROM flow_coordina f WHERE f.Realizado = 255 {date_clause} GROUP BY {period_expr} ORDER BY period",
+    "default_granularity": "month"
+  },
+  {
+    "key": "volumen_mensual_total",
+    "label": "Volumen mensual total",
+    "description": "Cantidad total de actividad realizada por per\u00edodo.",
+    "sql_query_template": "SELECT {period_expr} AS period, COUNT(*) AS value FROM flow_coordina f WHERE f.Realizado = 255 {date_clause} GROUP BY {period_expr} ORDER BY period",
+    "default_granularity": "month"
+  },
+  {
+    "key": "surgery_volume",
+    "label": "Volumen de cirugias",
+    "description": "Cantidad de cirugias por periodo",
+    "sql_query_template": "SELECT {period_expr} AS period, COUNT(*) AS value FROM dat_cirugia d JOIN flow_coordina f ON f.Cod = d.CodCoordina WHERE f.FechaRealizado > '1900-01-01' {date_clause} GROUP BY {period_expr} ORDER BY period",
+    "default_granularity": "month"
+  },
+  {
+    "key": "ptca_volume",
+    "label": "Volumen de PTCA",
+    "description": "Cantidad de procedimientos PTCA por periodo",
+    "sql_query_template": "SELECT {period_expr} AS period, COUNT(*) AS value FROM call_ptcamaster c JOIN flow_coordina f ON f.Cod = c.CodCoordina WHERE f.FechaRealizado > '1900-01-01' {date_clause} GROUP BY {period_expr} ORDER BY period",
+    "default_granularity": "month"
+  },
+  {
+    "key": "mortality_egreso_pct",
+    "label": "Mortalidad al egreso",
+    "description": "Porcentaje de pacientes fallecidos al egreso hospitalario",
+    "sql_query_template": "SELECT {period_expr} AS period, ROUND(100.0 * SUM(CASE WHEN p.FechaFallece > '1900-01-01' THEN 1 ELSE 0 END) / NULLIF(COUNT(*), 0), 2) AS value FROM flow_procedimientocardiologia p JOIN flow_coordina f ON f.CodPacFicha = p.CodPacFicha WHERE p.FechaEgreso > '1900-01-01' {date_clause} GROUP BY {period_expr} ORDER BY period",
+    "default_granularity": "month"
+  },
+  {
+    "key": "mortality_30d",
+    "label": "Mortalidad a 30 dias",
+    "description": "Porcentaje de pacientes fallecidos dentro de 30 dias",
+    "sql_query_template": "SELECT {period_expr} AS period, ROUND(100.0 * SUM(CASE WHEN p.FechaFallece > '1900-01-01' THEN 1 ELSE 0 END) / NULLIF(COUNT(*), 0), 2) AS value FROM flow_procedimientocardiologia p JOIN flow_coordina f ON f.CodPacFicha = p.CodPacFicha WHERE p.FechaEgreso > '1900-01-01' {date_clause} GROUP BY {period_expr} ORDER BY period",
+    "default_granularity": "month"
+  },
+  {
+    "key": "icu_los_avg",
+    "label": "Estadia promedio UCI",
+    "description": "Promedio de dias de internacion en UCI",
+    "sql_query_template": "SELECT {period_expr} AS period, ROUND(AVG(d.POestadiaUCI), 2) AS value FROM dat_cirugia d JOIN flow_coordina f ON f.Cod = d.CodCoordina WHERE f.FechaRealizado > '1900-01-01' AND d.POestadiaUCI >= 0 {date_clause} GROUP BY {period_expr} ORDER BY period",
+    "default_granularity": "month"
+  },
+  {
+    "key": "avg_wait_days",
+    "label": "Espera promedio",
+    "description": "Promedio de dias de espera entre coordinacion y realizado",
+    "sql_query_template": "SELECT {period_expr} AS period, ROUND(AVG(DATEDIFF(f.FechaRealizado, f.FechaCoordina)), 2) AS value FROM flow_coordina f WHERE f.FechaRealizado > '1900-01-01' AND f.FechaCoordina > '1900-01-01' AND DATEDIFF(f.FechaRealizado, f.FechaCoordina) >= 0 {date_clause} GROUP BY {period_expr} ORDER BY period",
+    "default_granularity": "month"
+  },
+  {
+    "key": "ptca_share_pct",
+    "label": "Participacion PTCA",
+    "description": "Porcentaje de PTCA sobre el total de actividad (PTCA + cirugias)",
+    "sql_query_template": "SELECT {period_expr} AS period, ROUND(100.0 * COUNT(DISTINCT c.Cod) / NULLIF(COUNT(DISTINCT d.k_id) + COUNT(DISTINCT c.Cod), 0), 2) AS value FROM flow_coordina f LEFT JOIN dat_cirugia d ON d.CodCoordina = f.Cod LEFT JOIN call_ptcamaster c ON c.CodCoordina = f.Cod WHERE f.FechaRealizado > '1900-01-01' {date_clause} GROUP BY {period_expr} ORDER BY period",
+    "default_granularity": "month"
+  },
+  {
+    "key": "readmission_30d",
+    "label": "Reingreso a 30 dias",
+    "description": "Pacientes readmitidos en los 30 dias posteriores",
+    "sql_query_template": "SELECT {period_expr} AS period, 0 AS value FROM flow_coordina f WHERE f.FechaRealizado > '1900-01-01' {date_clause} GROUP BY {period_expr} ORDER BY period",
+    "default_granularity": "month"
+  }
+]

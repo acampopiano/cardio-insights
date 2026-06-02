@@ -1,0 +1,765 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cardio Insights | Flujo visual del sistema</title>
+  <style>
+    :root {
+      --ink: #102438;
+      --muted: #587286;
+      --canvas: #f5f8f8;
+      --paper: #ffffff;
+      --navy: #103b53;
+      --teal: #087f83;
+      --mint: #dbf1ec;
+      --orange: #e36e3c;
+      --orange-soft: #ffeadf;
+      --blue: #21769a;
+      --blue-soft: #e4f2f8;
+      --purple: #7257a5;
+      --purple-soft: #f1ebff;
+      --line: #dae4e6;
+      --warn: #fff5dd;
+      --warn-border: #e6b642;
+      --shadow: 0 15px 44px rgba(16, 36, 56, .08);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--canvas);
+      font: 15px/1.48 "Segoe UI", Arial, sans-serif;
+    }
+    header {
+      background: linear-gradient(120deg, #092d43 0%, #0d5867 56%, #087f83 100%);
+      color: #fff;
+      padding: 40px clamp(22px, 6vw, 70px) 44px;
+    }
+    header .eyebrow {
+      margin: 0 0 14px;
+      color: #9de1d6;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+    }
+    h1 {
+      max-width: 900px;
+      margin: 0 0 13px;
+      font-size: clamp(34px, 4vw, 52px);
+      line-height: 1.08;
+      letter-spacing: -.04em;
+    }
+    header .lead {
+      max-width: 800px;
+      margin: 0;
+      color: #d5edf0;
+      font-size: 18px;
+    }
+    .hero-facts {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 30px;
+    }
+    .fact {
+      padding: 10px 14px;
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 10px;
+      background: rgba(255,255,255,.08);
+      color: #edfafa;
+      font-size: 13px;
+    }
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+      padding: 14px clamp(18px, 6vw, 70px);
+      border-bottom: 1px solid var(--line);
+      background: rgba(255,255,255,.94);
+      backdrop-filter: blur(8px);
+    }
+    nav a {
+      padding: 7px 12px;
+      border-radius: 18px;
+      color: var(--navy);
+      background: #eff5f5;
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+    }
+    main {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 34px clamp(18px, 5vw, 46px) 62px;
+    }
+    section { margin-bottom: 42px; }
+    h2 {
+      margin: 0 0 8px;
+      font-size: 29px;
+      letter-spacing: -.03em;
+    }
+    h3 {
+      margin: 0 0 8px;
+      font-size: 18px;
+    }
+    p { margin: 0 0 12px; }
+    .intro {
+      max-width: 820px;
+      margin-bottom: 23px;
+      color: var(--muted);
+      font-size: 16px;
+    }
+    .grid { display: grid; gap: 16px; }
+    .cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .card {
+      min-width: 0;
+      padding: 19px;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+    .chip {
+      display: inline-flex;
+      margin-bottom: 10px;
+      padding: 4px 9px;
+      border-radius: 13px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+    }
+    .available { color: #066d67; background: var(--mint); }
+    .used { color: #126185; background: var(--blue-soft); }
+    .partial { color: #96600a; background: var(--warn); }
+    .flow {
+      display: flex;
+      align-items: stretch;
+      gap: 9px;
+      overflow-x: auto;
+      padding: 10px 0 4px;
+    }
+    .node {
+      flex: 1 0 155px;
+      min-height: 114px;
+      padding: 13px;
+      border-radius: 13px;
+      border: 1px solid #bfd5d8;
+      background: #fff;
+    }
+    .node b { display: block; margin-bottom: 5px; color: var(--navy); }
+    .node small { color: var(--muted); }
+    .node.ui { border-top: 5px solid var(--blue); }
+    .node.api { border-top: 5px solid var(--teal); }
+    .node.rule { border-top: 5px solid var(--purple); }
+    .node.data { border-top: 5px solid var(--orange); }
+    .node.result { border-top: 5px solid #32945d; }
+    .arrow {
+      display: flex;
+      align-items: center;
+      flex: 0 0 20px;
+      color: var(--teal);
+      font-size: 25px;
+      font-weight: bold;
+    }
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin: 16px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .legend i {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      margin-right: 6px;
+      border-radius: 50%;
+    }
+    .callout {
+      padding: 16px 18px;
+      border: 1px solid var(--warn-border);
+      border-left: 5px solid var(--warn-border);
+      border-radius: 11px;
+      background: var(--warn);
+    }
+    .journey {
+      display: grid;
+      grid-template-columns: 55px minmax(0, 1fr);
+      gap: 0 14px;
+      margin-top: 17px;
+    }
+    .step-num {
+      display: grid;
+      place-items: center;
+      align-self: start;
+      width: 43px;
+      height: 43px;
+      border-radius: 50%;
+      background: var(--navy);
+      color: #fff;
+      font-size: 18px;
+      font-weight: 700;
+    }
+    .step-body {
+      margin-bottom: 13px;
+      padding: 4px 0 18px 4px;
+      border-bottom: 1px dashed var(--line);
+    }
+    .step-body strong { color: var(--navy); }
+    code, pre { font-family: Consolas, "Cascadia Code", monospace; }
+    code {
+      padding: 1px 5px;
+      border-radius: 5px;
+      color: #145b73;
+      background: #eff5f7;
+      font-size: .93em;
+    }
+    pre {
+      margin: 12px 0 0;
+      padding: 14px;
+      overflow-x: auto;
+      border-radius: 10px;
+      color: #dcebef;
+      background: #122a3b;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      border-radius: 12px;
+      overflow: hidden;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+      font-size: 13px;
+    }
+    th {
+      padding: 12px 11px;
+      color: #fff;
+      background: var(--navy);
+      text-align: left;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .03em;
+    }
+    td {
+      padding: 11px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+    }
+    tbody tr:last-child td { border-bottom: 0; }
+    .method {
+      display: inline-block;
+      min-width: 45px;
+      margin-right: 5px;
+      padding: 3px 5px;
+      border-radius: 5px;
+      font-size: 11px;
+      font-weight: 700;
+      text-align: center;
+    }
+    .get { color: #116378; background: #dff2f6; }
+    .post { color: #7f4510; background: #ffe8d5; }
+    .yes, .no {
+      display: inline-block;
+      padding: 3px 7px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .yes { color: #066d67; background: var(--mint); }
+    .no { color: #7a5b05; background: var(--warn); }
+    .payload {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 15px;
+    }
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-top: 10px;
+    }
+    .tag {
+      padding: 5px 9px;
+      border-radius: 8px;
+      color: var(--navy);
+      background: #eef4f5;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .branch {
+      position: relative;
+      padding-top: 11px;
+    }
+    .branch h3 {
+      color: var(--navy);
+      font-size: 16px;
+    }
+    .branch.trend { border-top: 5px solid var(--teal); }
+    .branch.ranking { border-top: 5px solid var(--purple); }
+    .branch.dynamic { border-top: 5px solid var(--orange); }
+    ul.clean {
+      margin: 9px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+    ul.clean li {
+      padding: 7px 0;
+      border-bottom: 1px dashed var(--line);
+    }
+    ul.clean li:last-child { border-bottom: 0; }
+    .two-path {
+      display: grid;
+      grid-template-columns: 1fr 72px 1fr;
+      align-items: center;
+      gap: 12px;
+      margin-top: 18px;
+    }
+    .split {
+      color: var(--teal);
+      text-align: center;
+      font-size: 29px;
+      font-weight: bold;
+    }
+    .mini-flow {
+      display: grid;
+      gap: 9px;
+    }
+    .mini-flow div {
+      padding: 10px;
+      border-left: 4px solid var(--teal);
+      border-radius: 7px;
+      background: #f4f9f9;
+    }
+    .source {
+      margin-top: 19px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    footer {
+      padding: 25px clamp(20px, 6vw, 70px) 34px;
+      color: #cce0e4;
+      background: var(--navy);
+      font-size: 13px;
+    }
+    @media (max-width: 900px) {
+      .cols-2, .cols-3, .payload, .two-path { grid-template-columns: 1fr; }
+      .split { transform: rotate(90deg); }
+      nav { position: static; }
+    }
+    @media print {
+      body { background: #fff; }
+      nav { display: none; }
+      header { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+      .card, table { box-shadow: none; }
+      section { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <p class="eyebrow">Cardio Insights / Mapa de funcionamiento</p>
+    <h1>De una pregunta clínica al dato visible</h1>
+    <p class="lead">Guía visual para entender qué hace el sistema, qué endpoints existen, qué consume hoy la interfaz y cómo una frase en lenguaje natural termina en una consulta analítica.</p>
+    <div class="hero-facts">
+      <div class="fact">API: FastAPI · <strong>/api/v1</strong></div>
+      <div class="fact">UI actual: React + Vite</div>
+      <div class="fact">Datos: Mock o MySQL INCC</div>
+      <div class="fact">Seguridad: JWT Bearer</div>
+      <div class="fact">Actualizado desde código: 24/05/2026</div>
+    </div>
+  </header>
+
+  <nav aria-label="Secciones">
+    <a href="#mapa">Mapa general</a>
+    <a href="#interfaz">Interfaz actual</a>
+    <a href="#endpoints">Endpoints</a>
+    <a href="#lenguaje">Lenguaje natural</a>
+    <a href="#designer">KPI Designer</a>
+    <a href="#datos">Datos</a>
+    <a href="#explicar">Guion corto</a>
+  </nav>
+
+  <main>
+    <section id="mapa">
+      <h2>1. El sistema en una mirada</h2>
+      <p class="intro">Cardio Insights desacopla la experiencia visual, la lógica de API y el origen de datos. El mismo contrato JSON puede responder desde datos simulados para desarrollo o desde MySQL con información real.</p>
+      <div class="flow" aria-label="Arquitectura general">
+        <div class="node ui"><b>Persona usuaria</b><small>Inicia sesión, filtra, mira tableros o formula una pregunta.</small></div>
+        <div class="arrow">→</div>
+        <div class="node ui"><b>Frontend React</b><small>Renderiza resumen, tendencias, tablas, ranking y cubo.</small></div>
+        <div class="arrow">→</div>
+        <div class="node api"><b>API FastAPI</b><small>Rutas bajo <code>/api/v1</code>; verifica JWT.</small></div>
+        <div class="arrow">→</div>
+        <div class="node rule"><b>Servicios</b><small>Auth, dashboard, KPIs, analytics, NL y Designer.</small></div>
+        <div class="arrow">→</div>
+        <div class="node data"><b>Repositorio</b><small><code>MockRepository</code> o <code>MySQLRepository</code>.</small></div>
+        <div class="arrow">→</div>
+        <div class="node result"><b>JSON visible</b><small>Tarjetas, series, tablas, rankings o cubos.</small></div>
+      </div>
+      <div class="legend">
+        <span><i style="background:#21769a"></i>Experiencia</span>
+        <span><i style="background:#087f83"></i>API</span>
+        <span><i style="background:#7257a5"></i>Lógica</span>
+        <span><i style="background:#e36e3c"></i>Datos</span>
+        <span><i style="background:#32945d"></i>Respuesta</span>
+      </div>
+      <div class="grid cols-3" style="margin-top:24px">
+        <article class="card">
+          <span class="chip available">Disponible</span>
+          <h3>API de consulta natural</h3>
+          <p><code>POST /natural-query/run</code> convierte preguntas a payloads de KPIs o analytics y ejecuta el resultado.</p>
+        </article>
+        <article class="card">
+          <span class="chip used">Usado por React</span>
+          <h3>Dashboard interactivo</h3>
+          <p>La pantalla actual consume resumen, KPIs y analytics para tablas, ranking y cubo.</p>
+        </article>
+        <article class="card">
+          <span class="chip partial">A integrar en UI</span>
+          <h3>Pregunta en pantalla</h3>
+          <p>El endpoint de lenguaje natural existe en backend, pero <strong>no está conectado</strong> desde <code>App.jsx</code>.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="interfaz">
+      <h2>2. Lo que hace la interfaz actual</h2>
+      <p class="intro">Al autenticarse, React guarda el token y arma un tablero con llamadas protegidas. Esto representa el recorrido que hoy puede ejecutar una persona desde la UI.</p>
+      <div class="journey">
+        <div class="step-num">1</div>
+        <div class="step-body"><strong>Login</strong>: envía usuario/clave a <code>POST /auth/login</code> y recibe el <code>access_token</code> JWT junto al perfil.</div>
+        <div class="step-num">2</div>
+        <div class="step-body"><strong>Carga inicial o aplicar filtros</strong>: llama en paralelo a <code>/dashboard/summary</code>, <code>/kpis/query</code> y dos variantes de <code>/analytics/query</code> (tabla y ranking).</div>
+        <div class="step-num">3</div>
+        <div class="step-body"><strong>Render</strong>: muestra tarjetas de situación, tendencias, tabla analítica y top ranking a partir del JSON recibido.</div>
+        <div class="step-num">4</div>
+        <div class="step-body"><strong>Vista Cubo</strong>: al entrar a “Cubo” o crear consulta, llama <code>POST /analytics/query</code> con dimensiones y agregación elegidas.</div>
+      </div>
+      <div class="payload">
+        <article class="card">
+          <span class="chip used">Request de tendencias</span>
+          <h3>React → KPIs</h3>
+          <pre>{
+  "kpi_keys": ["surgery_volume", "ptca_share_pct"],
+  "granularity": "month",
+  "filters": [
+    {"key": "date_from", "values": ["2025-01-01"]},
+    {"key": "date_to", "values": ["2026-05-24"]}
+  ]
+}</pre>
+        </article>
+        <article class="card">
+          <span class="chip used">Response para graficar</span>
+          <h3>KPIs → React</h3>
+          <pre>{
+  "series": [{
+    "kpi_key": "surgery_volume",
+    "points": [
+      {"period": "2026-03", "value": 214.0}
+    ]
+  }]
+}</pre>
+        </article>
+      </div>
+    </section>
+
+    <section id="endpoints">
+      <h2>3. Catálogo de endpoints</h2>
+      <p class="intro">Todos se publican debajo de <code>http://localhost:8000/api/v1</code>. Salvo health y la página HTML del designer, las operaciones relevantes requieren <code>Authorization: Bearer &lt;jwt&gt;</code>.</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Endpoint</th>
+            <th>Qué recibe</th>
+            <th>Qué devuelve</th>
+            <th>Uso actual React</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><span class="method get">GET</span><code>/health</code></td><td>Sin token</td><td>Estado, servicio, versión y ambiente</td><td><span class="no">No</span></td></tr>
+          <tr><td><span class="method post">POST</span><code>/auth/login</code></td><td><code>username</code>, <code>password</code></td><td>JWT, vencimiento y usuario/permisos</td><td><span class="yes">Sí</span></td></tr>
+          <tr><td><span class="method post">POST</span><code>/auth/logout</code></td><td>JWT</td><td><code>success</code>, sesión invalidada en memoria</td><td><span class="no">No: logout local</span></td></tr>
+          <tr><td><span class="method get">GET</span><code>/auth/me</code></td><td>JWT</td><td>Usuario autenticado</td><td><span class="no">No</span></td></tr>
+          <tr><td><span class="method get">GET</span><code>/catalogs/filters</code></td><td>JWT</td><td>Filtros y opciones habilitadas</td><td><span class="no">No</span></td></tr>
+          <tr><td><span class="method get">GET</span><code>/catalogs/kpis</code></td><td>JWT</td><td>KPIs: key, etiqueta, unidad, descripción</td><td><span class="no">No</span></td></tr>
+          <tr><td><span class="method get">GET</span><code>/dashboard/summary</code></td><td>JWT</td><td>Tarjetas con valor, unidad y delta</td><td><span class="yes">Sí</span></td></tr>
+          <tr><td><span class="method get">GET</span><code>/dashboard/charts</code></td><td>JWT</td><td>Gráficas preparadas con series x/y</td><td><span class="no">No</span></td></tr>
+          <tr><td><span class="method get">GET</span><code>/dashboard/table</code></td><td>JWT</td><td>Columnas y filas del tablero base</td><td><span class="no">No</span></td></tr>
+          <tr><td><span class="method post">POST</span><code>/kpis/query</code></td><td>KPIs, filtros, granularidad</td><td>Series <code>period/value</code></td><td><span class="yes">Sí</span></td></tr>
+          <tr><td><span class="method post">POST</span><code>/analytics/query</code></td><td>Tipo table/ranking/cube y configuración</td><td>Columnas, filas y metadatos</td><td><span class="yes">Sí</span></td></tr>
+          <tr><td><span class="method post">POST</span><code>/natural-query/run</code></td><td>Pregunta y aprobación opcional</td><td>Plan interpretado + resultado ejecutado</td><td><span class="no">Pendiente</span></td></tr>
+          <tr><td><span class="method get">GET</span><code>/kpi-designer/ui</code></td><td>Abierto en navegador</td><td>Formulario HTML para diseñar KPIs</td><td><span class="no">UI aparte</span></td></tr>
+          <tr><td><span class="method post">POST</span><code>/kpi-designer/generate</code></td><td>Nombre, detalle, SQL, granularidad</td><td>Key, snippets y payload de registro</td><td><span class="no">Designer</span></td></tr>
+          <tr><td><span class="method post">POST</span><code>/kpi-designer/create</code></td><td>Diseño de KPI</td><td>Registro + validación + preview</td><td><span class="no">Designer</span></td></tr>
+          <tr><td><span class="method post">POST</span><code>/kpi-designer/register</code></td><td>Definición ya generada</td><td>KPI disponible para consultar</td><td><span class="no">Designer</span></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>4. Tipos de respuesta que ve el usuario</h2>
+      <div class="grid cols-3">
+        <article class="card">
+          <span class="chip used">Resumen</span>
+          <h3>Tarjetas de control</h3>
+          <pre>{
+  "cards": [{
+    "key": "surgery_volume",
+    "label": "Cirugias (ultimo mes)",
+    "value": 214,
+    "unit": "casos",
+    "delta": 8.4
+  }]
+}</pre>
+        </article>
+        <article class="card">
+          <span class="chip used">Ranking</span>
+          <h3>¿Dónde fue mayor?</h3>
+          <pre>{
+  "widget_type": "ranking",
+  "rows": [{
+    "rank": 1,
+    "label": "2026-03",
+    "value": 214
+  }]
+}</pre>
+        </article>
+        <article class="card">
+          <span class="chip used">Cubo</span>
+          <h3>Cruce de dimensiones</h3>
+          <pre>{
+  "widget_type": "cube",
+  "rows": [{
+    "row_key": "2026-03",
+    "column_key": "T1",
+    "value": 214
+  }]
+}</pre>
+        </article>
+      </div>
+      <div class="tag-row">
+        <span class="tag">KPIs: cirugía</span>
+        <span class="tag">PTCA</span>
+        <span class="tag">mortalidad al egreso</span>
+        <span class="tag">espera promedio</span>
+        <span class="tag">estadía UCI</span>
+        <span class="tag">participación PTCA</span>
+        <span class="tag">KPIs dinámicos</span>
+      </div>
+    </section>
+
+    <section id="lenguaje">
+      <h2>5. Lenguaje natural: de frase a respuesta</h2>
+      <p class="intro">No es un modelo generativo: hoy el servicio interpreta la pregunta mediante reglas de palabras clave y reglas temporales JSON. Luego arma un request estructurado a un endpoint que ya existe.</p>
+      <div class="flow" aria-label="Flujo consulta natural">
+        <div class="node ui"><b>Pregunta</b><small>“¿En qué mes estuvimos peor con las demoras?”</small></div>
+        <div class="arrow">→</div>
+        <div class="node rule"><b>Normalizar</b><small>Minúsculas y equivalencias sin tildes.</small></div>
+        <div class="arrow">→</div>
+        <div class="node rule"><b>Detectar</b><small>Intent, métrica, granularidad y fechas.</small></div>
+        <div class="arrow">→</div>
+        <div class="node api"><b>Elegir endpoint</b><small>KPI trend o analytics ranking.</small></div>
+        <div class="arrow">→</div>
+        <div class="node data"><b>Ejecutar datos</b><small>Repositorio mock/MySQL.</small></div>
+        <div class="arrow">→</div>
+        <div class="node result"><b>Explicar</b><small>Payload, supuestos y resultado.</small></div>
+      </div>
+
+      <div class="grid cols-3" style="margin-top:23px">
+        <article class="card branch trend">
+          <h3>A. Tendencia</h3>
+          <p>Si pregunta “cómo viene”, “evolución” o menciona una métrica sin pedir top, deriva a:</p>
+          <p><code>POST /kpis/query</code></p>
+          <pre>{
+  "kpi_keys": ["avg_wait_days"],
+  "granularity": "month",
+  "filters": [
+    {"key": "date_from",
+     "values": ["2026-01-01"]},
+    {"key": "date_to",
+     "values": ["2026-12-31"]}
+  ]
+}</pre>
+        </article>
+        <article class="card branch ranking">
+          <h3>B. Ranking o pico</h3>
+          <p>Si detecta “top”, “mayor”, “peor”, “pico” o preguntas “en qué mes/día”, deriva a:</p>
+          <p><code>POST /analytics/query</code></p>
+          <pre>{
+  "widget_type": "ranking",
+  "metric_key": "avg_wait_days",
+  "granularity": "month",
+  "limit": 5,
+  "filters": [...]
+}</pre>
+        </article>
+        <article class="card branch dynamic">
+          <h3>C. KPI no existente</h3>
+          <p>Para casos previstos como “espera máxima” o “volumen total”, propone o crea un KPI dinámico.</p>
+          <p>Modo inicial: <code>human_approve</code></p>
+          <pre>{
+  "auto_kpi": {
+    "created": false,
+    "status": "pending_approval",
+    "requires_approval": true
+  }
+}</pre>
+        </article>
+      </div>
+
+      <h3 style="margin-top:27px">Diccionario que guía la interpretación</h3>
+      <table style="margin-top:12px">
+        <thead>
+          <tr><th>Lo que escribe la persona</th><th>Detección</th><th>Resultado técnico</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>“cirugía”, “quirófano”, “bypass”</td><td>Métrica de cirugía</td><td><code>surgery_volume</code></td></tr>
+          <tr><td>“PTCA”, “angioplastia”, “stent”</td><td>Métrica PTCA</td><td><code>ptca_volume</code></td></tr>
+          <tr><td>“porcentaje ... PTCA”</td><td>Participación</td><td><code>ptca_share_pct</code></td></tr>
+          <tr><td>“espera”, “demora”, “retraso”</td><td>Demora promedio</td><td><code>avg_wait_days</code></td></tr>
+          <tr><td>“mortalidad”, “fallecidos”</td><td>Resultado clínico</td><td><code>mortality_egreso_pct</code></td></tr>
+          <tr><td>“día”, “semana”, “mensual”, “anual”</td><td>Granularidad</td><td><code>day/week/month/year</code></td></tr>
+          <tr><td>“marzo 2024”</td><td>Rango de fechas</td><td><code>2024-03-01</code> a <code>2024-03-31</code></td></tr>
+          <tr><td>“el año pasado”</td><td>Año relativo</td><td>Año UTC anterior a la ejecución</td></tr>
+        </tbody>
+      </table>
+
+      <div class="payload" style="margin-top:22px">
+        <article class="card">
+          <span class="chip available">Entrada</span>
+          <h3>Pregunta en lenguaje natural</h3>
+          <pre>POST /api/v1/natural-query/run
+Authorization: Bearer &lt;jwt&gt;
+
+{
+  "question": "En que dia de marzo de 2024 tuvimos el pico de cirugias?"
+}</pre>
+        </article>
+        <article class="card">
+          <span class="chip available">Salida explicable</span>
+          <h3>Plan y dato devuelto</h3>
+          <pre>{
+  "intent": "ranking",
+  "endpoint_used": "/api/v1/analytics/query",
+  "payload": {
+    "metric_key": "surgery_volume",
+    "granularity": "day",
+    "limit": 1,
+    "filters": [
+      {"key": "date_from", "values": ["2024-03-01"]},
+      {"key": "date_to", "values": ["2024-03-31"]}
+    ]
+  },
+  "assumptions": ["Asumi rango del mes solicitado..."],
+  "result": {"widget_type": "ranking", "rows": []}
+}</pre>
+        </article>
+      </div>
+      <div class="callout" style="margin-top:22px">
+        <strong>Punto de control:</strong> la traducción natural ya funciona como endpoint de backend y cuenta con pruebas. Para que el usuario escriba preguntas dentro del dashboard React falta incorporar un cuadro de consulta y consumir <code>/natural-query/run</code>.
+      </div>
+    </section>
+
+    <section id="designer">
+      <h2>6. Cómo nace un KPI nuevo</h2>
+      <p class="intro">El KPI Designer permite ampliar métricas sin editar pantallas. En MySQL la definición puede persistir; en modo mock queda en el registro en memoria del proceso.</p>
+      <div class="two-path">
+        <article class="card">
+          <span class="chip available">Creación manual</span>
+          <div class="mini-flow">
+            <div>1. Abrir <code>/kpi-designer/ui</code> y pegar JWT</div>
+            <div>2. Definir nombre, descripción, granularidad y SQL</div>
+            <div>3. El SQL debe devolver <code>period</code> y <code>value</code></div>
+            <div>4. <code>POST /kpi-designer/create</code> genera, registra y valida</div>
+            <div>5. Consultar la key en <code>/kpis/query</code></div>
+          </div>
+        </article>
+        <div class="split">⇄</div>
+        <article class="card">
+          <span class="chip available">Desde lenguaje natural</span>
+          <div class="mini-flow">
+            <div>1. La pregunta pide una métrica no mapeada pero prevista</div>
+            <div>2. El planner genera un candidato de KPI y SQL</div>
+            <div>3. <code>suggest_only</code>, <code>human_approve</code> o <code>auto_create</code></div>
+            <div>4. Si se aprueba, registra y valida la nueva métrica</div>
+            <div>5. Reejecuta automáticamente la consulta original</div>
+          </div>
+        </article>
+      </div>
+      <div class="grid cols-3" style="margin-top:18px">
+        <article class="card">
+          <h3><code>suggest_only</code></h3>
+          <p>El sistema muestra el candidato, pero no crea nada.</p>
+        </article>
+        <article class="card">
+          <h3><code>human_approve</code></h3>
+          <p>Modo por defecto. Exige <code>approve_auto_kpi=true</code> y rol autorizado.</p>
+        </article>
+        <article class="card">
+          <h3><code>auto_create</code></h3>
+          <p>Crea y valida automáticamente, útil para prueba controlada.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="datos">
+      <h2>7. De dónde salen los datos</h2>
+      <div class="grid cols-2">
+        <article class="card">
+          <span class="chip available">Modo desarrollo</span>
+          <h3><code>REPOSITORY_BACKEND=mock</code></h3>
+          <ul class="clean">
+            <li>Usuarios demo y series fijas.</li>
+            <li>Permite desarrollar UI sin base instalada.</li>
+            <li>KPIs dinámicos viven en memoria y devuelven serie simulada.</li>
+          </ul>
+        </article>
+        <article class="card">
+          <span class="chip available">Modo datos reales</span>
+          <h3><code>REPOSITORY_BACKEND=mysql</code></h3>
+          <ul class="clean">
+            <li>Ejecuta SQL sobre base INCC.</li>
+            <li>Usa tablas como <code>flow_coordina</code>, <code>dat_cirugia</code>, <code>call_ptcamaster</code> y <code>flow_procedimientocardiologia</code>.</li>
+            <li>KPIs dinámicos se guardan en <code>cardio_dynamic_kpis</code>.</li>
+          </ul>
+        </article>
+      </div>
+      <div class="flow" style="margin-top:20px" aria-label="Cambio de repositorio">
+        <div class="node api"><b>Mismo endpoint</b><small><code>/kpis/query</code> o <code>/analytics/query</code></small></div>
+        <div class="arrow">→</div>
+        <div class="node rule"><b>Dependencia</b><small><code>get_repository()</code> lee configuración.</small></div>
+        <div class="arrow">→</div>
+        <div class="node data"><b>Mock / MySQL</b><small>Origen cambia; contrato no.</small></div>
+        <div class="arrow">→</div>
+        <div class="node result"><b>Contrato estable</b><small>React recibe el mismo tipo de JSON.</small></div>
+      </div>
+    </section>
+
+    <section id="explicar">
+      <h2>8. Guion de 60 segundos para el equipo</h2>
+      <div class="card" style="font-size:17px; padding:25px">
+        <p>“Cardio Insights tiene una interfaz React que nunca consulta directamente la base. Primero el usuario se autentica y obtiene un token. Con ese token, la pantalla pide tarjetas, series de KPIs y analítica al backend FastAPI.”</p>
+        <p>“La API pasa por servicios y usa un repositorio que puede ser mock o MySQL; por eso desarrollamos sin base y luego enchufamos datos reales sin cambiar la forma de las respuestas.”</p>
+        <p>“Además existe una capa de lenguaje natural: toma una pregunta, reconoce métrica, período e intención, la convierte a una consulta estructurada y devuelve tanto el dato como la explicación de lo que interpretó. Esa API está lista; el cuadro de preguntas todavía debe conectarse en el frontend.”</p>
+        <p style="margin-bottom:0">“Cuando aparece una métrica nueva, KPI Designer permite definirla con SQL que devuelva período y valor; luego se registra y queda consultable como cualquier otra serie.”</p>
+      </div>
+      <p class="source"><strong>Fuentes verificadas en el repositorio:</strong> <code>frontend/src/App.jsx</code>, <code>backend/app/api/v1/*.py</code>, <code>backend/app/services/*.py</code>, <code>backend/app/repositories/*.py</code>, <code>backend/app/schemas/*.py</code>, <code>backend/app/core/config.py</code> y <code>backend/app/tests/test_api.py</code>.</p>
+    </section>
+  </main>
+
+  <footer>
+    Cardio Insights · Documento visual de arquitectura y consumo API · Generado a partir del código local del proyecto el 24 de mayo de 2026.
+  </footer>
+</body>
+</html>

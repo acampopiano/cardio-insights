@@ -23,3 +23,8 @@ Thumbs.db
 
 # Docker
 *.pid
+
+# Local artifacts
+backend.zip
+frontend.rar
+backend/data/

@@ -5,7 +5,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 AllowedIntent = Literal["trend", "ranking", "comparison", "alert"]
 AllowedEndpoint = Literal["/api/v1/kpis/query", "/api/v1/analytics/query"]
-AllowedSource = Literal["rules", "llm"]
+AllowedSource = Literal["rules", "llm", "memory"]
 
 
 class NaturalQueryRequest(BaseModel):

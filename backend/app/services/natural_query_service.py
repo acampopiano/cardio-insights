@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import re
+import unicodedata
 from calendar import monthrange
 from datetime import UTC, datetime
 from functools import lru_cache
@@ -189,7 +190,7 @@ class NaturalQueryService:
         }
         for old, new in replacements.items():
             lowered = lowered.replace(old, new)
-        return lowered
+        return unicodedata.normalize("NFKD", lowered).encode("ascii", "ignore").decode("ascii")
 
     @staticmethod
     def _detect_granularity(normalized: str) -> str:
@@ -532,7 +533,7 @@ class NaturalQueryService:
                 "hemodinamia_tokens": ["hemodinam"],
                 "center_top_tokens": ["centro", "top"],
                 "center_tokens": ["centro"],
-                "surgery_tokens": ["cirug"],
+                "surgery_tokens": ["cirug", "quirurg"],
             },
             "auto_kpi": {
                 "wait_peak_tokens": ["espera maxima", "maxima espera", "mayor espera"],
@@ -545,8 +546,14 @@ class NaturalQueryService:
     def _rules() -> dict[str, object]:
         defaults = NaturalQueryService._default_rules()
 
+        backend_root = Path(__file__).resolve().parents[2]
+        repo_root = Path(__file__).resolve().parents[3]
+
         # New scalable layout: split rules by domain.
-        rules_dir = Path(__file__).resolve().parents[2] / "docs" / "natural-query-rules"
+        rules_dirs = [
+            backend_root / "docs" / "natural-query-rules",
+            repo_root / "docs" / "natural-query-rules",
+        ]
         split_files = ["temporal.json", "intent.json", "metrics.json"]
 
         merged = dict(defaults)
@@ -561,33 +568,39 @@ class NaturalQueryService:
                     merged[key] = value
 
         loaded_any = False
-        for file_name in split_files:
-            file_path = rules_dir / file_name
-            try:
-                loaded = json.loads(file_path.read_text(encoding="utf-8"))
-                if isinstance(loaded, dict):
-                    merge_loaded(loaded)
-                    loaded_any = True
-            except Exception:
-                continue
+        for rules_dir in rules_dirs:
+            for file_name in split_files:
+                file_path = rules_dir / file_name
+                try:
+                    loaded = json.loads(file_path.read_text(encoding="utf-8"))
+                    if isinstance(loaded, dict):
+                        merge_loaded(loaded)
+                        loaded_any = True
+                except Exception:
+                    continue
 
         if loaded_any:
             return merged
 
         # Backward compatibility with legacy single-file rules.
-        rules_path = Path(__file__).resolve().parents[2] / "docs" / "natural-query-language-rules.json"
-        try:
-            loaded = json.loads(rules_path.read_text(encoding="utf-8"))
-            if not isinstance(loaded, dict):
-                return defaults
-            merged = dict(defaults)
-            for key, value in loaded.items():
-                if isinstance(value, dict) and isinstance(merged.get(key), dict):
-                    merged_section = dict(merged[key])
-                    merged_section.update(value)
-                    merged[key] = merged_section
-                else:
-                    merged[key] = value
-            return merged
-        except Exception:
-            return defaults
+        rules_paths = [
+            backend_root / "docs" / "natural-query-language-rules.json",
+            repo_root / "docs" / "natural-query-language-rules.json",
+        ]
+        for rules_path in rules_paths:
+            try:
+                loaded = json.loads(rules_path.read_text(encoding="utf-8"))
+                if not isinstance(loaded, dict):
+                    continue
+                merged = dict(defaults)
+                for key, value in loaded.items():
+                    if isinstance(value, dict) and isinstance(merged.get(key), dict):
+                        merged_section = dict(merged[key])
+                        merged_section.update(value)
+                        merged[key] = merged_section
+                    else:
+                        merged[key] = value
+                return merged
+            except Exception:
+                continue
+        return defaults

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import re
+import unicodedata
 from datetime import UTC, datetime
 from difflib import SequenceMatcher
 from pathlib import Path
@@ -90,6 +91,7 @@ class NaturalQueryLearningService:
         }
         for old, new in replacements.items():
             lowered = lowered.replace(old, new)
+        lowered = unicodedata.normalize("NFKD", lowered).encode("ascii", "ignore").decode("ascii")
         lowered = re.sub(r"\s+", " ", lowered)
         return lowered
 
@@ -110,6 +112,24 @@ class NaturalQueryLearningService:
         union = len(left_tokens | right_tokens)
         token_score = float(intersection / union) if union else 0.0
         return max(seq_score, token_score)
+
+    @staticmethod
+    def _is_valid_plan(intent: str, metric: str, endpoint: str, translated_payload: dict[str, Any]) -> bool:
+        if not intent or not metric or not endpoint:
+            return False
+        if metric.startswith("__unmapped"):
+            return False
+        if endpoint not in {"/api/v1/kpis/query", "/api/v1/analytics/query"}:
+            return False
+        if intent not in {"trend", "ranking", "comparison", "alert"}:
+            return False
+
+        payload_metric = str(translated_payload.get("metric") or "").strip()
+        if payload_metric.startswith("__unmapped"):
+            return False
+        if payload_metric and payload_metric != metric:
+            return False
+        return True
 
     def recall_approved_plan(self, question: str, min_score: float = 0.88) -> dict[str, Any] | None:
         rows = self._read_json_lines(self._learning_file)
@@ -168,7 +188,7 @@ class NaturalQueryLearningService:
                 or ""
             ).strip()
 
-            if not intent or not metric or not endpoint:
+            if not self._is_valid_plan(intent, metric, endpoint, corrected_payload):
                 continue
 
             best = {
@@ -233,7 +253,7 @@ class NaturalQueryLearningService:
                 or ""
             ).strip()
 
-            if not intent or not metric or not endpoint:
+            if not self._is_valid_plan(intent, metric, endpoint, corrected_payload):
                 continue
 
             sample = {

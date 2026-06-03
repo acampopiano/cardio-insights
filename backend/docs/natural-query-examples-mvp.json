@@ -1,0 +1,50 @@
+[
+  {
+    "id": "trend_wait_current_year",
+    "question": "Como viene la espera promedio este ano?",
+    "intent": "trend",
+    "endpoint": "/api/v1/kpis/query"
+  },
+  {
+    "id": "trend_total_surgeries_year",
+    "question": "Mostrame el total de cirugias en 2025",
+    "intent": "trend",
+    "endpoint": "/api/v1/kpis/query"
+  },
+  {
+    "id": "ranking_worst_wait_month",
+    "question": "En que mes estuvimos peor con las demoras?",
+    "intent": "ranking",
+    "endpoint": "/api/v1/analytics/query"
+  },
+  {
+    "id": "ranking_peak_surgery_day",
+    "question": "En que dia del mes de marzo del ano 2024, tuvimos el pico de cirugias?",
+    "intent": "ranking",
+    "endpoint": "/api/v1/analytics/query"
+  },
+  {
+    "id": "ranking_deaths_day",
+    "question": "En que dia del ano 2025, murieron mas personas?",
+    "intent": "ranking",
+    "endpoint": "/api/v1/analytics/query"
+  },
+  {
+    "id": "trend_ptca_share",
+    "question": "Que porcentaje de los procedimientos corresponden a PTCA para el ano 2025?",
+    "intent": "trend",
+    "endpoint": "/api/v1/kpis/query"
+  },
+  {
+    "id": "ranking_wait_month_range",
+    "question": "Como se comporto la demora quirurgica entre marzo y agosto de 2025, y en que mes pego el salto mas fuerte?",
+    "intent": "ranking",
+    "endpoint": "/api/v1/analytics/query"
+  },
+  {
+    "id": "trend_deterioration_proxy",
+    "question": "Si miramos los ultimos 180 dias, cual KPI muestra el deterioro mas marcado y desde cuando empezo la tendencia?",
+    "intent": "trend",
+    "endpoint": "/api/v1/kpis/query"
+  }
+]

@@ -4,7 +4,7 @@ import pymysql
 from pymysql.cursors import DictCursor
 
 from app.core.config import get_settings
-from app.core.kpi_registry import kpi_registry
+from app.core.kpi_registry import DynamicKpi, kpi_registry
 from app.core.security import get_password_hash
 from app.repositories.interfaces import AnalyticsRepository, AuthRepository
 
@@ -51,6 +51,79 @@ class MySQLRepository(AuthRepository, AnalyticsRepository):
                 return list(cursor.fetchall())
         finally:
             conn.close()
+
+    def _ensure_dynamic_kpi_table(self) -> None:
+        self._execute(
+            """
+            CREATE TABLE IF NOT EXISTS cardio_dynamic_kpis (
+                kpi_key VARCHAR(120) PRIMARY KEY,
+                label VARCHAR(255) NOT NULL,
+                description TEXT NOT NULL,
+                sql_query_template TEXT NOT NULL,
+                default_granularity VARCHAR(20) NOT NULL DEFAULT 'month',
+                active TINYINT NOT NULL DEFAULT 1,
+                created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+            )
+            """
+        )
+
+    def upsert_dynamic_kpi(self, item: DynamicKpi) -> None:
+        self._ensure_dynamic_kpi_table()
+        self._execute(
+            """
+            INSERT INTO cardio_dynamic_kpis
+                (kpi_key, label, description, sql_query_template, default_granularity, active)
+            VALUES (%s, %s, %s, %s, %s, 1)
+            ON DUPLICATE KEY UPDATE
+                label = VALUES(label),
+                description = VALUES(description),
+                sql_query_template = VALUES(sql_query_template),
+                default_granularity = VALUES(default_granularity),
+                active = 1
+            """,
+            (item.key, item.label, item.description, item.sql_query_template, item.default_granularity),
+        )
+
+    def deactivate_dynamic_kpi(self, key: str) -> None:
+        self._ensure_dynamic_kpi_table()
+        self._execute(
+            "UPDATE cardio_dynamic_kpis SET active = 0 WHERE kpi_key = %s",
+            (key,),
+        )
+
+    def _load_dynamic_kpis_from_db(self) -> None:
+        try:
+            self._ensure_dynamic_kpi_table()
+            rows = self._execute(
+                """
+                SELECT kpi_key, label, description, sql_query_template, default_granularity
+                FROM cardio_dynamic_kpis
+                WHERE active = 1
+                """
+            )
+        except Exception:
+            return
+
+        for row in rows:
+            key = str(row.get("kpi_key") or "").strip()
+            label = str(row.get("label") or "").strip()
+            description = str(row.get("description") or "").strip()
+            sql_query_template = str(row.get("sql_query_template") or "").strip()
+            default_granularity = str(row.get("default_granularity") or "month").strip().lower()
+            if not key or not label or not description or not sql_query_template:
+                continue
+            if default_granularity not in {"day", "week", "month", "year"}:
+                default_granularity = "month"
+            kpi_registry.upsert(
+                DynamicKpi(
+                    key=key,
+                    label=label,
+                    description=description,
+                    sql_query_template=sql_query_template,
+                    default_granularity=default_granularity,
+                )
+            )
 
     @staticmethod
     def _first_filter_value(filters: list[dict[str, Any]], keys: list[str]) -> str | None:
@@ -105,6 +178,8 @@ class MySQLRepository(AuthRepository, AnalyticsRepository):
             return f"DATE_FORMAT({column_name}, '%Y-%m-%d')"
         if granularity == "week":
             return f"DATE_FORMAT({column_name}, '%x-W%v')"
+        if granularity == "year":
+            return f"DATE_FORMAT({column_name}, '%Y')"
         return f"DATE_FORMAT({column_name}, '%Y-%m')"
 
     def _monthly_surgery_volume(self, limit: int = 12) -> list[dict[str, Any]]:
@@ -280,7 +355,14 @@ class MySQLRepository(AuthRepository, AnalyticsRepository):
         }
 
     def get_kpis_catalog(self) -> dict[str, Any]:
+        self._load_dynamic_kpis_from_db()
         kpis: list[dict[str, str]] = [
+            {
+                "key": "volumen_mensual_total",
+                "label": "Volumen total de actividad",
+                "unit": "casos",
+                "description": "Cantidad total de actos realizados por periodo",
+            },
             {
                 "key": "surgery_volume",
                 "label": "Volumen de cirugias",
@@ -292,6 +374,12 @@ class MySQLRepository(AuthRepository, AnalyticsRepository):
                 "label": "Volumen de PTCA",
                 "unit": "casos",
                 "description": "Cantidad de procedimientos PTCA por periodo",
+            },
+            {
+                "key": "ptca_share_pct",
+                "label": "Participacion PTCA",
+                "unit": "%",
+                "description": "Porcentaje de PTCA sobre el total de actividad PTCA + cirugias",
             },
             {
                 "key": "mortality_egreso_pct",
@@ -306,10 +394,64 @@ class MySQLRepository(AuthRepository, AnalyticsRepository):
                 "description": "Promedio de dias entre coordinacion y acto realizado",
             },
             {
+                "key": "espera_maxima_en_dias",
+                "label": "Espera maxima",
+                "unit": "dias",
+                "description": "Maximo de dias entre coordinacion y acto realizado",
+            },
+            {
+                "key": "mortality_egreso_count",
+                "label": "Fallecidos al egreso",
+                "unit": "casos",
+                "description": "Cantidad de egresos con fallecimiento registrado",
+            },
+            {
                 "key": "icu_los_avg",
                 "label": "Estadia promedio UCI",
                 "unit": "dias",
                 "description": "Promedio de estadia UCI en cirugia con datos validos",
+            },
+            {
+                "key": "readmission_30d",
+                "label": "Reingreso a 30 dias",
+                "unit": "casos",
+                "description": "Pacientes readmitidos en los 30 dias posteriores segun motivos configurados",
+            },
+            {
+                "key": "reintervenciones_mensual",
+                "label": "Reintervenciones",
+                "unit": "casos",
+                "description": "Actos quirurgicos que tuvieron reintervencion posterior",
+            },
+            {
+                "key": "hemodinamia_volumen_mensual",
+                "label": "Volumen hemodinamia",
+                "unit": "casos",
+                "description": "Cantidad de actos de hemodinamia por periodo",
+            },
+            {
+                "key": "centros_que_envian_pacientes",
+                "label": "Centros que envian pacientes",
+                "unit": "actos",
+                "description": "Actos realizados asociados a centros derivadores",
+            },
+            {
+                "key": "top_centro_por_periodo",
+                "label": "Top centro por periodo",
+                "unit": "actos",
+                "description": "Cantidad del centro derivador con mayor volumen en cada periodo",
+            },
+            {
+                "key": "espera_tramite_a_autorizacion_dias",
+                "label": "Espera tramite a autorizacion",
+                "unit": "dias",
+                "description": "Promedio de dias desde inicio de tramite hasta autorizacion",
+            },
+            {
+                "key": "espera_autorizacion_a_realizado_dias",
+                "label": "Espera autorizacion a realizado",
+                "unit": "dias",
+                "description": "Promedio de dias desde autorizacion hasta acto realizado",
             },
         ]
 
@@ -488,7 +630,7 @@ class MySQLRepository(AuthRepository, AnalyticsRepository):
         kpi_keys = payload.get("kpi_keys", [])
         filters = payload.get("filters", [])
         granularity = str(payload.get("granularity") or "month").lower()
-        if granularity not in {"day", "week", "month"}:
+        if granularity not in {"day", "week", "month", "year"}:
             granularity = "month"
         act_type = self._normalize_act_type(filters)
 
@@ -503,6 +645,16 @@ class MySQLRepository(AuthRepository, AnalyticsRepository):
             "icu_los_avg": "icu_los_avg",
             "mortality_30d": "mortality_30d",
             "readmission_30d": "readmission_30d",
+            "volumen_mensual_total": "volumen_mensual_total",
+            "ptca_share_pct": "ptca_share_pct",
+            "mortality_egreso_count": "mortality_egreso_count",
+            "espera_maxima_en_dias": "espera_maxima_en_dias",
+            "reintervenciones_mensual": "reintervenciones_mensual",
+            "hemodinamia_volumen_mensual": "hemodinamia_volumen_mensual",
+            "centros_que_envian_pacientes": "centros_que_envian_pacientes",
+            "top_centro_por_periodo": "top_centro_por_periodo",
+            "espera_tramite_a_autorizacion_dias": "espera_tramite_a_autorizacion_dias",
+            "espera_autorizacion_a_realizado_dias": "espera_autorizacion_a_realizado_dias",
         }
 
         series: list[dict[str, Any]] = []
@@ -516,7 +668,17 @@ class MySQLRepository(AuthRepository, AnalyticsRepository):
                 series.append({"kpi_key": requested_key, "points": []})
                 continue
 
-            if normalized_key == "surgery_volume":
+            if normalized_key == "volumen_mensual_total":
+                extra_where = self._date_clause("f.FechaRealizado", filters)
+                query = f"""
+                    SELECT {period_realizado} AS period, COUNT(*) AS value
+                    FROM flow_coordina f
+                    WHERE f.Realizado = 255
+                      AND f.FechaRealizado > '1900-01-01'{extra_where}
+                    GROUP BY {period_realizado}
+                    ORDER BY period
+                """
+            elif normalized_key == "surgery_volume":
                 extra_where = self._date_clause("f.FechaRealizado", filters)
                 query = f"""
                     SELECT {period_realizado} AS period, COUNT(*) AS value
@@ -532,6 +694,22 @@ class MySQLRepository(AuthRepository, AnalyticsRepository):
                     SELECT {period_realizado} AS period, COUNT(*) AS value
                     FROM call_ptcamaster c
                     JOIN flow_coordina f ON f.Cod = c.CodCoordina
+                    WHERE f.FechaRealizado > '1900-01-01'{extra_where}
+                    GROUP BY {period_realizado}
+                    ORDER BY period
+                """
+            elif normalized_key == "ptca_share_pct":
+                extra_where = self._date_clause("f.FechaRealizado", filters)
+                query = f"""
+                    SELECT {period_realizado} AS period,
+                           ROUND(
+                               100.0 * COUNT(DISTINCT c.Cod)
+                               / NULLIF(COUNT(DISTINCT d.k_id) + COUNT(DISTINCT c.Cod), 0),
+                               2
+                           ) AS value
+                    FROM flow_coordina f
+                    LEFT JOIN dat_cirugia d ON d.CodCoordina = f.Cod
+                    LEFT JOIN call_ptcamaster c ON c.CodCoordina = f.Cod
                     WHERE f.FechaRealizado > '1900-01-01'{extra_where}
                     GROUP BY {period_realizado}
                     ORDER BY period
@@ -554,6 +732,19 @@ class MySQLRepository(AuthRepository, AnalyticsRepository):
                     GROUP BY {period_realizado}
                     ORDER BY period
                 """
+            elif normalized_key == "espera_maxima_en_dias":
+                extra_where = self._date_clause("f.FechaRealizado", filters)
+                query = f"""
+                    SELECT {period_realizado} AS period,
+                           MAX(DATEDIFF(f.FechaRealizado, f.FechaCoordina)) AS value
+                    FROM flow_coordina f
+                    WHERE f.Realizado = 255
+                      AND f.FechaRealizado > '1900-01-01'
+                      AND f.FechaCoordina > '1900-01-01'
+                      AND DATEDIFF(f.FechaRealizado, f.FechaCoordina) >= 0{extra_where}
+                    GROUP BY {period_realizado}
+                    ORDER BY period
+                """
             elif normalized_key in {"mortality_egreso_pct", "mortality_30d"}:
                 extra_where = self._date_clause("p.FechaEgreso", filters)
                 query = f"""
@@ -563,6 +754,16 @@ class MySQLRepository(AuthRepository, AnalyticsRepository):
                                 / NULLIF(COUNT(*), 0),
                                 2
                            ) AS value
+                    FROM flow_procedimientocardiologia p
+                    WHERE p.FechaEgreso > '1900-01-01'{extra_where}
+                    GROUP BY {period_egreso}
+                    ORDER BY period
+                """
+            elif normalized_key == "mortality_egreso_count":
+                extra_where = self._date_clause("p.FechaEgreso", filters)
+                query = f"""
+                    SELECT {period_egreso} AS period,
+                           SUM(CASE WHEN p.FechaFallece > '1900-01-01' THEN 1 ELSE 0 END) AS value
                     FROM flow_procedimientocardiologia p
                     WHERE p.FechaEgreso > '1900-01-01'{extra_where}
                     GROUP BY {period_egreso}
@@ -580,7 +781,96 @@ class MySQLRepository(AuthRepository, AnalyticsRepository):
                     GROUP BY {period_realizado}
                     ORDER BY period
                 """
+            elif normalized_key == "reintervenciones_mensual":
+                extra_where = self._date_clause("f.FechaRealizado", filters)
+                query = f"""
+                    SELECT {period_realizado} AS period,
+                           COUNT(DISTINCT f.Cod) AS value
+                    FROM flow_coordina f
+                    INNER JOIN flow_coordina ff
+                       ON ff.CodActo = f.Cod
+                      AND ff.FechaRealizado > f.FechaRealizado
+                      AND ff.Realizado = 255
+                    WHERE f.Realizado = 255
+                      AND f.CodCoordinaReglaMotivo IN (105, 109, 120)
+                      AND f.FechaRealizado > '1900-01-01'{extra_where}
+                    GROUP BY {period_realizado}
+                    ORDER BY period
+                """
+            elif normalized_key == "hemodinamia_volumen_mensual":
+                extra_where = self._date_clause("f.FechaRealizado", filters)
+                query = f"""
+                    SELECT {period_realizado} AS period,
+                           COUNT(*) AS value
+                    FROM flow_coordina f
+                    WHERE f.Realizado = 255
+                      AND f.sTecnica = 'He'
+                      AND f.FechaRealizado > '1900-01-01'{extra_where}
+                    GROUP BY {period_realizado}
+                    ORDER BY period
+                """
+            elif normalized_key == "centros_que_envian_pacientes":
+                extra_where = self._date_clause("f.FechaRealizado", filters)
+                query = f"""
+                    SELECT {period_realizado} AS period,
+                           COUNT(*) AS value
+                    FROM flow_coordina f
+                    INNER JOIN stk_cartera stk ON stk.CodPacFichaCubre = f.CodSeguroCoo
+                    WHERE f.Realizado = 255
+                      AND f.CodSeguroCoo > 0{extra_where}
+                    GROUP BY {period_realizado}
+                    ORDER BY period
+                """
+            elif normalized_key == "top_centro_por_periodo":
+                extra_where = self._date_clause("f.FechaRealizado", filters)
+                query = f"""
+                    SELECT t.period AS period,
+                           MAX(t.total_actos) AS value
+                    FROM (
+                        SELECT {period_realizado} AS period,
+                               f.CodSeguroCoo AS centro_cod,
+                               COUNT(*) AS total_actos
+                        FROM flow_coordina f
+                        INNER JOIN stk_cartera stk ON stk.CodPacFichaCubre = f.CodSeguroCoo
+                        WHERE f.Realizado = 255
+                          AND f.CodSeguroCoo > 0{extra_where}
+                        GROUP BY {period_realizado}, f.CodSeguroCoo
+                    ) t
+                    GROUP BY t.period
+                    ORDER BY t.period
+                """
+            elif normalized_key == "espera_tramite_a_autorizacion_dias":
+                extra_where = self._date_clause("f.FechaRealizado", filters)
+                query = f"""
+                    SELECT {period_realizado} AS period,
+                           ROUND(AVG(DATEDIFF(f.FechaFinTramite, f.FechaInputTramite)), 2) AS value
+                    FROM flow_coordina f
+                    WHERE f.Realizado = 255
+                      AND f.Autorizado = 255
+                      AND DATE_FORMAT(f.FechaInput, '%Y%m') > 200412
+                      AND f.FechaInputTramite > '1900-01-01'
+                      AND f.FechaFinTramite > '1900-01-01'
+                      AND DATEDIFF(f.FechaFinTramite, f.FechaInputTramite) > 0{extra_where}
+                    GROUP BY {period_realizado}
+                    ORDER BY period
+                """
+            elif normalized_key == "espera_autorizacion_a_realizado_dias":
+                extra_where = self._date_clause("f.FechaRealizado", filters)
+                query = f"""
+                    SELECT {period_realizado} AS period,
+                           ROUND(AVG(DATEDIFF(f.FechaRealizado, f.FechaFinTramite)), 2) AS value
+                    FROM flow_coordina f
+                    WHERE f.Realizado = 255
+                      AND f.Autorizado = 255
+                      AND DATE_FORMAT(f.FechaInput, '%Y%m') > 200412
+                      AND f.FechaFinTramite > '1900-01-01'
+                      AND f.FechaRealizado > '1900-01-01'
+                      AND DATEDIFF(f.FechaRealizado, f.FechaFinTramite) > 0{extra_where}
+                    GROUP BY {period_realizado}
+                    ORDER BY period
+                """
             else:
+                self._load_dynamic_kpis_from_db()
                 dynamic_kpi = kpi_registry.get(normalized_key)
                 if dynamic_kpi is None:
                     continue
@@ -631,7 +921,7 @@ class MySQLRepository(AuthRepository, AnalyticsRepository):
         widget_type = str(payload.get("widget_type") or "table").lower()
         metric_key = str(payload.get("metric_key") or "surgery_volume")
         granularity = str(payload.get("granularity") or "month").lower()
-        if granularity not in {"day", "week", "month"}:
+        if granularity not in {"day", "week", "month", "year"}:
             granularity = "month"
 
         limit = int(payload.get("limit") or 10)

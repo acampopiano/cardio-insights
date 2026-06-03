@@ -4,7 +4,7 @@ from pydantic import BaseModel, ConfigDict, Field
 class KpiDesignRequest(BaseModel):
     kpi_name: str = Field(min_length=3, examples=["Participacion PTCA"])
     description: str = Field(min_length=5, examples=["Porcentaje de PTCA sobre el total de actividad."])
-    granularity: str = Field(default="month", examples=["day", "week", "month"])
+    granularity: str = Field(default="month", examples=["day", "week", "month", "year"])
     sql_query: str = Field(
         min_length=20,
         description="SQL asociado al KPI. Debe devolver aliases period y value.",
@@ -76,7 +76,7 @@ class KpiRegisterRequest(BaseModel):
     label: str = Field(min_length=3)
     description: str = Field(min_length=5)
     sql_query_template: str = Field(min_length=20)
-    default_granularity: str = Field(default="month", examples=["day", "week", "month"])
+    default_granularity: str = Field(default="month", examples=["day", "week", "month", "year"])
 
 
 class KpiCreateResponse(BaseModel):

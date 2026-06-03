@@ -68,6 +68,12 @@ class MockRepository(AuthRepository, AnalyticsRepository):
     def get_kpis_catalog(self) -> dict[str, Any]:
         kpis: list[dict[str, str]] = [
             {
+                "key": "volumen_mensual_total",
+                "label": "Volumen total de actividad",
+                "unit": "casos",
+                "description": "Cantidad total de actos realizados por periodo",
+            },
+            {
                 "key": "mortality_30d",
                 "label": "Mortalidad a 30 dias",
                 "unit": "%",
@@ -114,6 +120,42 @@ class MockRepository(AuthRepository, AnalyticsRepository):
                 "label": "Espera promedio",
                 "unit": "dias",
                 "description": "Promedio de dias de espera entre coordinacion y realizado",
+            },
+            {
+                "key": "espera_maxima_en_dias",
+                "label": "Espera maxima",
+                "unit": "dias",
+                "description": "Maximo de dias de espera entre coordinacion y realizado",
+            },
+            {
+                "key": "mortality_egreso_count",
+                "label": "Fallecidos al egreso",
+                "unit": "casos",
+                "description": "Cantidad de egresos con fallecimiento registrado",
+            },
+            {
+                "key": "reintervenciones_mensual",
+                "label": "Reintervenciones",
+                "unit": "casos",
+                "description": "Actos quirurgicos que tuvieron reintervencion posterior",
+            },
+            {
+                "key": "hemodinamia_volumen_mensual",
+                "label": "Volumen hemodinamia",
+                "unit": "casos",
+                "description": "Cantidad de actos de hemodinamia por periodo",
+            },
+            {
+                "key": "centros_que_envian_pacientes",
+                "label": "Centros que envian pacientes",
+                "unit": "actos",
+                "description": "Actos realizados asociados a centros derivadores",
+            },
+            {
+                "key": "top_centro_por_periodo",
+                "label": "Top centro por periodo",
+                "unit": "actos",
+                "description": "Cantidad del centro derivador con mayor volumen en cada periodo",
             },
         ]
 
@@ -246,12 +288,20 @@ class MockRepository(AuthRepository, AnalyticsRepository):
     def query_kpis(self, payload: dict[str, Any]) -> dict[str, Any]:
         kpi_keys = payload.get("kpi_keys", [])
         base_series = {
+            "volumen_mensual_total": [290, 305, 318, 327, 342],
             "mortality_30d": [2.4, 2.3, 2.2, 2.1, 2.0],
+            "mortality_egreso_count": [4, 3, 5, 4, 3],
             "icu_los_avg": [4.1, 4.0, 3.9, 3.8, 3.8],
             "readmission_30d": [6.1, 6.0, 5.9, 5.8, 5.7],
             "surgery_volume": [180, 192, 201, 208, 214],
+            "ptca_volume": [86, 91, 88, 92, 97],
             "ptca_share_pct": [31.2, 30.8, 29.9, 30.5, 31.0],
             "avg_wait_days": [5.1, 4.9, 4.7, 4.4, 4.2],
+            "espera_maxima_en_dias": [19, 21, 18, 17, 16],
+            "reintervenciones_mensual": [3, 4, 2, 5, 3],
+            "hemodinamia_volumen_mensual": [86, 90, 91, 95, 99],
+            "centros_que_envian_pacientes": [120, 128, 131, 136, 139],
+            "top_centro_por_periodo": [34, 37, 35, 39, 41],
         }
         periods = ["2025-11", "2025-12", "2026-01", "2026-02", "2026-03"]
 

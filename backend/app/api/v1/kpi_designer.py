@@ -4,6 +4,7 @@ from fastapi.responses import HTMLResponse
 from app.core.dependencies import get_kpi_service, get_repository
 from app.core.kpi_registry import DynamicKpi, kpi_registry
 from app.core.security import get_current_claims
+from app.repositories.mysql_repository import MySQLRepository
 from app.schemas.kpi_designer import (
   KpiCreateResponse,
   KpiDesignRequest,
@@ -18,11 +19,19 @@ router = APIRouter(prefix="/kpi-designer", tags=["KPI Designer"])
 
 def _persist_dynamic_kpi(item: DynamicKpi, repository: object) -> bool:
   kpi_registry.upsert(item)
+  if isinstance(repository, MySQLRepository):
+    repository.upsert_dynamic_kpi(item)
+    return True
   return False
 
 
 def _rollback_dynamic_kpi(key: str, repository: object) -> None:
   kpi_registry.remove(key)
+  if isinstance(repository, MySQLRepository):
+    try:
+      repository.deactivate_dynamic_kpi(key)
+    except Exception:
+      pass
 
 
 @router.get("/ui", response_class=HTMLResponse)
@@ -81,6 +90,7 @@ def kpi_designer_ui() -> HTMLResponse:
           <option value=\"day\">day</option>
           <option value=\"week\">week</option>
           <option value=\"month\" selected>month</option>
+          <option value=\"year\">year</option>
         </select>
       </div>
     </div>
@@ -279,8 +289,8 @@ def register_kpi(
     payload: KpiRegisterRequest,
     _: dict = Depends(get_current_claims),
 ) -> dict[str, object]:
-    if payload.default_granularity not in {"day", "week", "month"}:
-        raise HTTPException(status_code=400, detail="default_granularity debe ser day, week o month")
+    if payload.default_granularity not in {"day", "week", "month", "year"}:
+        raise HTTPException(status_code=400, detail="default_granularity debe ser day, week, month o year")
 
     item = DynamicKpi(
         key=payload.key,

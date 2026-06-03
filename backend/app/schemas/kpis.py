@@ -9,7 +9,7 @@ class QueryFilter(BaseModel):
 class KpiQueryRequest(BaseModel):
     kpi_keys: list[str] = Field(min_length=1)
     filters: list[QueryFilter] = Field(default_factory=list)
-    granularity: str = Field(default="month", examples=["day", "week", "month"])
+    granularity: str = Field(default="month", examples=["day", "week", "month", "year"])
 
 
 class KpiQuerySeriesPoint(BaseModel):

@@ -77,22 +77,48 @@ Agregar en `.env`:
 
 ```env
 LLM_GATEWAY_URL=http://IP_DE_LA_VM:8000
-LLM_GATEWAY_ENABLED=true
+LLM_GATEWAY_ENABLED=false
 LLM_GATEWAY_TIMEOUT_SECONDS=8
 NATURAL_QUERY_LEARNING_FILE=data/natural_query_learning.jsonl
 NATURAL_QUERY_TRAINING_EXPORT_FILE=data/natural_query_training_dataset.jsonl
 NATURAL_QUERY_AUTO_FEEDBACK_MODE=off
 NATURAL_QUERY_AUTO_FEEDBACK_MIN_CONFIDENCE=0.80
+NATURAL_QUERY_ONLINE_MEMORY_ENABLED=false
+NATURAL_QUERY_ONLINE_MEMORY_MIN_SCORE=0.88
 ```
 
 Comportamiento:
 
+- Si `NATURAL_QUERY_ONLINE_MEMORY_ENABLED=true`, el endpoint intenta primero reutilizar planes aprobados por feedback humano. Esa respuesta se marca como `source=memory`.
 - Si `LLM_GATEWAY_ENABLED=true`, el endpoint de natural-query intenta resolver via gateway.
 - Si el gateway falla, expira o responde invalido, el backend hace fallback a reglas locales.
 - Si `LLM_GATEWAY_ENABLED=false`, siempre usa reglas locales.
 - Cada llamada a `POST /api/v1/natural-query/run` guarda una interaccion para aprendizaje continuo.
-- Si `NATURAL_QUERY_AUTO_FEEDBACK_MODE=all_resolved`, cada consulta resuelta se marca automaticamente como aceptada para entrenamiento.
+- Recomendado: mantener `NATURAL_QUERY_AUTO_FEEDBACK_MODE=off` y registrar feedback humano para evitar que el sistema aprenda respuestas incorrectas.
+- Si `NATURAL_QUERY_AUTO_FEEDBACK_MODE=all_resolved`, cada consulta resuelta se marca automaticamente como aceptada para entrenamiento. Usar solo en demos controladas.
 - Si `NATURAL_QUERY_AUTO_FEEDBACK_MODE=llm_only`, solo auto-aprende respuestas `source=llm` (con umbral opcional `NATURAL_QUERY_AUTO_FEEDBACK_MIN_CONFIDENCE`).
+
+Perfil recomendado para pruebas reales/demos con base INCC:
+
+```env
+REPOSITORY_BACKEND=mysql
+LLM_GATEWAY_ENABLED=true
+NATURAL_QUERY_AUTO_KPI_MODE=auto_create
+NATURAL_QUERY_AUTO_FEEDBACK_MODE=llm_only
+NATURAL_QUERY_AUTO_FEEDBACK_MIN_CONFIDENCE=0.85
+NATURAL_QUERY_ONLINE_MEMORY_ENABLED=true
+NATURAL_QUERY_ONLINE_MEMORY_MIN_SCORE=0.92
+```
+
+Perfil recomendado para CI/tests reproducibles:
+
+```env
+REPOSITORY_BACKEND=mock
+LLM_GATEWAY_ENABLED=false
+NATURAL_QUERY_AUTO_KPI_MODE=human_approve
+NATURAL_QUERY_AUTO_FEEDBACK_MODE=off
+NATURAL_QUERY_ONLINE_MEMORY_ENABLED=false
+```
 
 ## Ejecucion local rapida
 
@@ -136,12 +162,23 @@ MYSQL_DATABASE=incc
 
 KPI keys soportadas con SQL real:
 
+- volumen_mensual_total
 - surgery_volume
 - ptca_volume
+- ptca_share_pct
 - mortality_egreso_pct
 - avg_wait_days
 - icu_los_avg
 - mortality_30d (alias operativo de egreso con fallecimiento)
+- mortality_egreso_count
+- readmission_30d
+- espera_maxima_en_dias
+- reintervenciones_mensual
+- hemodinamia_volumen_mensual
+- centros_que_envian_pacientes
+- top_centro_por_periodo
+- espera_tramite_a_autorizacion_dias
+- espera_autorizacion_a_realizado_dias
 
 Autenticacion en modo mysql:
 
@@ -163,6 +200,8 @@ Si la persona que define KPIs no programa en Python, puede usar un formulario si
 - granularidad (`day`, `week`, `month`)
 - SQL asociada (debe devolver `period` y `value`)
 
+La SQL debe ser un unico `SELECT`, usar `{period_expr}` y `{date_clause}`, y referenciar solo tablas clinicas permitidas por el backend. Se bloquean comentarios, multiples sentencias, DDL/DML y tablas fuera de allowlist.
+
 5. Presiona "Generar snippets".
 6. Copia `registration_payload` de la respuesta.
 7. En Swagger, pega ese JSON en `POST /api/v1/kpi-designer/register`.
@@ -174,7 +213,7 @@ La salida incluye:
 - `query_payload_example` (para probar el KPI en query)
 - snippets de apoyo para equipo tecnico (opcionales)
 
-Nota: si `REPOSITORY_BACKEND=mysql`, el endpoint `/kpi-designer/register` persiste el KPI en MySQL y sobrevive reinicios. En modo mock, queda en memoria.
+Nota: si `REPOSITORY_BACKEND=mysql`, el endpoint `/kpi-designer/register` crea/actualiza la tabla `cardio_dynamic_kpis` y persiste el KPI en MySQL. En modo mock, queda en el registry/JSON local.
 
 ## Credenciales mock
 
@@ -470,7 +509,7 @@ Response:
 
 5. Verificar en la respuesta:
 
-- `source` (llm o rules)
+- `source` (`rules`, `llm` o `memory`)
 - `translated_payload`
 - `endpoint` + `payload`
 - `result`

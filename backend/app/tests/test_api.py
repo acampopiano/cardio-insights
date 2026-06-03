@@ -201,6 +201,41 @@ def test_natural_query_total_surgeries_specific_year_is_year_granularity() -> No
     assert "total anual" in data["explanation"].lower()
 
 
+def test_natural_query_surgical_activity_maps_to_surgery_volume() -> None:
+    previous_gateway = os.environ.get("LLM_GATEWAY_ENABLED")
+    previous_memory = os.environ.get("NATURAL_QUERY_ONLINE_MEMORY_ENABLED")
+    os.environ["LLM_GATEWAY_ENABLED"] = "false"
+    os.environ["NATURAL_QUERY_ONLINE_MEMORY_ENABLED"] = "false"
+    get_settings.cache_clear()
+    token = _get_token()
+    try:
+        response = client.post(
+            "/api/v1/natural-query/run",
+            json={"question": "Como estuvo la actividad quirurgica a lo largo de 2025?"},
+            headers={"Authorization": f"Bearer {token}"},
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert data["success"] is True
+        assert data["intent"] == "trend"
+        assert data["metric"] == "surgery_volume"
+        assert data["payload"]["kpi_keys"] == ["surgery_volume"]
+        assert data["payload"]["filters"] == [
+            {"key": "date_from", "values": ["2025-01-01"]},
+            {"key": "date_to", "values": ["2025-12-31"]},
+        ]
+    finally:
+        if previous_gateway is None:
+            os.environ.pop("LLM_GATEWAY_ENABLED", None)
+        else:
+            os.environ["LLM_GATEWAY_ENABLED"] = previous_gateway
+        if previous_memory is None:
+            os.environ.pop("NATURAL_QUERY_ONLINE_MEMORY_ENABLED", None)
+        else:
+            os.environ["NATURAL_QUERY_ONLINE_MEMORY_ENABLED"] = previous_memory
+        get_settings.cache_clear()
+
+
 def test_natural_query_ranking() -> None:
     token = _get_token()
     response = client.post(

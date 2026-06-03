@@ -45,7 +45,7 @@ class KpiRegistry:
             default_granularity = str(entry.get("default_granularity") or "month").strip().lower()
             if not key or not label or not description or not sql_query_template:
                 continue
-            if default_granularity not in {"day", "week", "month"}:
+            if default_granularity not in {"day", "week", "month", "year"}:
                 default_granularity = "month"
             loaded[key] = DynamicKpi(
                 key=key,

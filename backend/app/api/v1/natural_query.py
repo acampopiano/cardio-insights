@@ -1,4 +1,5 @@
 import re
+import unicodedata
 from calendar import monthrange
 from datetime import UTC, datetime
 from typing import Any
@@ -43,6 +44,12 @@ def run_natural_query(
     if _online_memory_enabled():
         min_score = float(get_settings().natural_query_online_memory_min_score or 0.88)
         memory_plan = learning_service.recall_approved_plan(payload.question, min_score=min_score)
+        if memory_plan is not None and not _memory_plan_matches_question(payload.question, memory_plan):
+            errors.append("Memoria online omitida: el plan aprobado no coincide con la metrica inferida localmente.")
+            memory_plan = None
+        if memory_plan is not None and not _metric_exists_in_local_catalog(str(memory_plan.get("metric") or ""), repository):
+            errors.append(f"Memoria online omitida: metrica fuera del catalogo local ({memory_plan.get('metric')}).")
+            memory_plan = None
         if memory_plan is not None:
             try:
                 translated_payload = dict(memory_plan.get("translated_payload") or {})
@@ -66,7 +73,7 @@ def run_natural_query(
                     response = _build_response(
                         question=payload.question,
                         resolved=True,
-                        source="llm",
+                        source="memory",
                         intent=str(memory_plan["intent"]),
                         metric=str(memory_plan["metric"]),
                         endpoint=str(memory_plan["endpoint"]),
@@ -248,8 +255,16 @@ def _validate_and_build_gateway_plan(
     if errors:
         return None, errors
 
+    normalized_endpoint = endpoint
+    assumptions = list(gateway_response.assumptions or [])
+    if intent == "ranking" and endpoint == "/api/v1/kpis/query":
+        normalized_endpoint = "/api/v1/analytics/query"
+        assumptions.append(
+            "Se normalizó endpoint a /api/v1/analytics/query para respetar semántica de ranking/top-N."
+        )
+
     query_payload = _translated_payload_to_internal_query(
-        endpoint=endpoint,
+        endpoint=normalized_endpoint,
         intent=intent,
         metric=metric,
         translated_payload=translated_payload,
@@ -261,11 +276,11 @@ def _validate_and_build_gateway_plan(
         "source": source,
         "intent": intent,
         "metric": metric,
-        "endpoint": endpoint,
+        "endpoint": normalized_endpoint,
         "confidence": gateway_response.confidence,
         "translated_payload": translated_payload,
         "query_payload": query_payload,
-        "assumptions": list(gateway_response.assumptions or []),
+        "assumptions": assumptions,
     }
     return plan, []
 
@@ -276,7 +291,11 @@ def _translated_payload_to_internal_query(
     metric: str,
     translated_payload: dict[str, object],
 ) -> dict[str, object] | None:
-    granularity = str(translated_payload.get("granularity") or "month").lower()
+    granularity = str(
+        translated_payload.get("granularity")
+        or translated_payload.get("time_granularity")
+        or "month"
+    ).lower()
     if granularity not in {"day", "week", "month", "year"}:
         granularity = "month"
 
@@ -292,6 +311,10 @@ def _translated_payload_to_internal_query(
     if endpoint == "/api/v1/analytics/query":
         widget_type = "ranking" if intent == "ranking" else "table"
         requested_limit = translated_payload.get("limit")
+        if not isinstance(requested_limit, int):
+            ranking = translated_payload.get("ranking")
+            if isinstance(ranking, dict) and isinstance(ranking.get("limit"), int):
+                requested_limit = ranking.get("limit")
         limit = 5 if widget_type == "ranking" else 10
         if isinstance(requested_limit, int):
             limit = requested_limit
@@ -328,6 +351,24 @@ def _extract_filters(translated_payload: dict[str, object]) -> list[dict[str, li
             normalized_filters.append({"key": key, "values": normalized_values})
         if normalized_filters:
             return normalized_filters
+
+    date_range = translated_payload.get("date_range")
+    if isinstance(date_range, dict):
+        year_value = date_range.get("year")
+        if isinstance(year_value, int):
+            return [
+                {"key": "date_from", "values": [f"{year_value}-01-01"]},
+                {"key": "date_to", "values": [f"{year_value}-12-31"]},
+            ]
+        date_from = str(date_range.get("date_from") or "").strip()
+        date_to = str(date_range.get("date_to") or "").strip()
+        out: list[dict[str, list[str]]] = []
+        if date_from:
+            out.append({"key": "date_from", "values": [date_from]})
+        if date_to:
+            out.append({"key": "date_to", "values": [date_to]})
+        if out:
+            return out
 
     period = translated_payload.get("period")
     if not isinstance(period, dict):
@@ -409,6 +450,12 @@ def _refine_query_payload_filters_with_question(
         query_payload["filters"] = hinted_filters
         return query_payload
 
+    current_year = _full_year_from_filters(current_filters)
+    hinted_year = _full_year_from_filters(hinted_filters)
+    if current_year is not None and hinted_year is not None and current_year != hinted_year:
+        query_payload["filters"] = hinted_filters
+        return query_payload
+
     if _is_full_year_filter(current_filters) and not _is_full_year_filter(hinted_filters):
         query_payload["filters"] = hinted_filters
 
@@ -416,6 +463,10 @@ def _refine_query_payload_filters_with_question(
 
 
 def _is_full_year_filter(filters: list[object]) -> bool:
+    return _full_year_from_filters(filters) is not None
+
+
+def _full_year_from_filters(filters: list[object]) -> int | None:
     date_from: str | None = None
     date_to: str | None = None
     for item in filters:
@@ -432,13 +483,15 @@ def _is_full_year_filter(filters: list[object]) -> bool:
             date_to = value
 
     if not date_from or not date_to:
-        return False
+        return None
 
     from_match = re.fullmatch(r"(20\d{2})-01-01", date_from)
     to_match = re.fullmatch(r"(20\d{2})-12-31", date_to)
     if not from_match or not to_match:
-        return False
-    return from_match.group(1) == to_match.group(1)
+        return None
+    if from_match.group(1) != to_match.group(1):
+        return None
+    return int(from_match.group(1))
 
 
 def _detect_unsafe_translated_payload(translated_payload: dict[str, object]) -> str | None:
@@ -505,6 +558,36 @@ def _metric_exists_in_local_catalog(metric: str, repository: object) -> bool:
     return metric in allowed
 
 
+def _memory_plan_matches_question(question: str, memory_plan: dict[str, object]) -> bool:
+    metric = str(memory_plan.get("metric") or "").strip()
+    if not metric:
+        return False
+
+    local_plan = NaturalQueryService().build_query_plan(question)
+    local_payload = local_plan.get("payload")
+    local_metric = ""
+    if isinstance(local_payload, dict):
+        kpi_keys = local_payload.get("kpi_keys")
+        if isinstance(kpi_keys, list) and kpi_keys:
+            local_metric = str(kpi_keys[0] or "").strip()
+        else:
+            local_metric = str(local_payload.get("metric_key") or "").strip()
+
+    if local_metric and not local_metric.startswith("__unmapped"):
+        return metric == local_metric
+
+    candidate = local_plan.get("auto_kpi_candidate")
+    if isinstance(candidate, dict):
+        try:
+            expected_key = KpiDesignerService().generate(KpiDesignRequest(**candidate)).generated_kpi_key
+        except Exception:
+            expected_key = ""
+        if expected_key:
+            return metric == expected_key
+
+    return True
+
+
 def _execute_internal_query(
     endpoint: str,
     query_payload: dict[str, object],
@@ -536,7 +619,7 @@ def _build_response(
     return NaturalQueryRunResponse(
         question=question,
         resolved=resolved,
-        source="llm" if source == "llm" else "rules",
+        source=source if source in {"rules", "llm", "memory"} else "rules",
         intent=intent,
         metric=metric,
         endpoint=endpoint,
@@ -598,6 +681,10 @@ def _safe_record_auto_feedback(
         return
     if not response.interaction_id:
         return
+    if str(response.metric or "").startswith("__unmapped"):
+        return
+    if response.source == "memory":
+        return
     if mode == "llm_only" and response.source != "llm":
         return
 
@@ -643,7 +730,7 @@ def _normalize_question_for_temporal_rules(question: str) -> str:
     }
     for old, new in replacements.items():
         lowered = lowered.replace(old, new)
-    return lowered
+    return unicodedata.normalize("NFKD", lowered).encode("ascii", "ignore").decode("ascii")
 
 
 def _detect_quarter_number(normalized: str) -> int | None:

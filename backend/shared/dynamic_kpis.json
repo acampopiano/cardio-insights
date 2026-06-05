@@ -68,5 +68,12 @@
     "description": "Pacientes readmitidos en los 30 dias posteriores.",
     "sql_query_template": "SELECT {period_expr} AS period, COUNT(*) AS value FROM flow_coordina f WHERE f.Realizado = 255 AND (f.CodCoordinaReglaMotivo = 105 OR f.CodCoordinaReglaMotivo = 109 OR f.CodCoordinaReglaMotivo = 120) {date_clause} GROUP BY {period_expr} ORDER BY period",
     "default_granularity": "month"
+  },
+  {
+    "key": "wait_over_30d_pct",
+    "label": "Espera mayor a 30 dias",
+    "description": "Porcentaje de pacientes con espera superior a 30 dias entre coordinacion y realizado.",
+    "sql_query_template": "SELECT {period_expr} AS period, ROUND(100.0 * SUM(CASE WHEN DATEDIFF(f.FechaRealizado, f.FechaCoordina) > 30 THEN 1 ELSE 0 END) / NULLIF(COUNT(*), 0), 2) AS value FROM flow_coordina f WHERE f.FechaRealizado > '1900-01-01' AND f.FechaCoordina > '1900-01-01' AND DATEDIFF(f.FechaRealizado, f.FechaCoordina) >= 0 {date_clause} GROUP BY {period_expr} ORDER BY period",
+    "default_granularity": "month"
   }
 ]

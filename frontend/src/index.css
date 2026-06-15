@@ -1,0 +1,118 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* INCC palette (extracted from logo + corporate site) */
+@theme inline {
+  --color-incc-deep: #0d3b66;
+  --color-incc-primary: #2e8bce;
+  --color-incc-soft: #eaf3fb;
+  --color-incc-accent: #d62828;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+}
+
+:root {
+  --background: #ffffff;
+  --foreground: #0f172a;
+
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+
+  --popover: #ffffff;
+  --popover-foreground: #0f172a;
+
+  /* INCC primary = azul medio del logo / botones */
+  --primary: #2e8bce;
+  --primary-foreground: #ffffff;
+
+  --secondary: #eaf3fb;
+  --secondary-foreground: #0d3b66;
+
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+
+  --accent: #eaf3fb;
+  --accent-foreground: #0d3b66;
+
+  --destructive: #d62828;
+  --destructive-foreground: #ffffff;
+
+  --border: #e2e8f0;
+  --input: #e2e8f0;
+  --ring: #2e8bce;
+
+  --radius: 0.625rem;
+}
+
+.dark {
+  --background: #0b1220;
+  --foreground: #f8fafc;
+
+  --card: #0f1a2e;
+  --card-foreground: #f8fafc;
+
+  --popover: #0f1a2e;
+  --popover-foreground: #f8fafc;
+
+  --primary: #5fa8df;
+  --primary-foreground: #0b1220;
+
+  --secondary: #122544;
+  --secondary-foreground: #f8fafc;
+
+  --muted: #122544;
+  --muted-foreground: #94a3b8;
+
+  --accent: #122544;
+  --accent-foreground: #f8fafc;
+
+  --destructive: #ef4444;
+  --destructive-foreground: #f8fafc;
+
+  --border: #1e2a44;
+  --input: #1e2a44;
+  --ring: #5fa8df;
+}
+
+* {
+  border-color: var(--border);
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu,
+    Cantarell, "Helvetica Neue", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}

@@ -31,7 +31,7 @@ def me(
 ) -> MeResponse:
     username = claims.get("sub")
     if not username:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token payload")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token inválido")
     try:
         user = auth_service.me(username)
     except ValueError as exc:

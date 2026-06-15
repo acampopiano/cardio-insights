@@ -35,6 +35,9 @@ class Settings(BaseSettings):
     mysql_password: str = Field(default="cardio")
     mysql_database: str = Field(default="incc")
 
+    metabase_site_url: str = Field(default="http://localhost:3000")
+    metabase_secret_key: str = Field(default="change-me")
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",

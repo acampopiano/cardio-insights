@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cardio Insights</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f0f4f8;
+      color: #1a202c;
+      min-height: 100vh;
+    }
+
+    header {
+      background: #1a365d;
+      color: #fff;
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    header h1 { font-size: 1.25rem; font-weight: 600; }
+    header span { font-size: 0.85rem; opacity: 0.7; }
+
+    .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+
+    /* Login form */
+    #login-section {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+      padding: 2rem;
+      max-width: 400px;
+      margin: 3rem auto;
+    }
+
+    #login-section h2 { margin-bottom: 1.5rem; font-size: 1.1rem; }
+
+    .field { margin-bottom: 1rem; }
+    .field label { display: block; font-size: 0.85rem; margin-bottom: 0.3rem; color: #4a5568; }
+    .field input {
+      width: 100%; padding: 0.55rem 0.75rem;
+      border: 1px solid #cbd5e0; border-radius: 6px;
+      font-size: 0.95rem;
+    }
+    .field input:focus { outline: none; border-color: #3182ce; box-shadow: 0 0 0 3px rgba(49,130,206,0.15); }
+
+    button {
+      background: #3182ce; color: #fff;
+      border: none; border-radius: 6px;
+      padding: 0.6rem 1.2rem; font-size: 0.95rem;
+      cursor: pointer; width: 100%;
+    }
+    button:hover { background: #2b6cb0; }
+    button:disabled { background: #a0aec0; cursor: not-allowed; }
+
+    .error {
+      margin-top: 0.75rem;
+      color: #c53030; font-size: 0.85rem;
+      background: #fff5f5; border: 1px solid #feb2b2;
+      border-radius: 6px; padding: 0.5rem 0.75rem;
+      display: none;
+    }
+
+    /* Dashboard section */
+    #dashboard-section { display: none; }
+
+    .toolbar {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+      padding: 1rem 1.5rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .toolbar label { font-size: 0.85rem; color: #4a5568; white-space: nowrap; }
+    .toolbar input[type="number"] {
+      width: 90px; padding: 0.45rem 0.6rem;
+      border: 1px solid #cbd5e0; border-radius: 6px;
+      font-size: 0.9rem;
+    }
+    .toolbar button { width: auto; }
+
+    #logout-btn {
+      margin-left: auto;
+      background: transparent; color: #718096;
+      border: 1px solid #cbd5e0; padding: 0.45rem 0.9rem;
+      font-size: 0.85rem; border-radius: 6px;
+    }
+    #logout-btn:hover { background: #edf2f7; color: #2d3748; }
+
+    .embed-wrapper {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+      overflow: hidden;
+      min-height: 600px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .embed-wrapper iframe {
+      width: 100%; height: 700px;
+      border: none; display: block;
+    }
+
+    .placeholder {
+      text-align: center; color: #a0aec0; padding: 3rem;
+    }
+    .placeholder p { margin-top: 0.5rem; font-size: 0.9rem; }
+
+    .spinner {
+      width: 32px; height: 32px;
+      border: 3px solid #e2e8f0;
+      border-top-color: #3182ce;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin: 0 auto 1rem;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+<header>
+  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+  </svg>
+  <h1>Cardio Insights</h1>
+  <span>Dashboard Analytics</span>
+</header>
+
+<!-- LOGIN -->
+<section class="container">
+  <div id="login-section">
+    <h2>Iniciar sesión</h2>
+    <div class="field">
+      <label for="username">Usuario</label>
+      <input id="username" type="text" value="clinician" autocomplete="username" />
+    </div>
+    <div class="field">
+      <label for="password">Contraseña</label>
+      <input id="password" type="password" value="Demo1234!" autocomplete="current-password" />
+    </div>
+    <button id="login-btn">Entrar</button>
+    <div id="login-error" class="error"></div>
+  </div>
+</section>
+
+<!-- DASHBOARD -->
+<section class="container" id="dashboard-section">
+  <div class="toolbar">
+    <label for="dashboard-id">ID del dashboard Metabase:</label>
+    <input id="dashboard-id" type="number" min="1" value="1" />
+    <button id="load-btn">Cargar dashboard</button>
+    <button id="logout-btn">Cerrar sesión</button>
+  </div>
+
+  <div class="embed-wrapper" id="embed-wrapper">
+    <div class="placeholder">
+      <p>Ingresá el ID del dashboard y hacé clic en <strong>Cargar dashboard</strong>.</p>
+      <p style="margin-top:0.25rem;font-size:0.8rem;color:#718096">
+        Encontrás el ID en la URL de Metabase: <code>/dashboard/<strong>1</strong>-mi-dashboard</code>
+      </p>
+    </div>
+  </div>
+</section>
+
+<script>
+  const API = 'http://localhost:8000/api/v1';
+  let accessToken = null;
+
+  // --- Auth ---
+  document.getElementById('login-btn').addEventListener('click', async () => {
+    const btn = document.getElementById('login-btn');
+    const errEl = document.getElementById('login-error');
+    btn.disabled = true;
+    errEl.style.display = 'none';
+
+    try {
+      const res = await fetch(`${API}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: document.getElementById('username').value.trim(),
+          password: document.getElementById('password').value,
+        }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.detail || 'Credenciales incorrectas');
+      }
+
+      const data = await res.json();
+      accessToken = data.access_token;
+      document.getElementById('login-section').parentElement.style.display = 'none';
+      document.getElementById('dashboard-section').style.display = 'block';
+    } catch (err) {
+      errEl.textContent = err.message;
+      errEl.style.display = 'block';
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
+  document.getElementById('password').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') document.getElementById('login-btn').click();
+  });
+
+  // --- Load dashboard ---
+  document.getElementById('load-btn').addEventListener('click', loadDashboard);
+
+  async function loadDashboard() {
+    const wrapper = document.getElementById('embed-wrapper');
+    const dashboardId = parseInt(document.getElementById('dashboard-id').value, 10);
+
+    if (!dashboardId || dashboardId < 1) {
+      showPlaceholder('Ingresá un ID de dashboard válido.');
+      return;
+    }
+
+    wrapper.innerHTML = '<div class="placeholder"><div class="spinner"></div><p>Generando token de embedding…</p></div>';
+
+    try {
+      const res = await fetch(`${API}/metabase/embed-token?dashboard_id=${dashboardId}`, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.detail || `Error ${res.status}`);
+      }
+
+      const { iframe_url } = await res.json();
+      wrapper.innerHTML = `<iframe src="${iframe_url}" allowtransparency></iframe>`;
+    } catch (err) {
+      showPlaceholder(`No se pudo cargar el dashboard: ${err.message}`);
+    }
+  }
+
+  function showPlaceholder(msg) {
+    document.getElementById('embed-wrapper').innerHTML =
+      `<div class="placeholder"><p>${msg}</p></div>`;
+  }
+
+  // --- Logout ---
+  document.getElementById('logout-btn').addEventListener('click', async () => {
+    try {
+      await fetch(`${API}/auth/logout`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+    } finally {
+      accessToken = null;
+      document.getElementById('dashboard-section').style.display = 'none';
+      const loginContainer = document.getElementById('login-section').parentElement;
+      loginContainer.style.display = 'block';
+      document.getElementById('login-error').style.display = 'none';
+    }
+  });
+</script>
+</body>
+</html>

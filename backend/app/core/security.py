@@ -15,7 +15,7 @@ bearer_scheme = HTTPBearer(auto_error=False)
 
 
 class AuthError(HTTPException):
-    def __init__(self, detail: str = "Invalid credentials") -> None:
+    def __init__(self, detail: str = "Credenciales inválidas") -> None:
         super().__init__(status_code=status.HTTP_401_UNAUTHORIZED, detail=detail)
 
 
@@ -47,14 +47,14 @@ def decode_token(token: str) -> dict[str, Any]:
     try:
         return jwt.decode(token, settings.jwt_secret_key, algorithms=[settings.jwt_algorithm])
     except JWTError as exc:
-        raise AuthError(detail="Invalid or expired token") from exc
+        raise AuthError(detail="Token inválido o expirado") from exc
 
 
 def get_current_token(
     credentials: HTTPAuthorizationCredentials | None = Depends(bearer_scheme),
 ) -> str:
     if credentials is None or credentials.scheme.lower() != "bearer":
-        raise AuthError(detail="Missing bearer token")
+        raise AuthError(detail="Falta el token de autenticación")
     return credentials.credentials
 
 
@@ -62,5 +62,5 @@ def get_current_claims(token: str = Depends(get_current_token)) -> dict[str, Any
     payload = decode_token(token)
     jti = payload.get("jti")
     if not jti or blocklist.contains(jti):
-        raise AuthError(detail="Token revoked")
+        raise AuthError(detail="Sesión expirada")
     return payload

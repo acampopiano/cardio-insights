@@ -30,7 +30,7 @@ class AuthService:
     def login(self, username: str, password: str) -> dict[str, Any]:
         user = self.auth_repository.get_user_by_username(username)
         if user is None or not self._password_valid(user, password):
-            raise ValueError("Invalid username or password")
+            raise ValueError("Usuario o contraseña incorrectos")
 
         access_token = create_access_token(
             subject=user["username"],
@@ -58,12 +58,12 @@ class AuthService:
         jti = payload.get("jti")
         if jti:
             blocklist.add(jti)
-        return {"success": True, "message": "Session closed"}
+        return {"success": True, "message": "Sesión cerrada"}
 
     def me(self, username: str) -> dict[str, Any]:
         user = self.auth_repository.get_user_by_username(username)
         if user is None:
-            raise ValueError("User not found")
+            raise ValueError("Usuario no encontrado")
         return {
             "id": user["id"],
             "username": user["username"],

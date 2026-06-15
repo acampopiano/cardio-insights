@@ -8,6 +8,7 @@ from app.api.v1.health import router as health_router
 from app.api.v1.kpi_designer import router as kpi_designer_router
 from app.api.v1.kpis import router as kpis_router
 from app.api.v1.natural_query import router as natural_query_router
+from app.api.v1.metabase import router as metabase_router
 
 api_router = APIRouter()
 api_router.include_router(auth_router)
@@ -18,3 +19,4 @@ api_router.include_router(kpis_router)
 api_router.include_router(kpi_designer_router)
 api_router.include_router(analytics_router)
 api_router.include_router(natural_query_router)
+api_router.include_router(metabase_router)

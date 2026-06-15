@@ -10,4 +10,47 @@ services:
       - "8000:8000"
     volumes:
       - ./app:/app/app
+    depends_on:
+      mysql:
+        condition: service_healthy
     restart: unless-stopped
+
+  mysql:
+    image: mysql:8.0
+    container_name: cardio-insights-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: incc
+      MYSQL_USER: cardio
+      MYSQL_PASSWORD: cardio
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "cardio", "-pcardio"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  metabase:
+    image: metabase/metabase:latest
+    container_name: cardio-insights-metabase
+    environment:
+      MB_DB_TYPE: mysql
+      MB_DB_DBNAME: metabase_app_db
+      MB_DB_PORT: 3306
+      MB_DB_HOST: mysql
+      MB_DB_USER: cardio
+      MB_DB_PASS: cardio
+    ports:
+      - "3000:3000"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  mysql_data:

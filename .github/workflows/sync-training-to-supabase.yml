@@ -1,0 +1,124 @@
+name: Sync Training Dataset to Supabase
+
+on:
+  schedule:
+    - cron: "0 * * * *"
+  workflow_dispatch:
+    inputs:
+      training_object_key:
+        description: "Supabase object key destino (opcional)"
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sync-training-to-supabase
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Sync export endpoint to Supabase Storage
+        env:
+          BACKEND_BASE_URL: ${{ secrets.BACKEND_BASE_URL }}
+          BACKEND_SYNC_USERNAME: ${{ secrets.BACKEND_SYNC_USERNAME }}
+          BACKEND_SYNC_PASSWORD: ${{ secrets.BACKEND_SYNC_PASSWORD }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          SUPABASE_BUCKET: ${{ secrets.SUPABASE_BUCKET }}
+          SUPABASE_TRAINING_OBJECT_KEY: "${{ github.event.inputs.training_object_key != '' && github.event.inputs.training_object_key || secrets.SUPABASE_TRAINING_OBJECT_KEY }}"
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          import time
+          import urllib.error
+          import urllib.parse
+          import urllib.request
+
+
+          def require_env(name: str) -> str:
+              value = os.getenv(name, "").strip()
+              if not value:
+                  raise RuntimeError(f"Missing required secret: {name}")
+              return value
+
+
+          def request_with_retry(request: urllib.request.Request, *, attempts: int = 3, timeout: int = 60) -> bytes:
+              last_error = None
+              for attempt in range(1, attempts + 1):
+                  try:
+                      with urllib.request.urlopen(request, timeout=timeout) as response:
+                          return response.read()
+                  except urllib.error.HTTPError as err:
+                      body = err.read().decode("utf-8", errors="replace")
+                      # Retry only on transient HTTP failures.
+                      if err.code in (429, 500, 502, 503, 504) and attempt < attempts:
+                          time.sleep(attempt * 2)
+                          continue
+                      raise RuntimeError(f"HTTP {err.code} for {request.full_url}: {body}") from err
+                  except urllib.error.URLError as err:
+                      last_error = err
+                      if attempt < attempts:
+                          time.sleep(attempt * 2)
+                          continue
+                      raise RuntimeError(f"Network error for {request.full_url}: {err}") from err
+              raise RuntimeError(f"Request failed for {request.full_url}: {last_error}")
+
+
+          backend_base_url = require_env("BACKEND_BASE_URL").rstrip("/")
+          username = require_env("BACKEND_SYNC_USERNAME")
+          password = require_env("BACKEND_SYNC_PASSWORD")
+          supabase_url = require_env("SUPABASE_URL").rstrip("/")
+          supabase_key = require_env("SUPABASE_SERVICE_ROLE_KEY")
+          bucket = require_env("SUPABASE_BUCKET")
+          object_key = require_env("SUPABASE_TRAINING_OBJECT_KEY")
+
+          login_payload = json.dumps({"username": username, "password": password}).encode("utf-8")
+          login_request = urllib.request.Request(
+              url=f"{backend_base_url}/api/v1/auth/login",
+              data=login_payload,
+              headers={"Content-Type": "application/json"},
+              method="POST",
+          )
+          login_response = request_with_retry(login_request, attempts=3, timeout=60)
+          login_json = json.loads(login_response.decode("utf-8"))
+          access_token = login_json.get("access_token")
+          if not access_token:
+              raise RuntimeError("Login response does not include access_token")
+
+          export_request = urllib.request.Request(
+              url=f"{backend_base_url}/api/v1/natural-query/training/export",
+              data=b"{}",
+              headers={
+                  "Authorization": f"Bearer {access_token}",
+                  "Content-Type": "application/json",
+              },
+              method="POST",
+          )
+          exported_content = request_with_retry(export_request, attempts=3, timeout=120)
+          if not exported_content:
+              raise RuntimeError("Export endpoint returned empty payload")
+
+          encoded_bucket = urllib.parse.quote(bucket, safe="")
+          encoded_key = urllib.parse.quote(object_key, safe="/")
+          upload_url = f"{supabase_url}/storage/v1/object/{encoded_bucket}/{encoded_key}"
+          upload_request = urllib.request.Request(
+              url=upload_url,
+              data=exported_content,
+              headers={
+                  "apikey": supabase_key,
+                  "Authorization": f"Bearer {supabase_key}",
+                  "x-upsert": "true",
+                  "Content-Type": "application/octet-stream",
+              },
+              method="POST",
+          )
+          request_with_retry(upload_request, attempts=3, timeout=120)
+
+          print(f"Synced {len(exported_content)} bytes to {bucket}/{object_key}")
+          PY

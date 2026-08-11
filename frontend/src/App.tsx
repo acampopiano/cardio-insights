@@ -6,9 +6,11 @@ import { LoginPage } from "@/features/auth/LoginPage"
 import { AgentePage } from "@/routes/AgentePage"
 import { HomePage } from "@/routes/HomePage"
 import { KpisPage } from "@/routes/KpisPage"
+import { MethodologyPage } from "@/routes/MethodologyPage"
 import { MLPage } from "@/routes/MLPage"
+import { ML_ACCESS_ROLES } from "@/lib/navigation"
 import { ProtectedRoute } from "@/routes/ProtectedRoute"
-import { ReportesPage } from "@/routes/ReportesPage"
+import { RoleRoute } from "@/routes/RoleRoute"
 
 export default function App() {
   return (
@@ -25,9 +27,23 @@ export default function App() {
             }
           >
             <Route path="/dashboard" element={<HomePage />} />
-            <Route path="/reportes" element={<ReportesPage />} />
             <Route path="/kpis" element={<KpisPage />} />
-            <Route path="/ml" element={<MLPage />} />
+            <Route
+              path="/ml"
+              element={
+                <RoleRoute roles={ML_ACCESS_ROLES}>
+                  <MLPage />
+                </RoleRoute>
+              }
+            />
+            <Route
+              path="/ml/metodologia"
+              element={
+                <RoleRoute roles={ML_ACCESS_ROLES}>
+                  <MethodologyPage />
+                </RoleRoute>
+              }
+            />
             <Route path="/agente" element={<AgentePage />} />
           </Route>
 

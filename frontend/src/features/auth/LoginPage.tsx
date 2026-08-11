@@ -192,19 +192,7 @@ export function LoginPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="password">Contrasena</Label>
-                    <button
-                      type="button"
-                      className="text-xs text-muted-foreground hover:text-foreground"
-                      onClick={(e) => {
-                        e.preventDefault()
-                      }}
-                      tabIndex={-1}
-                    >
-                      Olvidaste tu contrasena?
-                    </button>
-                  </div>
+                  <Label htmlFor="password">Contrasena</Label>
                   <div className="relative">
                     <Lock className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
                     <Input
@@ -270,17 +258,6 @@ export function LoginPage() {
                     "Entrar"
                   )}
                 </Button>
-
-                <p className="text-center text-xs text-muted-foreground">
-                  Demo:{" "}
-                  <code className="rounded bg-muted px-1 py-0.5 text-[11px]">
-                    clinician
-                  </code>{" "}
-                  /{" "}
-                  <code className="rounded bg-muted px-1 py-0.5 text-[11px]">
-                    Demo1234!
-                  </code>
-                </p>
               </form>
             </CardContent>
           </Card>

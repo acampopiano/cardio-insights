@@ -1,5 +1,4 @@
 import {
-  BarChart3,
   Brain,
   Home,
   MessageSquare,
@@ -14,9 +13,14 @@ export interface NavItem {
   icon: LucideIcon
   description: string
   available: boolean
+  /** Si está definido, solo esos roles ven el item. */
+  roles?: string[]
   comingSoonHint?: string
   features?: string[]
 }
+
+/** Roles con acceso a predicciones ML (alineado con backend ML_ACCESS_ROLES). */
+export const ML_ACCESS_ROLES = ["admin", "clinico"] as const
 
 export const NAV_ITEMS: NavItem[] = [
   {
@@ -28,37 +32,19 @@ export const NAV_ITEMS: NavItem[] = [
     available: true,
   },
   {
-    path: "/reportes",
-    label: "Reportes",
-    short: "Reportes",
-    icon: BarChart3,
-    description:
-      "Dashboards interactivos de Metabase con datos clinicos del INCC.",
-    available: false,
-    comingSoonHint:
-      "Integraremos los reportes embebidos de Metabase usando los tokens de embedding del backend.",
-    features: [
-      "Mortalidad operatoria",
-      "Volumen quirurgico mensual",
-      "Tiempos de espera por procedimiento",
-      "Indicadores de hemodinamia",
-    ],
-  },
-  {
     path: "/kpis",
     label: "KPIs",
     short: "KPIs",
     icon: TrendingUp,
     description:
-      "Indicadores clave de la actividad clinica con filtros por periodo y tipo de acto medico.",
-    available: false,
-    comingSoonHint:
-      "Conectaremos /api/v1/kpis/query y /api/v1/dashboard/summary para mostrar las metricas en cards interactivas.",
+      "Indicadores clave del INCC en dashboards de Metabase, con filtros y exportacion.",
+    available: true,
     features: [
-      "Mortalidad 30 dias",
-      "Volumen de cirugia cardiaca",
-      "Volumen de PTCA",
-      "Tiempo promedio en UCI",
+      "Actos (volumen y por procedimiento)",
+      "Cirugia (indicadores, pacientes, perfil)",
+      "Hemodinamia (resumen y evolucion)",
+      "Factores de riesgo y complicaciones",
+      "Exportacion de resultados (CSV / Excel / imagen)",
     ],
   },
   {
@@ -68,13 +54,12 @@ export const NAV_ITEMS: NavItem[] = [
     icon: Brain,
     description:
       "Modelos predictivos entrenados sobre datos historicos del INCC.",
-    available: false,
-    comingSoonHint:
-      "Vamos a exponer un endpoint para correr predicciones sobre pacientes concretos. El frontend cargara los inputs y mostrara el score con explicabilidad.",
+    available: true,
+    roles: [...ML_ACCESS_ROLES],
     features: [
-      "Riesgo de mortalidad perioperatoria",
-      "Probabilidad de complicaciones",
-      "Riesgo de reingreso a 30 dias",
+      "Riesgo de mortalidad en PTCA / angioplastia",
+      "Riesgo de mortalidad quirurgica a 30 dias",
+      "Explicabilidad: factores de mayor peso",
     ],
   },
   {
@@ -83,18 +68,46 @@ export const NAV_ITEMS: NavItem[] = [
     short: "Asistente",
     icon: MessageSquare,
     description:
-      "Consultas en lenguaje natural sobre los datos del INCC, respaldadas por un LLM con acceso a las vistas SQL.",
-    available: false,
-    comingSoonHint:
-      "El agente respondera preguntas como 'cuantas cirugias hubo el mes pasado' o 'mostrame la evolucion de la mortalidad a 30 dias'.",
+      "Consultas en lenguaje natural sobre los datos del INCC, respaldadas por un LLM con acceso de solo lectura a la base.",
+    available: true,
     features: [
       "Consultas conversacionales",
-      "Generacion de graficos on demand",
-      "Citas a la fuente de los datos",
+      "SQL generado y auditable",
+      "Acceso de solo lectura a los datos",
     ],
   },
 ]
 
+export function normalizeRole(role: string | null | undefined): string {
+  return (role ?? "").trim().toLowerCase()
+}
+
+export function roleCanAccessItem(
+  item: NavItem,
+  role: string | null | undefined
+): boolean {
+  if (!item.roles || item.roles.length === 0) return true
+  const normalized = normalizeRole(role)
+  return item.roles.some((allowed) => allowed.toLowerCase() === normalized)
+}
+
+export function getNavItemsForRole(role: string | null | undefined): NavItem[] {
+  return NAV_ITEMS.filter((item) => roleCanAccessItem(item, role))
+}
+
 export function getNavItem(path: string): NavItem | undefined {
   return NAV_ITEMS.find((item) => item.path === path)
+}
+
+export function roleCanAccessPath(
+  path: string,
+  role: string | null | undefined
+): boolean {
+  const item =
+    getNavItem(path) ??
+    NAV_ITEMS.find(
+      (nav) => path === nav.path || path.startsWith(`${nav.path}/`)
+    )
+  if (!item) return true
+  return roleCanAccessItem(item, role)
 }

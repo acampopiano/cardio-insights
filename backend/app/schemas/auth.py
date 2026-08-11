@@ -10,7 +10,7 @@ class UserPublic(BaseModel):
 
 
 class LoginRequest(BaseModel):
-    username: str = Field(min_length=1, examples=["clinician"])
+    username: str = Field(min_length=1, examples=["dcaraballo"])
     password: str = Field(min_length=1, examples=["Demo1234!"])
 
 

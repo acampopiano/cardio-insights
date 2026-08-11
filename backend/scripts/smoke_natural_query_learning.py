@@ -92,7 +92,7 @@ def main() -> int:
         help="Ruta al dataset de preguntas (relativa al backend o absoluta)",
     )
     parser.add_argument("--limit", type=int, default=20, help="Cantidad maxima de preguntas a ejecutar")
-    parser.add_argument("--username", default="clinician", help="Usuario para login")
+    parser.add_argument("--username", default="dcaraballo", help="Usuario para login")
     parser.add_argument("--password", default="Demo1234!", help="Password para login")
     parser.add_argument(
         "--require-growth",

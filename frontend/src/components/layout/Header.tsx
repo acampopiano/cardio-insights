@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom"
-import { ChevronDown, LogOut, Menu, Settings, UserCircle } from "lucide-react"
+import { ChevronDown, LogOut, Menu } from "lucide-react"
 
 import { BrandMark } from "@/components/BrandMark"
 import { ThemeToggle } from "@/components/ThemeToggle"
@@ -7,7 +7,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
@@ -15,9 +14,14 @@ import { useAuth } from "@/features/auth/useAuth"
 import { cn, getInitials } from "@/lib/utils"
 
 const ROLE_BADGE: Record<string, { label: string; className: string }> = {
-  clinician: {
-    label: "Clinician",
+  clinico: {
+    label: "Clinico",
     className: "bg-[var(--color-incc-primary)]/15 text-[var(--color-incc-primary)] ring-1 ring-[var(--color-incc-primary)]/30",
+  },
+  gestion: {
+    label: "Gestion",
+    className:
+      "bg-sky-500/15 text-sky-700 ring-1 ring-sky-500/30 dark:text-sky-300",
   },
   admin: {
     label: "Admin",
@@ -76,14 +80,6 @@ function UserAvatar({
   )
 }
 
-function ComingSoonBadge() {
-  return (
-    <span className="ml-auto rounded-full bg-muted px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-muted-foreground">
-      Pronto
-    </span>
-  )
-}
-
 interface HeaderProps {
   onMenuClick?: () => void
 }
@@ -139,7 +135,7 @@ export function Header({ onMenuClick }: HeaderProps) {
 
               <DropdownMenuContent
                 align="end"
-                className="w-72"
+                className="w-64"
                 onCloseAutoFocus={(e) => e.preventDefault()}
               >
                 <div className="flex items-center gap-3 px-2 py-2">
@@ -161,40 +157,6 @@ export function Header({ onMenuClick }: HeaderProps) {
                     </div>
                   </div>
                 </div>
-
-                <DropdownMenuSeparator />
-
-                <DropdownMenuLabel>Permisos</DropdownMenuLabel>
-                {user.permissions.length > 0 ? (
-                  <ul className="px-2 pb-1.5 space-y-0.5">
-                    {user.permissions.map((p) => (
-                      <li
-                        key={p}
-                        className="flex items-center gap-2 text-xs text-foreground/85"
-                      >
-                        <span className="size-1.5 rounded-full bg-[var(--color-incc-primary)]" />
-                        <code className="font-mono text-[11px]">{p}</code>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="px-2 pb-1.5 text-xs text-muted-foreground">
-                    Sin permisos asignados
-                  </p>
-                )}
-
-                <DropdownMenuSeparator />
-
-                <DropdownMenuItem disabled>
-                  <UserCircle />
-                  <span>Mi perfil</span>
-                  <ComingSoonBadge />
-                </DropdownMenuItem>
-                <DropdownMenuItem disabled>
-                  <Settings />
-                  <span>Preferencias</span>
-                  <ComingSoonBadge />
-                </DropdownMenuItem>
 
                 <DropdownMenuSeparator />
 

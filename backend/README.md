@@ -183,7 +183,7 @@ KPI keys soportadas con SQL real:
 Autenticacion en modo mysql:
 
 - Se intenta login contra `use_usuarios` (Alias + Clave/MD5text) y permisos desde `use_permiso`.
-- Si el usuario no existe en BD, queda fallback a usuarios de desarrollo (`clinician`, `admin`) para no frenar el MVP.
+- Si el usuario no existe en BD, queda fallback a usuarios de desarrollo (`dcaraballo`, `ggarcia`, `acampopiano`, `admin`) para no frenar el MVP.
 - Recomendado: crear usuario tecnico de pruebas en `use_usuarios` y usarlo para integracion.
 
 ## KPI Designer (interfaz no-code para equipo funcional)
@@ -215,10 +215,12 @@ La salida incluye:
 
 Nota: si `REPOSITORY_BACKEND=mysql`, el endpoint `/kpi-designer/register` crea/actualiza la tabla `cardio_dynamic_kpis` y persiste el KPI en MySQL. En modo mock, queda en el registry/JSON local.
 
-## Credenciales mock
+## Credenciales mock / seed
 
-- clinician / Demo1234!
-- admin / Admin1234!
+- admin / Admin1234! (`admin`)
+- dcaraballo / Demo1234! (`clinico`)
+- ggarcia / Demo1234! (`gestion`)
+- acampopiano / Demo1234! (`clinico`)
 
 ## Ejemplos de requests y responses
 
@@ -231,7 +233,7 @@ POST /api/v1/auth/login
 Content-Type: application/json
 
 {
-  "username": "clinician",
+  "username": "dcaraballo",
   "password": "Demo1234!"
 }
 ```
@@ -244,10 +246,10 @@ Response 200:
   "token_type": "bearer",
   "expires_in": 7200,
   "user": {
-    "id": 1,
-    "username": "clinician",
-    "full_name": "Dr. Ana Pereira",
-    "role": "clinician",
+    "id": 2,
+    "username": "dcaraballo",
+    "full_name": "Diego Caraballo",
+    "role": "clinico",
     "permissions": ["dashboard:read", "kpis:query"]
   }
 }
@@ -267,10 +269,10 @@ Response 200:
 ```json
 {
   "user": {
-    "id": 1,
-    "username": "clinician",
-    "full_name": "Dr. Ana Pereira",
-    "role": "clinician",
+    "id": 2,
+    "username": "dcaraballo",
+    "full_name": "Diego Caraballo",
+    "role": "clinico",
     "permissions": ["dashboard:read", "kpis:query"]
   }
 }
@@ -534,33 +536,45 @@ Ejemplo:
 Incluido:
 
 - tests de health
-- login + me
+- login + me + logout (invalidación de sesión)
+- auth unitaria (JWT, blocklist, passwords plain/md5/bcrypt)
+- `sql_guard` (matriz de seguridad del chat clínico)
 - auth requerida en endpoints protegidos
-- consulta KPI
+- consulta KPI / natural-query
 
 Ejecutar:
 
 ```bash
 cd backend
 pytest -q
+# Reporte HTML: backend/htmlcov/index.html
 ```
 
-Pruebas de integracion MySQL (opcionales):
+Coverage actual (baseline): ver salida de `pytest -q` (`--cov-fail-under=90` se activará al cerrar gaps de chat/ML/MySQL).
+
+
+Pruebas de integracion MySQL (recomendadas para coverage alto):
 
 ```bash
 cd backend
+docker compose down -v
+docker compose up -d mysql
+# esperar healthcheck healthy
+
 # PowerShell
 $env:RUN_INTEGRATION_DB_TESTS="1"
-$env:INCC_TEST_USERNAME="tu_alias"
-$env:INCC_TEST_PASSWORD="tu_password"
-pytest -q app/tests/test_integration_mysql.py
+pytest -q
+# o solo integración:
+pytest -q app/tests/integration
 ```
+
+Credenciales por defecto del compose: `cardio` / `cardio`, DB `incc`, user demo `dcaraballo` / `Demo1234!`.
 
 Recomendaciones siguientes:
 
-1. Agregar tests de error contractuales (401, 404, payload invalido).
-2. Agregar snapshot tests de contratos JSON para evitar romper frontend.
-3. Agregar tests de repositorio MySQL con DB de prueba en docker compose.
+1. Subir `--cov-fail-under` gradualmente hasta 90.
+2. Cerrar gaps restantes de `natural_query` / `kpi_designer` / learning.
+3. Snapshot tests de contratos JSON para evitar romper frontend.
 
 ## Plan de migracion de mocks a MySQL
 

@@ -1,0 +1,2319 @@
+{
+  "description": null,
+  "archived": false,
+  "view_count": 19,
+  "collection_position": null,
+  "dashcards": [
+    {
+      "size_x": 6,
+      "dashboard_tab_id": null,
+      "series": [],
+      "inline_parameters": [],
+      "action_id": null,
+      "collection_authority_level": null,
+      "card": {
+        "cache_invalidated_at": "2026-07-28T20:46:15.235941Z",
+        "description": null,
+        "archived": false,
+        "view_count": 2,
+        "collection_position": null,
+        "source_card_id": null,
+        "table_id": null,
+        "result_metadata": [
+          {
+            "name": "TotalAngioplastias",
+            "database_type": "BIGINT",
+            "base_type": "type/BigInteger",
+            "display_name": "TotalAngioplastias",
+            "field_ref": [
+              "field",
+              "TotalAngioplastias",
+              {
+                "base-type": "type/BigInteger"
+              }
+            ]
+          }
+        ],
+        "embedding_type": null,
+        "initially_published_at": null,
+        "can_write": true,
+        "card_schema": 23,
+        "database_id": 2,
+        "enable_embedding": false,
+        "collection_id": 4,
+        "query_type": "native",
+        "download_perms": "full",
+        "name": "Total Angioplastias (hasta año seleccionado)",
+        "document_id": null,
+        "last_used_at": "2026-07-28T19:27:11.24786Z",
+        "type": "question",
+        "dimensions": null,
+        "query_average_duration": null,
+        "creator_id": 13371339,
+        "moderation_reviews": [],
+        "updated_at": "2026-07-28T20:46:15.247843Z",
+        "made_public_by_id": null,
+        "embedding_params": null,
+        "cache_ttl": null,
+        "dataset_query": {
+          "lib/type": "mbql/query",
+          "database": 2,
+          "stages": [
+            {
+              "native": "SELECT \n    COUNT(*) AS TotalAngioplastias\nFROM flow_coordina f\nWHERE f.Realizado = 255\n  AND f.CodCoordinaReglaMotivo IN (101, 119)\n    AND YEAR(f.FechaRealizado) <= {{Anio}}\n      [[AND (({{sede}} = 'SMI' AND COALESCE(f.Hbritanico, 0) = 0) OR ({{sede}} = 'Britanico' AND f.Hbritanico = 1))]]\n      [[AND (({{facturacion}} = 'FNR' AND f.CodDestinoFact = 3) OR ({{facturacion}} = 'Otro' AND COALESCE(f.CodDestinoFact, 0) <> 3))]]\n",
+              "lib/type": "mbql.stage/native",
+              "template-tags": {
+                "Anio": {
+                  "id": "31c19fd9-8cb3-4375-9e93-fedeecb05114",
+                  "type": "text",
+                  "name": "Anio",
+                  "display-name": "Anio",
+                  "default": "2025",
+                  "required": true
+                },
+                "sede": {
+                  "display-name": "Sede",
+                  "type": "text",
+                  "id": "4d880fc8-4324-4b49-b626-860650a132e1",
+                  "name": "sede",
+                  "required": false
+                },
+                "facturacion": {
+                  "display-name": "Facturacion",
+                  "type": "text",
+                  "id": "00184738-4766-4dcc-9b8f-08cb8b1faa47",
+                  "name": "facturacion",
+                  "required": false
+                }
+              }
+            }
+          ]
+        },
+        "dimension_mappings": null,
+        "id": 430,
+        "legacy_query": null,
+        "parameter_mappings": [],
+        "display": "scalar",
+        "archived_directly": false,
+        "entity_id": "X03pENbnXBhhxW81fsceo",
+        "collection_preview": true,
+        "visualization_settings": {
+          "scalar.segments": []
+        },
+        "metabase_version": "v0.62.2.1 (b29c5af)",
+        "parameters": [
+          {
+            "id": "31c19fd9-8cb3-4375-9e93-fedeecb05114",
+            "type": "string/=",
+            "target": [
+              "variable",
+              [
+                "template-tag",
+                "Anio"
+              ]
+            ],
+            "name": "Anio",
+            "slug": "Anio",
+            "default": "2025",
+            "required": true,
+            "isMultiSelect": false
+          }
+        ],
+        "dashboard_id": 15,
+        "created_at": "2026-07-28T19:27:11.24786Z",
+        "public_uuid": null
+      },
+      "updated_at": "2026-07-28T20:01:31.876814Z",
+      "col": 6,
+      "id": 530,
+      "parameter_mappings": [
+        {
+          "parameter_id": "17e28864",
+          "card_id": 430,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "Anio"
+            ]
+          ]
+        },
+        {
+          "parameter_id": "f1sede01",
+          "card_id": 430,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "sede"
+            ]
+          ]
+        },
+        {
+          "parameter_id": "f1fact01",
+          "card_id": 430,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "facturacion"
+            ]
+          ]
+        }
+      ],
+      "card_id": 430,
+      "entity_id": "Oe61J4vtrklrMQP0I5RJN",
+      "visualization_settings": {},
+      "size_y": 3,
+      "dashboard_id": 15,
+      "created_at": "2026-07-28T19:27:11.29544Z",
+      "row": 0
+    },
+    {
+      "size_x": 6,
+      "dashboard_tab_id": null,
+      "series": [],
+      "inline_parameters": [],
+      "action_id": null,
+      "collection_authority_level": null,
+      "card": {
+        "cache_invalidated_at": "2026-07-28T19:27:48.971639Z",
+        "description": null,
+        "archived": false,
+        "view_count": 2,
+        "collection_position": null,
+        "source_card_id": null,
+        "table_id": null,
+        "result_metadata": [
+          {
+            "name": "TotalMP",
+            "database_type": "BIGINT",
+            "base_type": "type/BigInteger",
+            "display_name": "TotalMP",
+            "field_ref": [
+              "field",
+              "TotalMP",
+              {
+                "base-type": "type/BigInteger"
+              }
+            ]
+          }
+        ],
+        "embedding_type": null,
+        "initially_published_at": null,
+        "can_write": true,
+        "card_schema": 23,
+        "database_id": 2,
+        "enable_embedding": false,
+        "collection_id": 4,
+        "query_type": "native",
+        "download_perms": "full",
+        "name": "Total Marcapasos (hasta año seleccionado)",
+        "document_id": null,
+        "last_used_at": "2026-07-28T19:27:11.210914Z",
+        "type": "question",
+        "dimensions": null,
+        "query_average_duration": null,
+        "creator_id": 13371339,
+        "moderation_reviews": [],
+        "updated_at": "2026-07-28T19:27:48.984876Z",
+        "made_public_by_id": null,
+        "embedding_params": null,
+        "cache_ttl": null,
+        "dataset_query": {
+          "lib/type": "mbql/query",
+          "database": 2,
+          "stages": [
+            {
+              "native": "SELECT \n    COUNT(*) AS TotalMP\nFROM flow_coordina f\nWHERE f.Realizado = 255\n  AND f.CodCoordinaReglaMotivo IN (112, 113, 117, 128)\n    AND YEAR(f.FechaRealizado) <= {{Anio}}\n      [[AND (({{sede}} = 'SMI' AND COALESCE(f.Hbritanico, 0) = 0) OR ({{sede}} = 'Britanico' AND f.Hbritanico = 1))]]\n      [[AND (({{facturacion}} = 'FNR' AND f.CodDestinoFact = 3) OR ({{facturacion}} = 'Otro' AND COALESCE(f.CodDestinoFact, 0) <> 3))]]\n",
+              "lib/type": "mbql.stage/native",
+              "template-tags": {
+                "Anio": {
+                  "id": "98d564ad-e1f6-4092-b7ef-8c40d945de79",
+                  "type": "text",
+                  "name": "Anio",
+                  "display-name": "Anio",
+                  "default": "2025",
+                  "required": true
+                },
+                "sede": {
+                  "display-name": "Sede",
+                  "type": "text",
+                  "id": "a512b31f-3505-461c-b675-43ee3a335704",
+                  "name": "sede",
+                  "required": false
+                },
+                "facturacion": {
+                  "display-name": "Facturacion",
+                  "type": "text",
+                  "id": "fe9c8a85-ddcf-49cc-b17c-a9d4c0a84593",
+                  "name": "facturacion",
+                  "required": false
+                }
+              }
+            }
+          ]
+        },
+        "dimension_mappings": null,
+        "id": 426,
+        "legacy_query": null,
+        "parameter_mappings": [],
+        "display": "scalar",
+        "archived_directly": false,
+        "entity_id": "f_Le3Q1_voI1OXF9bagHL",
+        "collection_preview": true,
+        "visualization_settings": {
+          "scalar.segments": []
+        },
+        "metabase_version": "v0.62.2.1 (b29c5af)",
+        "parameters": [
+          {
+            "id": "98d564ad-e1f6-4092-b7ef-8c40d945de79",
+            "type": "string/=",
+            "target": [
+              "variable",
+              [
+                "template-tag",
+                "Anio"
+              ]
+            ],
+            "name": "Anio",
+            "slug": "Anio",
+            "default": "2025",
+            "required": true,
+            "isMultiSelect": false
+          }
+        ],
+        "dashboard_id": 15,
+        "created_at": "2026-07-28T19:27:11.210914Z",
+        "public_uuid": null
+      },
+      "updated_at": "2026-07-28T20:01:31.87885Z",
+      "col": 12,
+      "id": 531,
+      "parameter_mappings": [
+        {
+          "parameter_id": "17e28864",
+          "card_id": 426,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "Anio"
+            ]
+          ]
+        },
+        {
+          "parameter_id": "f1sede01",
+          "card_id": 426,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "sede"
+            ]
+          ]
+        },
+        {
+          "parameter_id": "f1fact01",
+          "card_id": 426,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "facturacion"
+            ]
+          ]
+        }
+      ],
+      "card_id": 426,
+      "entity_id": "lHr5ejL0bW0efuiinXmSq",
+      "visualization_settings": {},
+      "size_y": 3,
+      "dashboard_id": 15,
+      "created_at": "2026-07-28T19:27:11.29544Z",
+      "row": 0
+    },
+    {
+      "size_x": 6,
+      "dashboard_tab_id": null,
+      "series": [],
+      "inline_parameters": [],
+      "action_id": null,
+      "collection_authority_level": null,
+      "card": {
+        "cache_invalidated_at": "2026-07-28T19:27:49.421403Z",
+        "description": null,
+        "archived": false,
+        "view_count": 2,
+        "collection_position": null,
+        "source_card_id": null,
+        "table_id": null,
+        "result_metadata": [
+          {
+            "name": "TotalTAVI",
+            "database_type": "BIGINT",
+            "base_type": "type/BigInteger",
+            "display_name": "TotalTAVI",
+            "field_ref": [
+              "field",
+              "TotalTAVI",
+              {
+                "base-type": "type/BigInteger"
+              }
+            ]
+          }
+        ],
+        "embedding_type": null,
+        "initially_published_at": null,
+        "can_write": true,
+        "card_schema": 23,
+        "database_id": 2,
+        "enable_embedding": false,
+        "collection_id": 4,
+        "query_type": "native",
+        "download_perms": "full",
+        "name": "Total TAVIs (hasta año seleccionado)",
+        "document_id": null,
+        "last_used_at": "2026-07-28T19:27:11.284275Z",
+        "type": "question",
+        "dimensions": null,
+        "query_average_duration": null,
+        "creator_id": 13371339,
+        "moderation_reviews": [],
+        "updated_at": "2026-07-28T19:27:49.43406Z",
+        "made_public_by_id": null,
+        "embedding_params": null,
+        "cache_ttl": null,
+        "dataset_query": {
+          "lib/type": "mbql/query",
+          "database": 2,
+          "stages": [
+            {
+              "native": "SELECT \n    COUNT(*) AS TotalTAVI\nFROM flow_coordina f\nWHERE f.Realizado = 255\n  AND f.CodCoordinaReglaMotivo IN (138, 171, 172, 260, 261, 262, 263, 264, 265, 266, 267, 268)\n    AND YEAR(f.FechaRealizado) <= {{Anio}}\n      [[AND (({{sede}} = 'SMI' AND COALESCE(f.Hbritanico, 0) = 0) OR ({{sede}} = 'Britanico' AND f.Hbritanico = 1))]]\n      [[AND (({{facturacion}} = 'FNR' AND f.CodDestinoFact = 3) OR ({{facturacion}} = 'Otro' AND COALESCE(f.CodDestinoFact, 0) <> 3))]]\n",
+              "lib/type": "mbql.stage/native",
+              "template-tags": {
+                "Anio": {
+                  "id": "c267c2aa-bb98-4acc-9d3f-9584c8ce31ce",
+                  "type": "text",
+                  "name": "Anio",
+                  "display-name": "Anio",
+                  "default": "2025",
+                  "required": true
+                },
+                "sede": {
+                  "display-name": "Sede",
+                  "type": "text",
+                  "id": "98469558-87a3-4450-8867-11d6b53beb03",
+                  "name": "sede",
+                  "required": false
+                },
+                "facturacion": {
+                  "display-name": "Facturacion",
+                  "type": "text",
+                  "id": "8cad74ba-49ab-42b6-8d6a-731dadba7f23",
+                  "name": "facturacion",
+                  "required": false
+                }
+              }
+            }
+          ]
+        },
+        "dimension_mappings": null,
+        "id": 434,
+        "legacy_query": null,
+        "parameter_mappings": [],
+        "display": "scalar",
+        "archived_directly": false,
+        "entity_id": "gAMoZhP_jc-j6WSFqO0KL",
+        "collection_preview": true,
+        "visualization_settings": {
+          "scalar.segments": []
+        },
+        "metabase_version": "v0.62.2.1 (b29c5af)",
+        "parameters": [
+          {
+            "id": "c267c2aa-bb98-4acc-9d3f-9584c8ce31ce",
+            "type": "string/=",
+            "target": [
+              "variable",
+              [
+                "template-tag",
+                "Anio"
+              ]
+            ],
+            "name": "Anio",
+            "slug": "Anio",
+            "default": "2025",
+            "required": true,
+            "isMultiSelect": false
+          }
+        ],
+        "dashboard_id": 15,
+        "created_at": "2026-07-28T19:27:11.284275Z",
+        "public_uuid": null
+      },
+      "updated_at": "2026-07-28T20:01:31.880817Z",
+      "col": 18,
+      "id": 532,
+      "parameter_mappings": [
+        {
+          "parameter_id": "17e28864",
+          "card_id": 434,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "Anio"
+            ]
+          ]
+        },
+        {
+          "parameter_id": "f1sede01",
+          "card_id": 434,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "sede"
+            ]
+          ]
+        },
+        {
+          "parameter_id": "f1fact01",
+          "card_id": 434,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "facturacion"
+            ]
+          ]
+        }
+      ],
+      "card_id": 434,
+      "entity_id": "IBaE0XwZOCdvBamXMPuWk",
+      "visualization_settings": {},
+      "size_y": 3,
+      "dashboard_id": 15,
+      "created_at": "2026-07-28T19:27:11.29544Z",
+      "row": 0
+    },
+    {
+      "size_x": 24,
+      "dashboard_tab_id": null,
+      "series": [],
+      "inline_parameters": [],
+      "action_id": null,
+      "collection_authority_level": null,
+      "card": {
+        "cache_invalidated_at": "2026-07-28T20:11:48.88972Z",
+        "description": null,
+        "archived": false,
+        "view_count": 2,
+        "collection_position": null,
+        "source_card_id": null,
+        "table_id": null,
+        "result_metadata": [
+          {
+            "name": "ConDroga",
+            "database_type": "DECIMAL",
+            "base_type": "type/Decimal",
+            "display_name": "ConDroga",
+            "field_ref": [
+              "field",
+              "ConDroga",
+              {
+                "base-type": "type/Decimal"
+              }
+            ]
+          },
+          {
+            "name": "SinDroga",
+            "database_type": "DECIMAL",
+            "base_type": "type/Decimal",
+            "display_name": "SinDroga",
+            "field_ref": [
+              "field",
+              "SinDroga",
+              {
+                "base-type": "type/Decimal"
+              }
+            ]
+          },
+          {
+            "name": "Porcentaje_ConDroga",
+            "database_type": "DECIMAL",
+            "base_type": "type/Decimal",
+            "display_name": "Porcentaje_ConDroga",
+            "field_ref": [
+              "field",
+              "Porcentaje_ConDroga",
+              {
+                "base-type": "type/Decimal"
+              }
+            ]
+          },
+          {
+            "name": "Porcentaje_SinDroga",
+            "database_type": "DECIMAL",
+            "base_type": "type/Decimal",
+            "display_name": "Porcentaje_SinDroga",
+            "field_ref": [
+              "field",
+              "Porcentaje_SinDroga",
+              {
+                "base-type": "type/Decimal"
+              }
+            ]
+          },
+          {
+            "name": "Total_Stent",
+            "database_type": "BIGINT",
+            "base_type": "type/BigInteger",
+            "display_name": "Total_Stent",
+            "field_ref": [
+              "field",
+              "Total_Stent",
+              {
+                "base-type": "type/BigInteger"
+              }
+            ]
+          }
+        ],
+        "embedding_type": null,
+        "initially_published_at": null,
+        "can_write": true,
+        "card_schema": 23,
+        "database_id": 2,
+        "enable_embedding": false,
+        "collection_id": 4,
+        "query_type": "native",
+        "download_perms": "full",
+        "name": "Stent con Droga Vs Stent sin Droga (año seleccionado)",
+        "document_id": null,
+        "last_used_at": "2026-07-28T19:27:11.198745Z",
+        "type": "question",
+        "dimensions": null,
+        "query_average_duration": 364,
+        "creator_id": 13371339,
+        "moderation_reviews": [],
+        "updated_at": "2026-07-28T20:11:48.90224Z",
+        "made_public_by_id": null,
+        "embedding_params": null,
+        "cache_ttl": null,
+        "dataset_query": {
+          "lib/type": "mbql/query",
+          "database": 2,
+          "stages": [
+            {
+              "native": "SELECT \n    SUM(CASE WHEN am.StentDroga = 1 THEN 1 ELSE 0 END) AS ConDroga,\n    SUM(CASE WHEN am.StentDroga = 0 THEN 1 ELSE 0 END) AS SinDroga,\n    ROUND(SUM(CASE WHEN am.StentDroga = 1 THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 2) AS Porcentaje_ConDroga,\n    ROUND(SUM(CASE WHEN am.StentDroga = 0 THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 2) AS Porcentaje_SinDroga,\n    COUNT(*) AS Total_Stent\nFROM sqlstk_movearticulo s\nINNER JOIN stk_articulomarcamodelo am \n    ON am.k_id = s.IdMarcaModelo\nWHERE s.CodCoordina > 0 \n  AND s.IdGrupo = 1301180734254093\n  AND DATE_FORMAT(s.Fecha, '%Y') >= {{Anio}};",
+              "lib/type": "mbql.stage/native",
+              "template-tags": {
+                "Anio": {
+                  "required": true,
+                  "name": "Anio",
+                  "display-name": "Anio",
+                  "id": "d85a75cb-022f-4b88-b3a2-5926989e8396",
+                  "type": "text",
+                  "default": "2025"
+                }
+              }
+            }
+          ]
+        },
+        "dimension_mappings": null,
+        "id": 425,
+        "legacy_query": null,
+        "parameter_mappings": [],
+        "display": "table",
+        "archived_directly": false,
+        "entity_id": "8nQlOQN9hwLzQQxafhl1z",
+        "collection_preview": true,
+        "visualization_settings": {
+          "table.pivot_column": "ConDroga",
+          "table.cell_column": "SinDroga"
+        },
+        "metabase_version": "v0.62.2.1 (b29c5af)",
+        "parameters": [
+          {
+            "id": "d85a75cb-022f-4b88-b3a2-5926989e8396",
+            "type": "string/=",
+            "target": [
+              "variable",
+              [
+                "template-tag",
+                "Anio"
+              ]
+            ],
+            "name": "Anio",
+            "slug": "Anio",
+            "default": "2025",
+            "required": true,
+            "isMultiSelect": false
+          }
+        ],
+        "dashboard_id": 15,
+        "created_at": "2026-07-28T19:27:11.198745Z",
+        "public_uuid": null
+      },
+      "updated_at": "2026-07-28T20:01:31.883381Z",
+      "col": 0,
+      "id": 533,
+      "parameter_mappings": [
+        {
+          "parameter_id": "17e28864",
+          "card_id": 425,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "Anio"
+            ]
+          ]
+        }
+      ],
+      "card_id": 425,
+      "entity_id": "UpL2TswENptYNl-Pbm7yN",
+      "visualization_settings": {},
+      "size_y": 4,
+      "dashboard_id": 15,
+      "created_at": "2026-07-28T19:27:11.29544Z",
+      "row": 16
+    },
+    {
+      "size_x": 6,
+      "dashboard_tab_id": null,
+      "series": [],
+      "inline_parameters": [],
+      "action_id": null,
+      "collection_authority_level": null,
+      "card": {
+        "cache_invalidated_at": "2026-07-28T19:27:50.243619Z",
+        "description": null,
+        "archived": false,
+        "view_count": 2,
+        "collection_position": null,
+        "source_card_id": null,
+        "table_id": null,
+        "result_metadata": [
+          {
+            "name": "TotalCat",
+            "database_type": "BIGINT",
+            "base_type": "type/BigInteger",
+            "display_name": "TotalCat",
+            "field_ref": [
+              "field",
+              "TotalCat",
+              {
+                "base-type": "type/BigInteger"
+              }
+            ]
+          }
+        ],
+        "embedding_type": null,
+        "initially_published_at": null,
+        "can_write": true,
+        "card_schema": 23,
+        "database_id": 2,
+        "enable_embedding": false,
+        "collection_id": 4,
+        "query_type": "native",
+        "download_perms": "full",
+        "name": "Total Cateterismos (hasta año seleccionado)",
+        "document_id": null,
+        "last_used_at": "2026-07-28T19:27:11.169158Z",
+        "type": "question",
+        "dimensions": null,
+        "query_average_duration": null,
+        "creator_id": 13371339,
+        "moderation_reviews": [],
+        "updated_at": "2026-07-28T19:27:50.258967Z",
+        "made_public_by_id": null,
+        "embedding_params": null,
+        "cache_ttl": null,
+        "dataset_query": {
+          "lib/type": "mbql/query",
+          "database": 2,
+          "stages": [
+            {
+              "native": "SELECT \n    COUNT(*) AS TotalCat\nFROM flow_coordina f\nWHERE f.Realizado = 255\n  AND f.CodCoordinaReglaMotivo IN (108)\n  AND YEAR(f.FechaRealizado) <= {{anio}}\n      [[AND (({{sede}} = 'SMI' AND COALESCE(f.Hbritanico, 0) = 0) OR ({{sede}} = 'Britanico' AND f.Hbritanico = 1))]]\n      [[AND (({{facturacion}} = 'FNR' AND f.CodDestinoFact = 3) OR ({{facturacion}} = 'Otro' AND COALESCE(f.CodDestinoFact, 0) <> 3))]]\n",
+              "lib/type": "mbql.stage/native",
+              "template-tags": {
+                "anio": {
+                  "default": "2025",
+                  "id": "373ad882-1e20-46de-824a-8147ba406bab",
+                  "type": "text",
+                  "name": "anio",
+                  "display-name": "Anio",
+                  "required": true
+                },
+                "sede": {
+                  "display-name": "Sede",
+                  "type": "text",
+                  "id": "3fb09752-8c22-4dcb-bfb7-f094386b8fa9",
+                  "name": "sede",
+                  "required": false
+                },
+                "facturacion": {
+                  "display-name": "Facturacion",
+                  "type": "text",
+                  "id": "1f786f16-7f39-488d-ade0-262c163bacd5",
+                  "name": "facturacion",
+                  "required": false
+                }
+              }
+            }
+          ]
+        },
+        "dimension_mappings": null,
+        "id": 422,
+        "legacy_query": null,
+        "parameter_mappings": [],
+        "display": "scalar",
+        "archived_directly": false,
+        "entity_id": "iXJaiZEmOJ4PZ-0JdIB0p",
+        "collection_preview": true,
+        "visualization_settings": {
+          "scalar.segments": []
+        },
+        "metabase_version": "v0.62.2.1 (b29c5af)",
+        "parameters": [
+          {
+            "id": "373ad882-1e20-46de-824a-8147ba406bab",
+            "type": "string/=",
+            "target": [
+              "variable",
+              [
+                "template-tag",
+                "anio"
+              ]
+            ],
+            "name": "Anio",
+            "slug": "anio",
+            "default": "2025",
+            "required": true,
+            "isMultiSelect": false
+          }
+        ],
+        "dashboard_id": 15,
+        "created_at": "2026-07-28T19:27:11.169158Z",
+        "public_uuid": null
+      },
+      "updated_at": "2026-07-28T20:01:31.885725Z",
+      "col": 0,
+      "id": 536,
+      "parameter_mappings": [
+        {
+          "parameter_id": "17e28864",
+          "card_id": 422,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "anio"
+            ]
+          ]
+        },
+        {
+          "parameter_id": "f1sede01",
+          "card_id": 422,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "sede"
+            ]
+          ]
+        },
+        {
+          "parameter_id": "f1fact01",
+          "card_id": 422,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "facturacion"
+            ]
+          ]
+        }
+      ],
+      "card_id": 422,
+      "entity_id": "UT4OX9mcjWPAsEvwaAUvJ",
+      "visualization_settings": {},
+      "size_y": 3,
+      "dashboard_id": 15,
+      "created_at": "2026-07-28T19:27:11.29544Z",
+      "row": 0
+    },
+    {
+      "size_x": 6,
+      "dashboard_tab_id": null,
+      "series": [],
+      "inline_parameters": [],
+      "action_id": null,
+      "collection_authority_level": null,
+      "card": {
+        "cache_invalidated_at": "2026-07-28T19:27:50.827696Z",
+        "description": null,
+        "archived": false,
+        "view_count": 2,
+        "collection_position": null,
+        "source_card_id": null,
+        "table_id": null,
+        "result_metadata": [
+          {
+            "name": "TotalCat",
+            "database_type": "BIGINT",
+            "base_type": "type/BigInteger",
+            "display_name": "TotalCat",
+            "field_ref": [
+              "field",
+              "TotalCat",
+              {
+                "base-type": "type/BigInteger"
+              }
+            ]
+          }
+        ],
+        "embedding_type": null,
+        "initially_published_at": null,
+        "can_write": true,
+        "card_schema": 23,
+        "database_id": 2,
+        "enable_embedding": false,
+        "collection_id": 4,
+        "query_type": "native",
+        "download_perms": "full",
+        "name": "Total Cateterismos (año seleccionado)",
+        "document_id": null,
+        "last_used_at": "2026-07-28T19:27:11.229232Z",
+        "type": "question",
+        "dimensions": null,
+        "query_average_duration": null,
+        "creator_id": 13371339,
+        "moderation_reviews": [],
+        "updated_at": "2026-07-28T19:27:50.840218Z",
+        "made_public_by_id": null,
+        "embedding_params": null,
+        "cache_ttl": null,
+        "dataset_query": {
+          "lib/type": "mbql/query",
+          "database": 2,
+          "stages": [
+            {
+              "lib/type": "mbql.stage/native",
+              "native": "SELECT \n    COUNT(*) AS TotalCat\nFROM flow_coordina f\nWHERE f.Realizado = 255\n  AND f.CodCoordinaReglaMotivo IN (108)\n  AND YEAR(f.FechaRealizado) = {{Anio}}\n      [[AND (({{sede}} = 'SMI' AND COALESCE(f.Hbritanico, 0) = 0) OR ({{sede}} = 'Britanico' AND f.Hbritanico = 1))]]\n      [[AND (({{facturacion}} = 'FNR' AND f.CodDestinoFact = 3) OR ({{facturacion}} = 'Otro' AND COALESCE(f.CodDestinoFact, 0) <> 3))]]\n",
+              "template-tags": {
+                "Anio": {
+                  "required": true,
+                  "id": "0f712406-7c69-4298-a94d-83029e764c77",
+                  "display-name": "Anio",
+                  "type": "text",
+                  "name": "Anio",
+                  "default": "2025"
+                },
+                "sede": {
+                  "display-name": "Sede",
+                  "type": "text",
+                  "id": "0551067e-b6a1-40b7-8eab-5c34037960d6",
+                  "name": "sede",
+                  "required": false
+                },
+                "facturacion": {
+                  "display-name": "Facturacion",
+                  "type": "text",
+                  "id": "13873e2c-f2ba-4920-96fa-591f7308d8b2",
+                  "name": "facturacion",
+                  "required": false
+                }
+              }
+            }
+          ]
+        },
+        "dimension_mappings": null,
+        "id": 428,
+        "legacy_query": null,
+        "parameter_mappings": [],
+        "display": "scalar",
+        "archived_directly": false,
+        "entity_id": "VXgO2JNxV3Kz2vI6Ofa4v",
+        "collection_preview": true,
+        "visualization_settings": {
+          "scalar.segments": []
+        },
+        "metabase_version": "v0.62.2.1 (b29c5af)",
+        "parameters": [
+          {
+            "id": "0f712406-7c69-4298-a94d-83029e764c77",
+            "type": "string/=",
+            "target": [
+              "variable",
+              [
+                "template-tag",
+                "Anio"
+              ]
+            ],
+            "name": "Anio",
+            "slug": "Anio",
+            "default": "2025",
+            "required": true,
+            "isMultiSelect": false
+          }
+        ],
+        "dashboard_id": 15,
+        "created_at": "2026-07-28T19:27:11.229232Z",
+        "public_uuid": null
+      },
+      "updated_at": "2026-07-28T20:01:31.888245Z",
+      "col": 0,
+      "id": 539,
+      "parameter_mappings": [
+        {
+          "parameter_id": "17e28864",
+          "card_id": 428,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "Anio"
+            ]
+          ]
+        },
+        {
+          "parameter_id": "f1sede01",
+          "card_id": 428,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "sede"
+            ]
+          ]
+        },
+        {
+          "parameter_id": "f1fact01",
+          "card_id": 428,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "facturacion"
+            ]
+          ]
+        }
+      ],
+      "card_id": 428,
+      "entity_id": "Ue6DHJrOsZsP8gH77BRse",
+      "visualization_settings": {},
+      "size_y": 3,
+      "dashboard_id": 15,
+      "created_at": "2026-07-28T19:27:11.29544Z",
+      "row": 3
+    },
+    {
+      "size_x": 6,
+      "dashboard_tab_id": null,
+      "series": [],
+      "inline_parameters": [],
+      "action_id": null,
+      "collection_authority_level": null,
+      "card": {
+        "cache_invalidated_at": "2026-07-28T20:46:15.70973Z",
+        "description": null,
+        "archived": false,
+        "view_count": 2,
+        "collection_position": null,
+        "source_card_id": null,
+        "table_id": null,
+        "result_metadata": [
+          {
+            "name": "TotalAngioplastias",
+            "database_type": "BIGINT",
+            "base_type": "type/BigInteger",
+            "display_name": "TotalAngioplastias",
+            "field_ref": [
+              "field",
+              "TotalAngioplastias",
+              {
+                "base-type": "type/BigInteger"
+              }
+            ]
+          }
+        ],
+        "embedding_type": null,
+        "initially_published_at": null,
+        "can_write": true,
+        "card_schema": 23,
+        "database_id": 2,
+        "enable_embedding": false,
+        "collection_id": 4,
+        "query_type": "native",
+        "download_perms": "full",
+        "name": "Total Angioplastias (año seleccionado)",
+        "document_id": null,
+        "last_used_at": "2026-07-28T19:27:11.219995Z",
+        "type": "question",
+        "dimensions": null,
+        "query_average_duration": null,
+        "creator_id": 13371339,
+        "moderation_reviews": [],
+        "updated_at": "2026-07-28T20:46:15.721458Z",
+        "made_public_by_id": null,
+        "embedding_params": null,
+        "cache_ttl": null,
+        "dataset_query": {
+          "lib/type": "mbql/query",
+          "database": 2,
+          "stages": [
+            {
+              "native": "SELECT \n    COUNT(*) AS TotalAngioplastias\nFROM flow_coordina f\nWHERE f.Realizado = 255\n  AND f.CodCoordinaReglaMotivo IN (101, 119)\n    AND YEAR(f.FechaRealizado) = {{Anio}}\n      [[AND (({{sede}} = 'SMI' AND COALESCE(f.Hbritanico, 0) = 0) OR ({{sede}} = 'Britanico' AND f.Hbritanico = 1))]]\n      [[AND (({{facturacion}} = 'FNR' AND f.CodDestinoFact = 3) OR ({{facturacion}} = 'Otro' AND COALESCE(f.CodDestinoFact, 0) <> 3))]]\n",
+              "lib/type": "mbql.stage/native",
+              "template-tags": {
+                "Anio": {
+                  "id": "709c2df9-2a1b-49c8-a555-5c64cda498ba",
+                  "type": "text",
+                  "name": "Anio",
+                  "display-name": "Anio",
+                  "default": "2025",
+                  "required": true
+                },
+                "sede": {
+                  "display-name": "Sede",
+                  "type": "text",
+                  "id": "872e3569-6b7c-42c1-bb6e-acde53682a9e",
+                  "name": "sede",
+                  "required": false
+                },
+                "facturacion": {
+                  "display-name": "Facturacion",
+                  "type": "text",
+                  "id": "7f186bbd-be28-4c4c-8bd3-27c74fcc3d25",
+                  "name": "facturacion",
+                  "required": false
+                }
+              }
+            }
+          ]
+        },
+        "dimension_mappings": null,
+        "id": 427,
+        "legacy_query": null,
+        "parameter_mappings": [],
+        "display": "scalar",
+        "archived_directly": false,
+        "entity_id": "ssh2OZQydj7Lj7W2vjSgd",
+        "collection_preview": true,
+        "visualization_settings": {
+          "scalar.segments": []
+        },
+        "metabase_version": "v0.62.2.1 (b29c5af)",
+        "parameters": [
+          {
+            "id": "709c2df9-2a1b-49c8-a555-5c64cda498ba",
+            "type": "string/=",
+            "target": [
+              "variable",
+              [
+                "template-tag",
+                "Anio"
+              ]
+            ],
+            "name": "Anio",
+            "slug": "Anio",
+            "default": "2025",
+            "required": true,
+            "isMultiSelect": false
+          }
+        ],
+        "dashboard_id": 15,
+        "created_at": "2026-07-28T19:27:11.219995Z",
+        "public_uuid": null
+      },
+      "updated_at": "2026-07-28T20:01:31.890429Z",
+      "col": 6,
+      "id": 540,
+      "parameter_mappings": [
+        {
+          "parameter_id": "17e28864",
+          "card_id": 427,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "Anio"
+            ]
+          ]
+        },
+        {
+          "parameter_id": "f1sede01",
+          "card_id": 427,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "sede"
+            ]
+          ]
+        },
+        {
+          "parameter_id": "f1fact01",
+          "card_id": 427,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "facturacion"
+            ]
+          ]
+        }
+      ],
+      "card_id": 427,
+      "entity_id": "n1T9iHE24WEP0djHr3iTH",
+      "visualization_settings": {},
+      "size_y": 3,
+      "dashboard_id": 15,
+      "created_at": "2026-07-28T19:27:11.29544Z",
+      "row": 3
+    },
+    {
+      "size_x": 6,
+      "dashboard_tab_id": null,
+      "series": [],
+      "inline_parameters": [],
+      "action_id": null,
+      "collection_authority_level": null,
+      "card": {
+        "cache_invalidated_at": "2026-07-28T19:27:51.791556Z",
+        "description": null,
+        "archived": false,
+        "view_count": 2,
+        "collection_position": null,
+        "source_card_id": null,
+        "table_id": null,
+        "result_metadata": [
+          {
+            "name": "TotalMP",
+            "database_type": "BIGINT",
+            "base_type": "type/BigInteger",
+            "display_name": "TotalMP",
+            "field_ref": [
+              "field",
+              "TotalMP",
+              {
+                "base-type": "type/BigInteger"
+              }
+            ]
+          }
+        ],
+        "embedding_type": null,
+        "initially_published_at": null,
+        "can_write": true,
+        "card_schema": 23,
+        "database_id": 2,
+        "enable_embedding": false,
+        "collection_id": 4,
+        "query_type": "native",
+        "download_perms": "full",
+        "name": "Total Marcapasos (año seleccionado)",
+        "document_id": null,
+        "last_used_at": "2026-07-28T19:27:11.256685Z",
+        "type": "question",
+        "dimensions": null,
+        "query_average_duration": null,
+        "creator_id": 13371339,
+        "moderation_reviews": [],
+        "updated_at": "2026-07-28T19:27:51.803793Z",
+        "made_public_by_id": null,
+        "embedding_params": null,
+        "cache_ttl": null,
+        "dataset_query": {
+          "lib/type": "mbql/query",
+          "database": 2,
+          "stages": [
+            {
+              "lib/type": "mbql.stage/native",
+              "native": "SELECT \n    COUNT(*) AS TotalMP\nFROM flow_coordina f\nWHERE f.Realizado = 255\n  AND f.CodCoordinaReglaMotivo IN (112, 113, 117, 128)\n    AND YEAR(f.FechaRealizado) = {{Anio}}\n      [[AND (({{sede}} = 'SMI' AND COALESCE(f.Hbritanico, 0) = 0) OR ({{sede}} = 'Britanico' AND f.Hbritanico = 1))]]\n      [[AND (({{facturacion}} = 'FNR' AND f.CodDestinoFact = 3) OR ({{facturacion}} = 'Otro' AND COALESCE(f.CodDestinoFact, 0) <> 3))]]\n",
+              "template-tags": {
+                "Anio": {
+                  "required": true,
+                  "type": "text",
+                  "display-name": "Anio",
+                  "name": "Anio",
+                  "id": "f6134ae0-4c96-4c93-b296-35ef91796789",
+                  "default": "2025"
+                },
+                "sede": {
+                  "display-name": "Sede",
+                  "type": "text",
+                  "id": "d4eac072-2742-4016-86a3-4f395c520f81",
+                  "name": "sede",
+                  "required": false
+                },
+                "facturacion": {
+                  "display-name": "Facturacion",
+                  "type": "text",
+                  "id": "403476ee-5869-4a5e-85eb-f3bca68b9923",
+                  "name": "facturacion",
+                  "required": false
+                }
+              }
+            }
+          ]
+        },
+        "dimension_mappings": null,
+        "id": 431,
+        "legacy_query": null,
+        "parameter_mappings": [],
+        "display": "scalar",
+        "archived_directly": false,
+        "entity_id": "jxRxTTdDI7nFFU9iU-Bgp",
+        "collection_preview": true,
+        "visualization_settings": {
+          "scalar.segments": []
+        },
+        "metabase_version": "v0.62.2.1 (b29c5af)",
+        "parameters": [
+          {
+            "id": "f6134ae0-4c96-4c93-b296-35ef91796789",
+            "type": "string/=",
+            "target": [
+              "variable",
+              [
+                "template-tag",
+                "Anio"
+              ]
+            ],
+            "name": "Anio",
+            "slug": "Anio",
+            "default": "2025",
+            "required": true,
+            "isMultiSelect": false
+          }
+        ],
+        "dashboard_id": 15,
+        "created_at": "2026-07-28T19:27:11.256685Z",
+        "public_uuid": null
+      },
+      "updated_at": "2026-07-28T20:01:31.892831Z",
+      "col": 12,
+      "id": 541,
+      "parameter_mappings": [
+        {
+          "parameter_id": "17e28864",
+          "card_id": 431,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "Anio"
+            ]
+          ]
+        },
+        {
+          "parameter_id": "f1sede01",
+          "card_id": 431,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "sede"
+            ]
+          ]
+        },
+        {
+          "parameter_id": "f1fact01",
+          "card_id": 431,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "facturacion"
+            ]
+          ]
+        }
+      ],
+      "card_id": 431,
+      "entity_id": "PORVNU_OBrZeChdwxEOSD",
+      "visualization_settings": {},
+      "size_y": 3,
+      "dashboard_id": 15,
+      "created_at": "2026-07-28T19:27:11.29544Z",
+      "row": 3
+    },
+    {
+      "size_x": 6,
+      "dashboard_tab_id": null,
+      "series": [],
+      "inline_parameters": [],
+      "action_id": null,
+      "collection_authority_level": null,
+      "card": {
+        "cache_invalidated_at": "2026-07-28T19:27:52.258972Z",
+        "description": null,
+        "archived": false,
+        "view_count": 2,
+        "collection_position": null,
+        "source_card_id": null,
+        "table_id": null,
+        "result_metadata": [
+          {
+            "name": "TotalTAVI",
+            "database_type": "BIGINT",
+            "base_type": "type/BigInteger",
+            "display_name": "TotalTAVI",
+            "field_ref": [
+              "field",
+              "TotalTAVI",
+              {
+                "base-type": "type/BigInteger"
+              }
+            ]
+          }
+        ],
+        "embedding_type": null,
+        "initially_published_at": null,
+        "can_write": true,
+        "card_schema": 23,
+        "database_id": 2,
+        "enable_embedding": false,
+        "collection_id": 4,
+        "query_type": "native",
+        "download_perms": "full",
+        "name": "Total TAVIs (año seleccionado)",
+        "document_id": null,
+        "last_used_at": "2026-07-28T19:27:11.274789Z",
+        "type": "question",
+        "dimensions": null,
+        "query_average_duration": null,
+        "creator_id": 13371339,
+        "moderation_reviews": [],
+        "updated_at": "2026-07-28T19:27:52.270971Z",
+        "made_public_by_id": null,
+        "embedding_params": null,
+        "cache_ttl": null,
+        "dataset_query": {
+          "lib/type": "mbql/query",
+          "database": 2,
+          "stages": [
+            {
+              "native": "SELECT \n    COUNT(*) AS TotalTAVI\nFROM flow_coordina f\nWHERE f.Realizado = 255\n  AND f.CodCoordinaReglaMotivo IN (138, 171, 172, 260, 261, 262, 263, 264, 265, 266, 267, 268)\n    AND YEAR(f.FechaRealizado) = {{Anio}}\n      [[AND (({{sede}} = 'SMI' AND COALESCE(f.Hbritanico, 0) = 0) OR ({{sede}} = 'Britanico' AND f.Hbritanico = 1))]]\n      [[AND (({{facturacion}} = 'FNR' AND f.CodDestinoFact = 3) OR ({{facturacion}} = 'Otro' AND COALESCE(f.CodDestinoFact, 0) <> 3))]]\n",
+              "lib/type": "mbql.stage/native",
+              "template-tags": {
+                "Anio": {
+                  "id": "faf81d1d-86a6-4950-9951-6ffcb1496171",
+                  "type": "text",
+                  "name": "Anio",
+                  "display-name": "Anio",
+                  "default": "2025",
+                  "required": true
+                },
+                "sede": {
+                  "display-name": "Sede",
+                  "type": "text",
+                  "id": "85a295f4-66a3-42e3-b32c-80ca24125162",
+                  "name": "sede",
+                  "required": false
+                },
+                "facturacion": {
+                  "display-name": "Facturacion",
+                  "type": "text",
+                  "id": "cd1662d7-9cbc-41b1-839c-508dce7324c2",
+                  "name": "facturacion",
+                  "required": false
+                }
+              }
+            }
+          ]
+        },
+        "dimension_mappings": null,
+        "id": 433,
+        "legacy_query": null,
+        "parameter_mappings": [],
+        "display": "scalar",
+        "archived_directly": false,
+        "entity_id": "A2Q6h496sIg86EtM5QfWx",
+        "collection_preview": true,
+        "visualization_settings": {
+          "scalar.segments": []
+        },
+        "metabase_version": "v0.62.2.1 (b29c5af)",
+        "parameters": [
+          {
+            "id": "faf81d1d-86a6-4950-9951-6ffcb1496171",
+            "type": "string/=",
+            "target": [
+              "variable",
+              [
+                "template-tag",
+                "Anio"
+              ]
+            ],
+            "name": "Anio",
+            "slug": "Anio",
+            "default": "2025",
+            "required": true,
+            "isMultiSelect": false
+          }
+        ],
+        "dashboard_id": 15,
+        "created_at": "2026-07-28T19:27:11.274789Z",
+        "public_uuid": null
+      },
+      "updated_at": "2026-07-28T20:01:31.895219Z",
+      "col": 18,
+      "id": 542,
+      "parameter_mappings": [
+        {
+          "parameter_id": "17e28864",
+          "card_id": 433,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "Anio"
+            ]
+          ]
+        },
+        {
+          "parameter_id": "f1sede01",
+          "card_id": 433,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "sede"
+            ]
+          ]
+        },
+        {
+          "parameter_id": "f1fact01",
+          "card_id": 433,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "facturacion"
+            ]
+          ]
+        }
+      ],
+      "card_id": 433,
+      "entity_id": "BJhjGmGCqbo0RoSyNOyxU",
+      "visualization_settings": {},
+      "size_y": 3,
+      "dashboard_id": 15,
+      "created_at": "2026-07-28T19:27:11.29544Z",
+      "row": 3
+    },
+    {
+      "size_x": 12,
+      "dashboard_tab_id": null,
+      "series": [],
+      "inline_parameters": [],
+      "action_id": null,
+      "collection_authority_level": null,
+      "card": {
+        "cache_invalidated_at": "2026-07-28T19:27:52.721994Z",
+        "description": null,
+        "archived": false,
+        "view_count": 2,
+        "collection_position": null,
+        "source_card_id": null,
+        "table_id": null,
+        "result_metadata": [
+          {
+            "database_type": "VARCHAR",
+            "semantic_type": null,
+            "lib/deduplicated-name": "Departamento",
+            "lib/original-name": "Departamento",
+            "name": "Departamento",
+            "lib/source": "source/native",
+            "lib/source-column-alias": "Departamento",
+            "source": "native",
+            "field_ref": [
+              "field",
+              "Departamento",
+              {
+                "base-type": "type/Text"
+              }
+            ],
+            "effective_type": "type/Text",
+            "lib/desired-column-alias": "Departamento",
+            "display_name": "Departamento",
+            "fingerprint": {
+              "global": {
+                "distinct-count": 23,
+                "nil%": 0.0
+              },
+              "type": {
+                "type/Text": {
+                  "percent-json": 0.0,
+                  "percent-url": 0.0,
+                  "percent-email": 0.0,
+                  "percent-state": 0.04347826086956522,
+                  "percent-blank": 0.0,
+                  "average-length": 8.956521739130435,
+                  "mode-fraction": 0.043478260869565216,
+                  "top-3-fraction": 0.13043478260869565
+                }
+              }
+            },
+            "base_type": "type/Text"
+          },
+          {
+            "database_type": "BIGINT",
+            "semantic_type": null,
+            "lib/deduplicated-name": "TotalRegistros",
+            "lib/original-name": "TotalRegistros",
+            "name": "TotalRegistros",
+            "lib/source": "source/native",
+            "lib/source-column-alias": "TotalRegistros",
+            "source": "native",
+            "field_ref": [
+              "field",
+              "TotalRegistros",
+              {
+                "base-type": "type/BigInteger"
+              }
+            ],
+            "effective_type": "type/BigInteger",
+            "lib/desired-column-alias": "TotalRegistros",
+            "display_name": "TotalRegistros",
+            "fingerprint": {
+              "global": {
+                "distinct-count": 21,
+                "nil%": 0.0
+              },
+              "type": {
+                "type/Number": {
+                  "skewness": 4.4994882283895254,
+                  "min": 1.0,
+                  "q1": 129.0,
+                  "q3": 1763.0,
+                  "excess-kurtosis": 20.9484017457103,
+                  "zero-fraction": 0.0,
+                  "mode-fraction": 0.08695652173913043,
+                  "top-3-fraction": 0.21739130434782608,
+                  "max": 28762.0,
+                  "sd": 5914.062048126559,
+                  "avg": 2177.0
+                }
+              }
+            },
+            "base_type": "type/BigInteger"
+          }
+        ],
+        "embedding_type": null,
+        "initially_published_at": null,
+        "can_write": true,
+        "card_schema": 23,
+        "database_id": 2,
+        "enable_embedding": false,
+        "collection_id": 4,
+        "query_type": "native",
+        "download_perms": "full",
+        "name": "Mapa pacientes por departamento (acumulado)",
+        "document_id": null,
+        "last_used_at": "2026-07-28T19:27:11.158742Z",
+        "type": "question",
+        "dimensions": null,
+        "query_average_duration": null,
+        "creator_id": 13371339,
+        "moderation_reviews": [],
+        "updated_at": "2026-07-28T19:27:52.734025Z",
+        "made_public_by_id": null,
+        "embedding_params": null,
+        "cache_ttl": null,
+        "dataset_query": {
+          "lib/type": "mbql/query",
+          "database": 2,
+          "stages": [
+            {
+              "lib/type": "mbql.stage/native",
+              "native": "SELECT  \n  dir_paissubdiv.Descr AS Departamento,\n  COUNT(*) AS TotalRegistros\nFROM\n  flow_coordina f\n  INNER JOIN pac_ficha ON f.CodPac = pac_ficha.Cod\n  INNER JOIN salud_paciente ON pac_ficha.Cod = salud_paciente.NroHistoria\n  INNER JOIN dir_comunica ON salud_paciente.k_id = dir_comunica.IdRegistro\n  INNER JOIN dir_comunicadir ON dir_comunicadir.IdComunica = dir_comunica.k_id\n  INNER JOIN dir_paislocalidad ON dir_paislocalidad.k_id = dir_comunicadir.IdLocalidad\n  INNER JOIN dir_paissubdiv ON dir_paissubdiv.k_id = dir_paislocalidad.IdPaisSubDiv\nWHERE\ndir_comunicadir.IdLocalidad > 0 AND DATE_FORMAT(f.FechaRealizado, '%Y') > 2004 AND f.CodCoordinaReglaMotivo IN (101, 108, 119, 138, 171, 172, 260, 261, 262, 263, 264, 265, 266, 267, 268, 112, 113, 117, 128)\n            [[AND (({{sede}} = 'SMI' AND COALESCE(f.Hbritanico, 0) = 0) OR ({{sede}} = 'Britanico' AND f.Hbritanico = 1))]]\n      [[AND (({{facturacion}} = 'FNR' AND f.CodDestinoFact = 3) OR ({{facturacion}} = 'Otro' AND COALESCE(f.CodDestinoFact, 0) <> 3))]]\n  \nGROUP BY\n  dir_paissubdiv.Descr\nORDER BY\n  TotalRegistros DESC;",
+              "template-tags": {
+                "sede": {
+                  "name": "sede",
+                  "display-name": "Sede",
+                  "type": "text",
+                  "id": "ba3a0222-2ee4-4441-8d35-e63acbebcb4c",
+                  "required": false
+                },
+                "facturacion": {
+                  "name": "facturacion",
+                  "display-name": "Facturacion",
+                  "type": "text",
+                  "id": "0d7fb52e-d915-4231-860a-3206cd0a03f9",
+                  "required": false
+                }
+              }
+            }
+          ]
+        },
+        "dimension_mappings": null,
+        "id": 421,
+        "legacy_query": null,
+        "parameter_mappings": [],
+        "display": "map",
+        "archived_directly": false,
+        "entity_id": "h5m-mD5E7viZM9sItwEM6",
+        "collection_preview": true,
+        "visualization_settings": {
+          "map.region": "962796e6-54ef-dda5-6d7b-4eb553d232cf",
+          "map.colors": [
+            "rgb(255, 245, 214)",
+            "rgb(255, 237, 178)",
+            "rgb(255, 228, 141)",
+            "rgb(255, 220, 105)",
+            "hsl(45.89999999999998, 100%, 55.5%)"
+          ]
+        },
+        "metabase_version": "v0.62.2.1 (b29c5af)",
+        "parameters": [],
+        "dashboard_id": 15,
+        "created_at": "2026-07-28T19:27:11.158742Z",
+        "public_uuid": null
+      },
+      "updated_at": "2026-07-28T20:01:31.897405Z",
+      "col": 0,
+      "id": 543,
+      "parameter_mappings": [
+        {
+          "parameter_id": "f1sede01",
+          "card_id": 421,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "sede"
+            ]
+          ]
+        },
+        {
+          "parameter_id": "f1fact01",
+          "card_id": 421,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "facturacion"
+            ]
+          ]
+        }
+      ],
+      "card_id": 421,
+      "entity_id": "7AX3AdgkzTYk-cL_Lpw54",
+      "visualization_settings": {},
+      "size_y": 10,
+      "dashboard_id": 15,
+      "created_at": "2026-07-28T19:27:11.29544Z",
+      "row": 6
+    },
+    {
+      "size_x": 12,
+      "dashboard_tab_id": null,
+      "series": [],
+      "inline_parameters": [],
+      "action_id": null,
+      "collection_authority_level": null,
+      "card": {
+        "cache_invalidated_at": "2026-07-28T19:27:53.364385Z",
+        "description": null,
+        "archived": false,
+        "view_count": 2,
+        "collection_position": null,
+        "source_card_id": null,
+        "table_id": null,
+        "result_metadata": [
+          {
+            "database_type": "VARCHAR",
+            "semantic_type": null,
+            "lib/deduplicated-name": "Departamento",
+            "lib/original-name": "Departamento",
+            "name": "Departamento",
+            "lib/source": "source/native",
+            "lib/source-column-alias": "Departamento",
+            "source": "native",
+            "field_ref": [
+              "field",
+              "Departamento",
+              {
+                "base-type": "type/Text"
+              }
+            ],
+            "effective_type": "type/Text",
+            "lib/desired-column-alias": "Departamento",
+            "display_name": "Departamento",
+            "fingerprint": {
+              "global": {
+                "distinct-count": 23,
+                "nil%": 0.0
+              },
+              "type": {
+                "type/Text": {
+                  "percent-json": 0.0,
+                  "percent-url": 0.0,
+                  "percent-email": 0.0,
+                  "percent-state": 0.04347826086956522,
+                  "percent-blank": 0.0,
+                  "average-length": 8.956521739130435,
+                  "mode-fraction": 0.043478260869565216,
+                  "top-3-fraction": 0.13043478260869565
+                }
+              }
+            },
+            "base_type": "type/Text"
+          },
+          {
+            "database_type": "BIGINT",
+            "semantic_type": null,
+            "lib/deduplicated-name": "TotalRegistros",
+            "lib/original-name": "TotalRegistros",
+            "name": "TotalRegistros",
+            "lib/source": "source/native",
+            "lib/source-column-alias": "TotalRegistros",
+            "source": "native",
+            "field_ref": [
+              "field",
+              "TotalRegistros",
+              {
+                "base-type": "type/BigInteger"
+              }
+            ],
+            "effective_type": "type/BigInteger",
+            "lib/desired-column-alias": "TotalRegistros",
+            "display_name": "TotalRegistros",
+            "fingerprint": {
+              "global": {
+                "distinct-count": 21,
+                "nil%": 0.0
+              },
+              "type": {
+                "type/Number": {
+                  "skewness": 4.4994882283895254,
+                  "min": 1.0,
+                  "q1": 129.0,
+                  "q3": 1763.0,
+                  "excess-kurtosis": 20.9484017457103,
+                  "zero-fraction": 0.0,
+                  "mode-fraction": 0.08695652173913043,
+                  "top-3-fraction": 0.21739130434782608,
+                  "max": 28762.0,
+                  "sd": 5914.062048126559,
+                  "avg": 2177.0
+                }
+              }
+            },
+            "base_type": "type/BigInteger"
+          }
+        ],
+        "embedding_type": null,
+        "initially_published_at": null,
+        "can_write": true,
+        "card_schema": 23,
+        "database_id": 2,
+        "enable_embedding": false,
+        "collection_id": 4,
+        "query_type": "native",
+        "download_perms": "full",
+        "name": "Pacientes por Departamento (acumulado)",
+        "document_id": null,
+        "last_used_at": "2026-07-28T19:27:11.265566Z",
+        "type": "question",
+        "dimensions": null,
+        "query_average_duration": null,
+        "creator_id": 13371339,
+        "moderation_reviews": [],
+        "updated_at": "2026-07-28T19:27:53.377871Z",
+        "made_public_by_id": null,
+        "embedding_params": null,
+        "cache_ttl": null,
+        "dataset_query": {
+          "lib/type": "mbql/query",
+          "database": 2,
+          "stages": [
+            {
+              "lib/type": "mbql.stage/native",
+              "native": "SELECT  \n  dir_paissubdiv.Descr AS Departamento,\n  COUNT(*) AS TotalRegistros\nFROM\n  flow_coordina f\n  INNER JOIN pac_ficha ON f.CodPac = pac_ficha.Cod\n  INNER JOIN salud_paciente ON pac_ficha.Cod = salud_paciente.NroHistoria\n  INNER JOIN dir_comunica ON salud_paciente.k_id = dir_comunica.IdRegistro\n  INNER JOIN dir_comunicadir ON dir_comunicadir.IdComunica = dir_comunica.k_id\n  INNER JOIN dir_paislocalidad ON dir_paislocalidad.k_id = dir_comunicadir.IdLocalidad\n  INNER JOIN dir_paissubdiv ON dir_paissubdiv.k_id = dir_paislocalidad.IdPaisSubDiv\nWHERE\ndir_comunicadir.IdLocalidad > 0 AND DATE_FORMAT(f.FechaRealizado, '%Y') > 2004 AND f.CodCoordinaReglaMotivo IN (101, 108, 119, 138, 171, 172, 260, 261, 262, 263, 264, 265, 266, 267, 268, 112, 113, 117, 128)\n            [[AND (({{sede}} = 'SMI' AND COALESCE(f.Hbritanico, 0) = 0) OR ({{sede}} = 'Britanico' AND f.Hbritanico = 1))]]\n      [[AND (({{facturacion}} = 'FNR' AND f.CodDestinoFact = 3) OR ({{facturacion}} = 'Otro' AND COALESCE(f.CodDestinoFact, 0) <> 3))]]\n  \nGROUP BY\n  dir_paissubdiv.Descr\nORDER BY\n  TotalRegistros DESC;",
+              "template-tags": {
+                "sede": {
+                  "name": "sede",
+                  "display-name": "Sede",
+                  "type": "text",
+                  "id": "23da82af-990e-4c33-a4ca-c71fb80ec6e5",
+                  "required": false
+                },
+                "facturacion": {
+                  "name": "facturacion",
+                  "display-name": "Facturacion",
+                  "type": "text",
+                  "id": "d3496df8-6625-45d9-a4fc-ba360014c01c",
+                  "required": false
+                }
+              }
+            }
+          ]
+        },
+        "dimension_mappings": null,
+        "id": 432,
+        "legacy_query": null,
+        "parameter_mappings": [],
+        "display": "pie",
+        "archived_directly": false,
+        "entity_id": "1Lvwk_myzYTalDQwtGjmY",
+        "collection_preview": true,
+        "visualization_settings": {
+          "pie.rows": [
+            {
+              "key": "Montevideo",
+              "name": "Montevideo",
+              "originalName": "Montevideo",
+              "color": "#509EE3",
+              "defaultColor": true,
+              "enabled": true,
+              "hidden": false,
+              "isOther": false
+            },
+            {
+              "key": "Canelones",
+              "name": "Canelones",
+              "originalName": "Canelones",
+              "color": "#88BF4D",
+              "defaultColor": false,
+              "enabled": true,
+              "hidden": false,
+              "isOther": false
+            },
+            {
+              "key": "Cerro Largo",
+              "name": "Cerro Largo",
+              "originalName": "Cerro Largo",
+              "color": "#A989C5",
+              "defaultColor": false,
+              "enabled": true,
+              "hidden": false,
+              "isOther": false
+            },
+            {
+              "key": "Colonia",
+              "name": "Colonia",
+              "originalName": "Colonia",
+              "color": "#EF8C8C",
+              "defaultColor": false,
+              "enabled": true,
+              "hidden": false,
+              "isOther": false
+            },
+            {
+              "key": "Florida",
+              "name": "Florida",
+              "originalName": "Florida",
+              "color": "#F9D45C",
+              "defaultColor": false,
+              "enabled": true,
+              "hidden": false,
+              "isOther": false
+            },
+            {
+              "key": "Maldonado",
+              "name": "Maldonado",
+              "originalName": "Maldonado",
+              "color": "#F2A86F",
+              "defaultColor": false,
+              "enabled": true,
+              "hidden": false,
+              "isOther": false
+            },
+            {
+              "key": "Paysandú",
+              "name": "Paysandú",
+              "originalName": "Paysandú",
+              "color": "#98D9D9",
+              "defaultColor": false,
+              "enabled": true,
+              "hidden": false,
+              "isOther": false
+            },
+            {
+              "key": "Tacuarembó",
+              "name": "Tacuarembó",
+              "originalName": "Tacuarembó",
+              "color": "#7172AD",
+              "defaultColor": false,
+              "enabled": true,
+              "hidden": false,
+              "isOther": false
+            },
+            {
+              "key": "Rivera",
+              "name": "Rivera",
+              "originalName": "Rivera",
+              "color": "#227FD2",
+              "defaultColor": true,
+              "enabled": true,
+              "hidden": false,
+              "isOther": true
+            },
+            {
+              "key": "Río Negro",
+              "name": "Río Negro",
+              "originalName": "Río Negro",
+              "color": "#A7D07C",
+              "defaultColor": true,
+              "enabled": true,
+              "hidden": false,
+              "isOther": true
+            },
+            {
+              "key": "Artigas",
+              "name": "Artigas",
+              "originalName": "Artigas",
+              "color": "#689636",
+              "defaultColor": true,
+              "enabled": true,
+              "hidden": false,
+              "isOther": true
+            },
+            {
+              "key": "San José",
+              "name": "San José",
+              "originalName": "San José",
+              "color": "#C8B4DA",
+              "defaultColor": true,
+              "enabled": true,
+              "hidden": false,
+              "isOther": true
+            },
+            {
+              "key": "Soriano",
+              "name": "Soriano",
+              "originalName": "Soriano",
+              "color": "#8A5EB0",
+              "defaultColor": true,
+              "enabled": true,
+              "hidden": false,
+              "isOther": true
+            },
+            {
+              "key": "Salto",
+              "name": "Salto",
+              "originalName": "Salto",
+              "color": "#F7C4C4",
+              "defaultColor": true,
+              "enabled": true,
+              "hidden": false,
+              "isOther": true
+            },
+            {
+              "key": "Treinta y Tres",
+              "name": "Treinta y Tres",
+              "originalName": "Treinta y Tres",
+              "color": "#E75454",
+              "defaultColor": true,
+              "enabled": true,
+              "hidden": false,
+              "isOther": true
+            },
+            {
+              "key": "Durazno",
+              "name": "Durazno",
+              "originalName": "Durazno",
+              "color": "#FBE499",
+              "defaultColor": true,
+              "enabled": true,
+              "hidden": false,
+              "isOther": true
+            },
+            {
+              "key": "Rocha",
+              "name": "Rocha",
+              "originalName": "Rocha",
+              "color": "#F7C41F",
+              "defaultColor": true,
+              "enabled": true,
+              "hidden": false,
+              "isOther": true
+            },
+            {
+              "key": "Lavalleja",
+              "name": "Lavalleja",
+              "originalName": "Lavalleja",
+              "color": "#F7CBA9",
+              "defaultColor": true,
+              "enabled": true,
+              "hidden": false,
+              "isOther": true
+            },
+            {
+              "key": "Flores",
+              "name": "Flores",
+              "originalName": "Flores",
+              "color": "#ED8535",
+              "defaultColor": true,
+              "enabled": true,
+              "hidden": false,
+              "isOther": true
+            },
+            {
+              "key": "Rio Grande do Sul",
+              "name": "Rio Grande do Sul",
+              "originalName": "Rio Grande do Sul",
+              "color": "#C7EAEA",
+              "defaultColor": true,
+              "enabled": true,
+              "hidden": false,
+              "isOther": true
+            },
+            {
+              "key": "Buenos Aires",
+              "name": "Buenos Aires",
+              "originalName": "Buenos Aires",
+              "color": "#69C8C8",
+              "defaultColor": true,
+              "enabled": true,
+              "hidden": false,
+              "isOther": true
+            },
+            {
+              "key": "Islas Falkland",
+              "name": "Islas Falkland",
+              "originalName": "Islas Falkland",
+              "color": "#7172AD",
+              "defaultColor": true,
+              "enabled": true,
+              "hidden": false,
+              "isOther": true
+            },
+            {
+              "key": "Sao Pablo",
+              "name": "Sao Pablo",
+              "originalName": "Sao Pablo",
+              "color": "#999AC4",
+              "defaultColor": true,
+              "enabled": true,
+              "hidden": false,
+              "isOther": true
+            }
+          ],
+          "pie.show_labels": false,
+          "pie.percent_visibility": "both",
+          "map.region": "962796e6-54ef-dda5-6d7b-4eb553d232cf"
+        },
+        "metabase_version": "v0.62.2.1 (b29c5af)",
+        "parameters": [],
+        "dashboard_id": 15,
+        "created_at": "2026-07-28T19:27:11.265566Z",
+        "public_uuid": null
+      },
+      "updated_at": "2026-07-28T20:01:31.899562Z",
+      "col": 12,
+      "id": 544,
+      "parameter_mappings": [
+        {
+          "parameter_id": "f1sede01",
+          "card_id": 432,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "sede"
+            ]
+          ]
+        },
+        {
+          "parameter_id": "f1fact01",
+          "card_id": 432,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "facturacion"
+            ]
+          ]
+        }
+      ],
+      "card_id": 432,
+      "entity_id": "e9dfB3qfgTV1VHOW7VRdU",
+      "visualization_settings": {},
+      "size_y": 10,
+      "dashboard_id": 15,
+      "created_at": "2026-07-28T19:27:11.29544Z",
+      "row": 6
+    }
+  ],
+  "embedding_type": null,
+  "initially_published_at": "2026-07-28T19:27:14Z",
+  "can_write": true,
+  "can_set_cache_policy": true,
+  "tabs": [],
+  "enable_embedding": true,
+  "collection_id": 4,
+  "show_in_getting_started": false,
+  "name": "Cardio Insights - Hemodinamia - Resumen",
+  "is_remote_synced": false,
+  "width": "fixed",
+  "caveats": null,
+  "collection_authority_level": null,
+  "creator_id": 13371339,
+  "can_restore": false,
+  "moderation_reviews": [],
+  "updated_at": "2026-07-28T19:27:14.523224Z",
+  "made_public_by_id": null,
+  "embedding_params": {
+    "seleccionar_a%C3%B1o": "enabled",
+    "sede": "enabled",
+    "facturacion": "enabled"
+  },
+  "cache_ttl": null,
+  "last_used_param_values": {},
+  "id": 15,
+  "last_viewed_at": "2026-07-28T20:09:15.10625Z",
+  "position": null,
+  "archived_directly": false,
+  "entity_id": "d_mKbgAxEqHFPgk7PVNSw",
+  "param_fields": {},
+  "last-edit-info": {
+    "id": 13371339,
+    "email": "gervasiojaviergarcia@gmail.com",
+    "first_name": "Gervasio",
+    "last_name": "Garcia",
+    "timestamp": "2026-07-28T20:01:32Z"
+  },
+  "collection": {
+    "authority_level": null,
+    "description": null,
+    "archived": false,
+    "slug": "coleccion_personal_de_gervasio_garcia",
+    "archive_operation_id": null,
+    "name": "Colección personal de Gervasio Garcia",
+    "is_remote_synced": false,
+    "personal_owner_id": 13371339,
+    "type": null,
+    "is_sample": false,
+    "effective_location": "/",
+    "id": 4,
+    "archived_directly": null,
+    "entity_id": "kzemoKQszjj-KKvcj0jaa",
+    "location": "/",
+    "namespace": null,
+    "is_personal": true,
+    "created_at": "2026-06-26T19:25:17.578869Z"
+  },
+  "parameters": [
+    {
+      "slug": "seleccionar_a%C3%B1o",
+      "values_query_type": "list",
+      "default": [
+        "2025"
+      ],
+      "name": "Seleccionar año",
+      "type": "string/=",
+      "sectionId": "string",
+      "values_source_type": "static-list",
+      "id": "17e28864",
+      "values_source_config": {
+        "values": [
+          [
+            "2025"
+          ],
+          [
+            "2024"
+          ],
+          [
+            "2023"
+          ],
+          [
+            "2022"
+          ],
+          [
+            "2021"
+          ],
+          [
+            "2020"
+          ],
+          [
+            "2019"
+          ],
+          [
+            "2018"
+          ],
+          [
+            "2017"
+          ],
+          [
+            "2016"
+          ],
+          [
+            "2015"
+          ],
+          [
+            "2014"
+          ],
+          [
+            "2013"
+          ],
+          [
+            "2012"
+          ],
+          [
+            "2011"
+          ],
+          [
+            "2010"
+          ],
+          [
+            "2009"
+          ],
+          [
+            "2008"
+          ],
+          [
+            "2007"
+          ],
+          [
+            "2006"
+          ],
+          [
+            "2005"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "f1sede01",
+      "name": "Sede",
+      "slug": "sede",
+      "type": "string/=",
+      "sectionId": "string",
+      "values_query_type": "list",
+      "values_source_type": "static-list",
+      "values_source_config": {
+        "values": [
+          "SMI",
+          "Britanico"
+        ]
+      }
+    },
+    {
+      "id": "f1fact01",
+      "name": "Facturacion",
+      "slug": "facturacion",
+      "type": "string/=",
+      "sectionId": "string",
+      "values_query_type": "list",
+      "values_source_type": "static-list",
+      "values_source_config": {
+        "values": [
+          "FNR",
+          "Otro"
+        ]
+      }
+    }
+  ],
+  "auto_apply_filters": true,
+  "created_at": "2026-07-28T19:27:11.135885Z",
+  "public_uuid": null,
+  "points_of_interest": null,
+  "can_delete": false
+}

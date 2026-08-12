@@ -1,0 +1,1281 @@
+{
+  "description": null,
+  "archived": false,
+  "view_count": 33,
+  "collection_position": null,
+  "dashcards": [
+    {
+      "size_x": 24,
+      "dashboard_tab_id": null,
+      "series": [],
+      "inline_parameters": [],
+      "action_id": null,
+      "collection_authority_level": null,
+      "card": {
+        "cache_invalidated_at": "2026-07-28T19:27:23.580525Z",
+        "description": null,
+        "archived": false,
+        "view_count": 15,
+        "collection_position": null,
+        "source_card_id": null,
+        "table_id": null,
+        "result_metadata": [
+          {
+            "name": "periodo",
+            "database_type": "VARCHAR",
+            "base_type": "type/Text",
+            "display_name": "periodo",
+            "field_ref": [
+              "field",
+              "periodo",
+              {
+                "base-type": "type/Text"
+              }
+            ]
+          },
+          {
+            "name": "tipo_acto",
+            "database_type": "VARCHAR",
+            "base_type": "type/Text",
+            "display_name": "tipo_acto",
+            "field_ref": [
+              "field",
+              "tipo_acto",
+              {
+                "base-type": "type/Text"
+              }
+            ]
+          },
+          {
+            "name": "total",
+            "database_type": "BIGINT",
+            "base_type": "type/BigInteger",
+            "display_name": "total",
+            "field_ref": [
+              "field",
+              "total",
+              {
+                "base-type": "type/BigInteger"
+              }
+            ]
+          }
+        ],
+        "embedding_type": null,
+        "initially_published_at": null,
+        "can_write": true,
+        "card_schema": 23,
+        "database_id": 2,
+        "enable_embedding": false,
+        "collection_id": 4,
+        "query_type": "native",
+        "download_perms": "full",
+        "name": "Cateterismos y Angioplastias",
+        "document_id": null,
+        "last_used_at": "2026-07-27T18:58:49.883176Z",
+        "type": "question",
+        "dimensions": null,
+        "query_average_duration": null,
+        "creator_id": 13371339,
+        "moderation_reviews": [],
+        "updated_at": "2026-07-28T19:27:23.595769Z",
+        "made_public_by_id": null,
+        "embedding_params": null,
+        "cache_ttl": null,
+        "dataset_query": {
+          "lib/type": "mbql/query",
+          "database": 2,
+          "stages": [
+            {
+              "native": "SELECT\n  DATE_FORMAT(f.FechaRealizado, '%Y-%m') AS periodo, f.`sTecnicaDetalle` as tipo_acto,\n  COUNT(*) AS total\nFROM sqlflow_coordina f\nWHERE f.`Realizado` = 255 AND DATE_FORMAT(f.FechaRealizado, '%Y') = {{anio}} AND f.CodCoordinaReglaMotivo IN (101, 108, 119)\n\n      [[AND (({{sede}} = 'SMI' AND COALESCE(f.Hbritanico, 0) = 0) OR ({{sede}} = 'Britanico' AND f.Hbritanico = 1))]]\n      [[AND (({{facturacion}} = 'FNR' AND f.CodDestinoFact = 3) OR ({{facturacion}} = 'Otro' AND COALESCE(f.CodDestinoFact, 0) <> 3))]]\nGROUP BY periodo, tipo_acto\nORDER BY periodo, tipo_acto;",
+              "lib/type": "mbql.stage/native",
+              "template-tags": {
+                "anio": {
+                  "display-name": "Anio",
+                  "name": "anio",
+                  "id": "ad27b923-bb86-4367-a6c7-5d483389f12f",
+                  "required": true,
+                  "type": "text",
+                  "default": "2025"
+                },
+                "sede": {
+                  "type": "text",
+                  "id": "c51c2880-89b1-4e86-80f8-617347771b44",
+                  "name": "sede",
+                  "display-name": "Sede",
+                  "required": false
+                },
+                "facturacion": {
+                  "type": "text",
+                  "id": "b60daffd-d7d0-4bb2-95c8-9eda93dbaba5",
+                  "name": "facturacion",
+                  "display-name": "Facturacion",
+                  "required": false
+                }
+              }
+            }
+          ]
+        },
+        "dimension_mappings": null,
+        "id": 353,
+        "legacy_query": null,
+        "parameter_mappings": [],
+        "display": "bar",
+        "archived_directly": false,
+        "entity_id": "5czxOBgAzHX_H3cMIDrlC",
+        "collection_preview": true,
+        "visualization_settings": {
+          "graph.show_values": true,
+          "graph.x_axis.scale": "ordinal",
+          "graph.dimensions": [
+            "periodo",
+            "tipo_acto"
+          ],
+          "graph.metrics": [
+            "total"
+          ]
+        },
+        "metabase_version": "v0.62.2.1 (b29c5af)",
+        "parameters": [
+          {
+            "id": "ad27b923-bb86-4367-a6c7-5d483389f12f",
+            "type": "string/=",
+            "target": [
+              "variable",
+              [
+                "template-tag",
+                "anio"
+              ]
+            ],
+            "name": "Anio",
+            "slug": "anio",
+            "default": "2025",
+            "required": true,
+            "isMultiSelect": false
+          }
+        ],
+        "dashboard_id": 11,
+        "created_at": "2026-07-27T18:58:49.883176Z",
+        "public_uuid": null
+      },
+      "updated_at": "2026-07-28T01:33:13.696672Z",
+      "col": 0,
+      "id": 457,
+      "parameter_mappings": [
+        {
+          "parameter_id": "17e28864",
+          "card_id": 353,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "anio"
+            ]
+          ]
+        },
+        {
+          "parameter_id": "f1sede01",
+          "card_id": 353,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "sede"
+            ]
+          ]
+        },
+        {
+          "parameter_id": "f1fact01",
+          "card_id": 353,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "facturacion"
+            ]
+          ]
+        }
+      ],
+      "card_id": 353,
+      "entity_id": "VMXG82-L7R5dopbhimoPS",
+      "visualization_settings": {},
+      "size_y": 6,
+      "dashboard_id": 11,
+      "created_at": "2026-07-27T18:58:49.919777Z",
+      "row": 0
+    },
+    {
+      "size_x": 24,
+      "dashboard_tab_id": null,
+      "series": [],
+      "inline_parameters": [],
+      "action_id": null,
+      "collection_authority_level": null,
+      "card": {
+        "cache_invalidated_at": "2026-07-28T19:27:24.194168Z",
+        "description": null,
+        "archived": false,
+        "view_count": 15,
+        "collection_position": null,
+        "source_card_id": null,
+        "table_id": null,
+        "result_metadata": [
+          {
+            "database_type": "VARCHAR",
+            "semantic_type": null,
+            "lib/deduplicated-name": "periodo",
+            "lib/original-name": "periodo",
+            "name": "periodo",
+            "lib/source": "source/native",
+            "lib/source-column-alias": "periodo",
+            "source": "native",
+            "field_ref": [
+              "field",
+              "periodo",
+              {
+                "base-type": "type/Text"
+              }
+            ],
+            "effective_type": "type/Text",
+            "lib/desired-column-alias": "periodo",
+            "display_name": "periodo",
+            "fingerprint": {
+              "global": {
+                "distinct-count": 12,
+                "nil%": 0.0
+              },
+              "type": {
+                "type/Text": {
+                  "percent-json": 0.0,
+                  "percent-url": 0.0,
+                  "percent-email": 0.0,
+                  "percent-state": 0.0,
+                  "percent-blank": 0.0,
+                  "average-length": 7.0,
+                  "mode-fraction": 0.11764705882352941,
+                  "top-3-fraction": 0.35294117647058826
+                }
+              }
+            },
+            "base_type": "type/Text"
+          },
+          {
+            "database_type": "VARCHAR",
+            "semantic_type": null,
+            "lib/deduplicated-name": "tipo_acto",
+            "lib/original-name": "tipo_acto",
+            "name": "tipo_acto",
+            "lib/source": "source/native",
+            "lib/source-column-alias": "tipo_acto",
+            "source": "native",
+            "field_ref": [
+              "field",
+              "tipo_acto",
+              {
+                "base-type": "type/Text"
+              }
+            ],
+            "effective_type": "type/Text",
+            "lib/desired-column-alias": "tipo_acto",
+            "display_name": "tipo_acto",
+            "fingerprint": {
+              "global": {
+                "distinct-count": 2,
+                "nil%": 0.0
+              },
+              "type": {
+                "type/Text": {
+                  "percent-json": 0.0,
+                  "percent-url": 0.0,
+                  "percent-email": 0.0,
+                  "percent-state": 0.0,
+                  "percent-blank": 0.0,
+                  "average-length": 13.0,
+                  "mode-fraction": 0.7058823529411765,
+                  "top-3-fraction": 1.0
+                }
+              }
+            },
+            "base_type": "type/Text"
+          },
+          {
+            "database_type": "BIGINT",
+            "semantic_type": null,
+            "lib/deduplicated-name": "total",
+            "lib/original-name": "total",
+            "name": "total",
+            "lib/source": "source/native",
+            "lib/source-column-alias": "total",
+            "source": "native",
+            "field_ref": [
+              "field",
+              "total",
+              {
+                "base-type": "type/BigInteger"
+              }
+            ],
+            "effective_type": "type/BigInteger",
+            "lib/desired-column-alias": "total",
+            "display_name": "total",
+            "fingerprint": {
+              "global": {
+                "distinct-count": 7,
+                "nil%": 0.0
+              },
+              "type": {
+                "type/Number": {
+                  "skewness": -0.7538586510855286,
+                  "min": 1.0,
+                  "q1": 1.0,
+                  "q3": 24.0,
+                  "excess-kurtosis": -1.2598849938847305,
+                  "zero-fraction": 0.0,
+                  "mode-fraction": 0.29411764705882354,
+                  "top-3-fraction": 0.6470588235294118,
+                  "max": 29.0,
+                  "sd": 10.991306725290299,
+                  "avg": 16.941176470588236
+                }
+              }
+            },
+            "base_type": "type/BigInteger"
+          }
+        ],
+        "embedding_type": null,
+        "initially_published_at": null,
+        "can_write": true,
+        "card_schema": 23,
+        "database_id": 2,
+        "enable_embedding": false,
+        "collection_id": 4,
+        "query_type": "native",
+        "download_perms": "full",
+        "name": "Cirugías",
+        "document_id": null,
+        "last_used_at": "2026-07-27T18:58:49.808919Z",
+        "type": "question",
+        "dimensions": null,
+        "query_average_duration": null,
+        "creator_id": 13371339,
+        "moderation_reviews": [],
+        "updated_at": "2026-07-28T19:27:24.210697Z",
+        "made_public_by_id": null,
+        "embedding_params": null,
+        "cache_ttl": null,
+        "dataset_query": {
+          "lib/type": "mbql/query",
+          "database": 2,
+          "stages": [
+            {
+              "native": "SELECT\n  DATE_FORMAT(f.FechaRealizado, '%Y-%m') AS periodo, f.`sTecnicaDetalle` as tipo_acto,\n  COUNT(*) AS total\nFROM sqlflow_coordina f\nWHERE f.`Realizado` = 255 AND DATE_FORMAT(f.FechaRealizado, '%Y') = {{anio}} AND f.CodCoordinaReglaMotivo IN (105, 109, 120)\n\n      [[AND (({{sede}} = 'SMI' AND COALESCE(f.Hbritanico, 0) = 0) OR ({{sede}} = 'Britanico' AND f.Hbritanico = 1))]]\n      [[AND (({{facturacion}} = 'FNR' AND f.CodDestinoFact = 3) OR ({{facturacion}} = 'Otro' AND COALESCE(f.CodDestinoFact, 0) <> 3))]]\nGROUP BY periodo, tipo_acto\nORDER BY periodo, tipo_acto;",
+              "lib/type": "mbql.stage/native",
+              "template-tags": {
+                "anio": {
+                  "default": "2025",
+                  "name": "anio",
+                  "id": "c2ae9bdb-f708-493f-be3d-9e19382f3f38",
+                  "type": "text",
+                  "display-name": "Anio",
+                  "required": true
+                },
+                "sede": {
+                  "type": "text",
+                  "id": "34bed6db-8756-44bb-b554-8f103fb44076",
+                  "name": "sede",
+                  "display-name": "Sede",
+                  "required": false
+                },
+                "facturacion": {
+                  "type": "text",
+                  "id": "ae36165e-018c-4316-b0e7-4878bd7c1fbf",
+                  "name": "facturacion",
+                  "display-name": "Facturacion",
+                  "required": false
+                }
+              }
+            }
+          ]
+        },
+        "dimension_mappings": null,
+        "id": 346,
+        "legacy_query": null,
+        "parameter_mappings": [],
+        "display": "bar",
+        "archived_directly": false,
+        "entity_id": "V3pHnwrfl6tfNhdN1qPE_",
+        "collection_preview": true,
+        "visualization_settings": {
+          "graph.label_value_formatting": "auto",
+          "graph.show_values": true,
+          "series_settings": {
+            "Cirugía c/CEC": {
+              "color": "#E75454"
+            },
+            "Cirugía s/CEC": {
+              "color": "#F7C4C4"
+            }
+          },
+          "graph.x_axis.scale": "ordinal",
+          "graph.dimensions": [
+            "periodo",
+            "tipo_acto"
+          ],
+          "graph.metrics": [
+            "total"
+          ]
+        },
+        "metabase_version": "v0.62.2.1 (b29c5af)",
+        "parameters": [
+          {
+            "id": "c2ae9bdb-f708-493f-be3d-9e19382f3f38",
+            "type": "string/=",
+            "target": [
+              "variable",
+              [
+                "template-tag",
+                "anio"
+              ]
+            ],
+            "name": "Anio",
+            "slug": "anio",
+            "default": "2025",
+            "required": true,
+            "isMultiSelect": false
+          }
+        ],
+        "dashboard_id": 11,
+        "created_at": "2026-07-27T18:58:49.808919Z",
+        "public_uuid": null
+      },
+      "updated_at": "2026-07-28T20:45:41.89663Z",
+      "col": 0,
+      "id": 458,
+      "parameter_mappings": [
+        {
+          "parameter_id": "17e28864",
+          "card_id": 346,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "anio"
+            ]
+          ]
+        },
+        {
+          "parameter_id": "f1sede01",
+          "card_id": 346,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "sede"
+            ]
+          ]
+        },
+        {
+          "parameter_id": "f1fact01",
+          "card_id": 346,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "facturacion"
+            ]
+          ]
+        }
+      ],
+      "card_id": 346,
+      "entity_id": "PTfZrDcVMK1uJdH7uaAo4",
+      "visualization_settings": {},
+      "size_y": 6,
+      "dashboard_id": 11,
+      "created_at": "2026-07-27T18:58:49.919777Z",
+      "row": 6
+    },
+    {
+      "size_x": 24,
+      "dashboard_tab_id": null,
+      "series": [],
+      "inline_parameters": [],
+      "action_id": null,
+      "collection_authority_level": null,
+      "card": {
+        "cache_invalidated_at": "2026-07-28T19:27:24.609197Z",
+        "description": null,
+        "archived": false,
+        "view_count": 15,
+        "collection_position": null,
+        "source_card_id": null,
+        "table_id": null,
+        "result_metadata": [
+          {
+            "name": "periodo",
+            "database_type": "VARCHAR",
+            "base_type": "type/Text",
+            "display_name": "periodo",
+            "field_ref": [
+              "field",
+              "periodo",
+              {
+                "base-type": "type/Text"
+              }
+            ]
+          },
+          {
+            "name": "tipo_acto",
+            "database_type": "VARCHAR",
+            "base_type": "type/Text",
+            "display_name": "tipo_acto",
+            "field_ref": [
+              "field",
+              "tipo_acto",
+              {
+                "base-type": "type/Text"
+              }
+            ]
+          },
+          {
+            "name": "total",
+            "database_type": "BIGINT",
+            "base_type": "type/BigInteger",
+            "display_name": "total",
+            "field_ref": [
+              "field",
+              "total",
+              {
+                "base-type": "type/BigInteger"
+              }
+            ]
+          }
+        ],
+        "embedding_type": null,
+        "initially_published_at": null,
+        "can_write": true,
+        "card_schema": 23,
+        "database_id": 2,
+        "enable_embedding": false,
+        "collection_id": 4,
+        "query_type": "native",
+        "download_perms": "full",
+        "name": "TAVI",
+        "document_id": null,
+        "last_used_at": "2026-07-27T18:58:49.900704Z",
+        "type": "question",
+        "dimensions": null,
+        "query_average_duration": null,
+        "creator_id": 13371339,
+        "moderation_reviews": [],
+        "updated_at": "2026-07-28T19:27:24.6232Z",
+        "made_public_by_id": null,
+        "embedding_params": null,
+        "cache_ttl": null,
+        "dataset_query": {
+          "lib/type": "mbql/query",
+          "database": 2,
+          "stages": [
+            {
+              "lib/type": "mbql.stage/native",
+              "native": "SELECT\n  DATE_FORMAT(f.FechaRealizado, '%Y-%m') AS periodo, f.`sTecnicaDetalle` as tipo_acto,\n  COUNT(*) AS total\nFROM sqlflow_coordina f\nINNER JOIN med_tecnicadetalle mt ON mt.Cod = f.CodCoordinaReglaMotivo AND mt.Estructural = 1\nWHERE f.`Realizado` = 255 AND DATE_FORMAT(f.FechaRealizado, '%Y') = {{anio}} \n\n      [[AND (({{sede}} = 'SMI' AND COALESCE(f.Hbritanico, 0) = 0) OR ({{sede}} = 'Britanico' AND f.Hbritanico = 1))]]\n      [[AND (({{facturacion}} = 'FNR' AND f.CodDestinoFact = 3) OR ({{facturacion}} = 'Otro' AND COALESCE(f.CodDestinoFact, 0) <> 3))]]\nGROUP BY periodo, tipo_acto\nORDER BY periodo, tipo_acto;",
+              "template-tags": {
+                "anio": {
+                  "default": "2025",
+                  "name": "anio",
+                  "id": "7c87492d-8cd5-4e3c-8eb1-8f1bdc342fb1",
+                  "type": "text",
+                  "display-name": "Anio",
+                  "required": true
+                },
+                "sede": {
+                  "type": "text",
+                  "id": "9c154569-7648-4df6-8469-4259c95e1468",
+                  "name": "sede",
+                  "display-name": "Sede",
+                  "required": false
+                },
+                "facturacion": {
+                  "type": "text",
+                  "id": "1eb44f81-2233-4a16-b5f9-f62099d984ad",
+                  "name": "facturacion",
+                  "display-name": "Facturacion",
+                  "required": false
+                }
+              }
+            }
+          ]
+        },
+        "dimension_mappings": null,
+        "id": 355,
+        "legacy_query": null,
+        "parameter_mappings": [],
+        "display": "bar",
+        "archived_directly": false,
+        "entity_id": "WGC8fngBLCW4PWm9-8qNw",
+        "collection_preview": true,
+        "visualization_settings": {
+          "graph.show_values": true,
+          "graph.x_axis.scale": "ordinal",
+          "graph.dimensions": [
+            "periodo",
+            "tipo_acto"
+          ],
+          "graph.metrics": [
+            "total"
+          ]
+        },
+        "metabase_version": "v0.62.2.1 (b29c5af)",
+        "parameters": [
+          {
+            "id": "7c87492d-8cd5-4e3c-8eb1-8f1bdc342fb1",
+            "type": "string/=",
+            "target": [
+              "variable",
+              [
+                "template-tag",
+                "anio"
+              ]
+            ],
+            "name": "Anio",
+            "slug": "anio",
+            "default": "2025",
+            "required": true,
+            "isMultiSelect": false
+          }
+        ],
+        "dashboard_id": 11,
+        "created_at": "2026-07-27T18:58:49.900704Z",
+        "public_uuid": null
+      },
+      "updated_at": "2026-07-28T01:33:13.7011Z",
+      "col": 0,
+      "id": 459,
+      "parameter_mappings": [
+        {
+          "parameter_id": "17e28864",
+          "card_id": 355,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "anio"
+            ]
+          ]
+        },
+        {
+          "parameter_id": "f1sede01",
+          "card_id": 355,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "sede"
+            ]
+          ]
+        },
+        {
+          "parameter_id": "f1fact01",
+          "card_id": 355,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "facturacion"
+            ]
+          ]
+        }
+      ],
+      "card_id": 355,
+      "entity_id": "qdTsKLZhQRJNo_Lg7FX-_",
+      "visualization_settings": {},
+      "size_y": 6,
+      "dashboard_id": 11,
+      "created_at": "2026-07-27T18:58:49.919777Z",
+      "row": 12
+    },
+    {
+      "size_x": 24,
+      "dashboard_tab_id": null,
+      "series": [],
+      "inline_parameters": [],
+      "action_id": null,
+      "collection_authority_level": null,
+      "card": {
+        "cache_invalidated_at": "2026-07-28T19:27:25.185436Z",
+        "description": null,
+        "archived": false,
+        "view_count": 15,
+        "collection_position": null,
+        "source_card_id": null,
+        "table_id": null,
+        "result_metadata": [
+          {
+            "name": "periodo",
+            "database_type": "VARCHAR",
+            "base_type": "type/Text",
+            "display_name": "periodo",
+            "field_ref": [
+              "field",
+              "periodo",
+              {
+                "base-type": "type/Text"
+              }
+            ]
+          },
+          {
+            "name": "tipo_acto",
+            "database_type": "VARCHAR",
+            "base_type": "type/Text",
+            "display_name": "tipo_acto",
+            "field_ref": [
+              "field",
+              "tipo_acto",
+              {
+                "base-type": "type/Text"
+              }
+            ]
+          },
+          {
+            "name": "total",
+            "database_type": "BIGINT",
+            "base_type": "type/BigInteger",
+            "display_name": "total",
+            "field_ref": [
+              "field",
+              "total",
+              {
+                "base-type": "type/BigInteger"
+              }
+            ]
+          }
+        ],
+        "embedding_type": null,
+        "initially_published_at": null,
+        "can_write": true,
+        "card_schema": 23,
+        "database_id": 2,
+        "enable_embedding": false,
+        "collection_id": 4,
+        "query_type": "native",
+        "download_perms": "full",
+        "name": "Marcapasos",
+        "document_id": null,
+        "last_used_at": "2026-07-27T18:58:49.842066Z",
+        "type": "question",
+        "dimensions": null,
+        "query_average_duration": null,
+        "creator_id": 13371339,
+        "moderation_reviews": [],
+        "updated_at": "2026-07-28T19:27:25.200368Z",
+        "made_public_by_id": null,
+        "embedding_params": null,
+        "cache_ttl": null,
+        "dataset_query": {
+          "lib/type": "mbql/query",
+          "database": 2,
+          "stages": [
+            {
+              "native": "SELECT\n  DATE_FORMAT(f.FechaRealizado, '%Y-%m') AS periodo, f.`sTecnicaDetalle` as tipo_acto,\n  COUNT(*) AS total\nFROM sqlflow_coordina f\nWHERE f.`Realizado` = 255 AND DATE_FORMAT(f.FechaRealizado, '%Y') = {{anio}} AND f.CodCoordinaReglaMotivo IN (112, 113, 117, 128)\n\n      [[AND (({{sede}} = 'SMI' AND COALESCE(f.Hbritanico, 0) = 0) OR ({{sede}} = 'Britanico' AND f.Hbritanico = 1))]]\n      [[AND (({{facturacion}} = 'FNR' AND f.CodDestinoFact = 3) OR ({{facturacion}} = 'Otro' AND COALESCE(f.CodDestinoFact, 0) <> 3))]]\nGROUP BY periodo, tipo_acto\nORDER BY periodo, tipo_acto;",
+              "lib/type": "mbql.stage/native",
+              "template-tags": {
+                "anio": {
+                  "default": "2025",
+                  "name": "anio",
+                  "id": "c498a40c-db6f-4213-a1b7-d56ac310ba72",
+                  "type": "text",
+                  "display-name": "Anio",
+                  "required": true
+                },
+                "sede": {
+                  "type": "text",
+                  "id": "396a80da-0d0a-4807-9ec5-19d10378b8cb",
+                  "name": "sede",
+                  "display-name": "Sede",
+                  "required": false
+                },
+                "facturacion": {
+                  "type": "text",
+                  "id": "ecf167c4-a899-45f9-97fd-1107375f1105",
+                  "name": "facturacion",
+                  "display-name": "Facturacion",
+                  "required": false
+                }
+              }
+            }
+          ]
+        },
+        "dimension_mappings": null,
+        "id": 349,
+        "legacy_query": null,
+        "parameter_mappings": [],
+        "display": "bar",
+        "archived_directly": false,
+        "entity_id": "Ew51jiXmFxwawOd2Be00h",
+        "collection_preview": true,
+        "visualization_settings": {
+          "graph.show_values": true,
+          "series_settings": {
+            "MP reimplante": {
+              "color": "#87BCEC"
+            },
+            "Cardiodesf. Reimp.": {
+              "color": "#C8B4DA"
+            },
+            "Cardiodesf. Impl.": {
+              "color": "#8A5EB0"
+            },
+            "MP implante": {
+              "color": "#227FD2"
+            }
+          },
+          "graph.x_axis.scale": "ordinal",
+          "graph.dimensions": [
+            "periodo",
+            "tipo_acto"
+          ],
+          "graph.metrics": [
+            "total"
+          ]
+        },
+        "metabase_version": "v0.62.2.1 (b29c5af)",
+        "parameters": [
+          {
+            "id": "c498a40c-db6f-4213-a1b7-d56ac310ba72",
+            "type": "string/=",
+            "target": [
+              "variable",
+              [
+                "template-tag",
+                "anio"
+              ]
+            ],
+            "name": "Anio",
+            "slug": "anio",
+            "default": "2025",
+            "required": true,
+            "isMultiSelect": false
+          }
+        ],
+        "dashboard_id": 11,
+        "created_at": "2026-07-27T18:58:49.842066Z",
+        "public_uuid": null
+      },
+      "updated_at": "2026-07-28T01:33:13.703345Z",
+      "col": 0,
+      "id": 460,
+      "parameter_mappings": [
+        {
+          "parameter_id": "17e28864",
+          "card_id": 349,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "anio"
+            ]
+          ]
+        },
+        {
+          "parameter_id": "f1sede01",
+          "card_id": 349,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "sede"
+            ]
+          ]
+        },
+        {
+          "parameter_id": "f1fact01",
+          "card_id": 349,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "facturacion"
+            ]
+          ]
+        }
+      ],
+      "card_id": 349,
+      "entity_id": "AjjFpfN6tPI9TUfV3jxwH",
+      "visualization_settings": {},
+      "size_y": 6,
+      "dashboard_id": 11,
+      "created_at": "2026-07-27T18:58:49.919777Z",
+      "row": 18
+    },
+    {
+      "size_x": 24,
+      "dashboard_tab_id": null,
+      "series": [],
+      "inline_parameters": [],
+      "action_id": null,
+      "collection_authority_level": null,
+      "card": {
+        "cache_invalidated_at": "2026-07-28T19:27:25.729203Z",
+        "description": null,
+        "archived": false,
+        "view_count": 15,
+        "collection_position": null,
+        "source_card_id": null,
+        "table_id": null,
+        "result_metadata": [
+          {
+            "name": "periodo",
+            "database_type": "VARCHAR",
+            "base_type": "type/Text",
+            "display_name": "periodo",
+            "field_ref": [
+              "field",
+              "periodo",
+              {
+                "base-type": "type/Text"
+              }
+            ]
+          },
+          {
+            "name": "tipo_acto",
+            "database_type": "VARCHAR",
+            "base_type": "type/Text",
+            "display_name": "tipo_acto",
+            "field_ref": [
+              "field",
+              "tipo_acto",
+              {
+                "base-type": "type/Text"
+              }
+            ]
+          },
+          {
+            "name": "total",
+            "database_type": "BIGINT",
+            "base_type": "type/BigInteger",
+            "display_name": "total",
+            "field_ref": [
+              "field",
+              "total",
+              {
+                "base-type": "type/BigInteger"
+              }
+            ]
+          }
+        ],
+        "embedding_type": null,
+        "initially_published_at": null,
+        "can_write": true,
+        "card_schema": 23,
+        "database_id": 2,
+        "enable_embedding": false,
+        "collection_id": 4,
+        "query_type": "native",
+        "download_perms": "full",
+        "name": "Ecografías",
+        "document_id": null,
+        "last_used_at": "2026-07-27T18:58:49.832204Z",
+        "type": "question",
+        "dimensions": null,
+        "query_average_duration": null,
+        "creator_id": 13371339,
+        "moderation_reviews": [],
+        "updated_at": "2026-07-28T19:27:25.743714Z",
+        "made_public_by_id": null,
+        "embedding_params": null,
+        "cache_ttl": null,
+        "dataset_query": {
+          "lib/type": "mbql/query",
+          "database": 2,
+          "stages": [
+            {
+              "native": "SELECT\n  DATE_FORMAT(f.FechaRealizado, '%Y-%m') AS periodo, f.`sTecnicaDetalle` as tipo_acto,\n  COUNT(*) AS total\nFROM sqlflow_coordina f\nWHERE f.`Realizado` = 255 AND DATE_FORMAT(f.FechaRealizado, '%Y') = {{anio}} AND f.CodCoordinaReglaMotivo IN (124, 125, 126, 127, 228)\n\n      [[AND (({{sede}} = 'SMI' AND COALESCE(f.Hbritanico, 0) = 0) OR ({{sede}} = 'Britanico' AND f.Hbritanico = 1))]]\n      [[AND (({{facturacion}} = 'FNR' AND f.CodDestinoFact = 3) OR ({{facturacion}} = 'Otro' AND COALESCE(f.CodDestinoFact, 0) <> 3))]]\nGROUP BY periodo, tipo_acto\nORDER BY periodo, tipo_acto;",
+              "lib/type": "mbql.stage/native",
+              "template-tags": {
+                "anio": {
+                  "default": "2025",
+                  "name": "anio",
+                  "id": "b03ae884-dcef-457b-8ba7-4131d283a302",
+                  "type": "text",
+                  "display-name": "Anio",
+                  "required": true
+                },
+                "sede": {
+                  "type": "text",
+                  "id": "d2e4e0a4-f1b7-4b06-b917-c1c9a68c5ef7",
+                  "name": "sede",
+                  "display-name": "Sede",
+                  "required": false
+                },
+                "facturacion": {
+                  "type": "text",
+                  "id": "c6d31a3f-72fc-4b50-8fc1-c8c9fec9ebb6",
+                  "name": "facturacion",
+                  "display-name": "Facturacion",
+                  "required": false
+                }
+              }
+            }
+          ]
+        },
+        "dimension_mappings": null,
+        "id": 348,
+        "legacy_query": null,
+        "parameter_mappings": [],
+        "display": "bar",
+        "archived_directly": false,
+        "entity_id": "Vx7Ptsj3S2RX4pu60WB31",
+        "collection_preview": true,
+        "visualization_settings": {
+          "graph.show_values": true,
+          "graph.x_axis.scale": "ordinal",
+          "graph.dimensions": [
+            "periodo",
+            "tipo_acto"
+          ],
+          "graph.metrics": [
+            "total"
+          ]
+        },
+        "metabase_version": "v0.62.2.1 (b29c5af)",
+        "parameters": [
+          {
+            "id": "b03ae884-dcef-457b-8ba7-4131d283a302",
+            "type": "string/=",
+            "target": [
+              "variable",
+              [
+                "template-tag",
+                "anio"
+              ]
+            ],
+            "name": "Anio",
+            "slug": "anio",
+            "default": "2025",
+            "required": true,
+            "isMultiSelect": false
+          }
+        ],
+        "dashboard_id": 11,
+        "created_at": "2026-07-27T18:58:49.832204Z",
+        "public_uuid": null
+      },
+      "updated_at": "2026-07-28T01:33:13.70557Z",
+      "col": 0,
+      "id": 461,
+      "parameter_mappings": [
+        {
+          "parameter_id": "17e28864",
+          "card_id": 348,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "anio"
+            ]
+          ]
+        },
+        {
+          "parameter_id": "f1sede01",
+          "card_id": 348,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "sede"
+            ]
+          ]
+        },
+        {
+          "parameter_id": "f1fact01",
+          "card_id": 348,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "facturacion"
+            ]
+          ]
+        }
+      ],
+      "card_id": 348,
+      "entity_id": "QdtMh5suNzwtFW730ZiBs",
+      "visualization_settings": {},
+      "size_y": 6,
+      "dashboard_id": 11,
+      "created_at": "2026-07-27T18:58:49.919777Z",
+      "row": 24
+    }
+  ],
+  "embedding_type": null,
+  "initially_published_at": "2026-07-27T18:58:52Z",
+  "can_write": true,
+  "can_set_cache_policy": true,
+  "tabs": [],
+  "enable_embedding": true,
+  "collection_id": 4,
+  "show_in_getting_started": false,
+  "name": "Cardio Insights - Actos - Por procedimiento",
+  "is_remote_synced": false,
+  "width": "fixed",
+  "caveats": null,
+  "collection_authority_level": null,
+  "creator_id": 13371339,
+  "can_restore": false,
+  "moderation_reviews": [],
+  "updated_at": "2026-07-28T01:33:13.611615Z",
+  "made_public_by_id": null,
+  "embedding_params": {
+    "seleccionar_a%C3%B1o": "enabled",
+    "sede": "enabled",
+    "facturacion": "enabled"
+  },
+  "cache_ttl": null,
+  "last_used_param_values": {},
+  "id": 11,
+  "last_viewed_at": "2026-07-28T20:41:47.018798Z",
+  "position": null,
+  "archived_directly": false,
+  "entity_id": "jFTpq-KBm53WWKTvU7l_m",
+  "param_fields": {},
+  "last-edit-info": {
+    "id": 13371339,
+    "email": "gervasiojaviergarcia@gmail.com",
+    "first_name": "Gervasio",
+    "last_name": "Garcia",
+    "timestamp": "2026-07-28T20:45:42Z"
+  },
+  "collection": {
+    "authority_level": null,
+    "description": null,
+    "archived": false,
+    "slug": "coleccion_personal_de_gervasio_garcia",
+    "archive_operation_id": null,
+    "name": "Colección personal de Gervasio Garcia",
+    "is_remote_synced": false,
+    "personal_owner_id": 13371339,
+    "type": null,
+    "is_sample": false,
+    "effective_location": "/",
+    "id": 4,
+    "archived_directly": null,
+    "entity_id": "kzemoKQszjj-KKvcj0jaa",
+    "location": "/",
+    "namespace": null,
+    "is_personal": true,
+    "created_at": "2026-06-26T19:25:17.578869Z"
+  },
+  "parameters": [
+    {
+      "slug": "seleccionar_a%C3%B1o",
+      "values_query_type": "list",
+      "default": [
+        "2025"
+      ],
+      "name": "Seleccionar año",
+      "type": "string/=",
+      "sectionId": "string",
+      "values_source_type": "static-list",
+      "id": "17e28864",
+      "values_source_config": {
+        "values": [
+          [
+            "2025"
+          ],
+          [
+            "2024"
+          ],
+          [
+            "2023"
+          ],
+          [
+            "2022"
+          ],
+          [
+            "2021"
+          ],
+          [
+            "2020"
+          ],
+          [
+            "2019"
+          ],
+          [
+            "2018"
+          ],
+          [
+            "2017"
+          ],
+          [
+            "2016"
+          ],
+          [
+            "2015"
+          ],
+          [
+            "2014"
+          ],
+          [
+            "2013"
+          ],
+          [
+            "2012"
+          ],
+          [
+            "2011"
+          ],
+          [
+            "2010"
+          ],
+          [
+            "2009"
+          ],
+          [
+            "2008"
+          ],
+          [
+            "2007"
+          ],
+          [
+            "2006"
+          ],
+          [
+            "2005"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "f1sede01",
+      "name": "Sede",
+      "slug": "sede",
+      "type": "string/=",
+      "sectionId": "string",
+      "values_query_type": "list",
+      "values_source_type": "static-list",
+      "values_source_config": {
+        "values": [
+          "SMI",
+          "Britanico"
+        ]
+      }
+    },
+    {
+      "id": "f1fact01",
+      "name": "Facturacion",
+      "slug": "facturacion",
+      "type": "string/=",
+      "sectionId": "string",
+      "values_query_type": "list",
+      "values_source_type": "static-list",
+      "values_source_config": {
+        "values": [
+          "FNR",
+          "Otro"
+        ]
+      }
+    }
+  ],
+  "auto_apply_filters": true,
+  "created_at": "2026-07-27T18:58:49.799134Z",
+  "public_uuid": null,
+  "points_of_interest": null,
+  "can_delete": false
+}

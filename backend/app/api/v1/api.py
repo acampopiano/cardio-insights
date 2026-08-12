@@ -3,12 +3,14 @@ from fastapi import APIRouter
 from app.api.v1.analytics import router as analytics_router
 from app.api.v1.auth import router as auth_router
 from app.api.v1.catalogs import router as catalogs_router
+from app.api.v1.chat import router as chat_router
 from app.api.v1.dashboard import router as dashboard_router
 from app.api.v1.health import router as health_router
 from app.api.v1.kpi_designer import router as kpi_designer_router
 from app.api.v1.kpis import router as kpis_router
 from app.api.v1.natural_query import router as natural_query_router
 from app.api.v1.metabase import router as metabase_router
+from app.api.v1.predictions import router as predictions_router
 
 api_router = APIRouter()
 api_router.include_router(auth_router)
@@ -20,3 +22,5 @@ api_router.include_router(kpi_designer_router)
 api_router.include_router(analytics_router)
 api_router.include_router(natural_query_router)
 api_router.include_router(metabase_router)
+api_router.include_router(chat_router)
+api_router.include_router(predictions_router)

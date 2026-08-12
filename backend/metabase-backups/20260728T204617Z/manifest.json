@@ -1,0 +1,724 @@
+{
+  "created_at": "20260728T204617Z",
+  "metabase_site": "http://190.64.90.170:8810",
+  "dashboard_ids": [
+    2,
+    5,
+    6,
+    7,
+    8,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17
+  ],
+  "dashboards": [
+    {
+      "id": 2,
+      "name": "Cardio Insights - KPI",
+      "enable_embedding": true,
+      "parameters": [
+        {
+          "id": "17e28864",
+          "name": "Seleccionar año",
+          "slug": "seleccionar_a%C3%B1o",
+          "type": "string/="
+        }
+      ],
+      "embedding_params": {
+        "seleccionar_a%C3%B1o": "enabled"
+      },
+      "dashcard_count": 53,
+      "card_ids": [
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        68,
+        69,
+        70,
+        71,
+        72,
+        73,
+        74,
+        75,
+        76,
+        77,
+        78,
+        79,
+        80,
+        81,
+        82,
+        83,
+        84,
+        85,
+        86,
+        312,
+        318,
+        319
+      ]
+    },
+    {
+      "id": 5,
+      "name": "Cardio Insights - Actos",
+      "enable_embedding": true,
+      "parameters": [
+        {
+          "id": "17e28864",
+          "name": "Seleccionar año",
+          "slug": "seleccionar_a%C3%B1o",
+          "type": "string/="
+        }
+      ],
+      "embedding_params": {
+        "seleccionar_a%C3%B1o": "enabled"
+      },
+      "dashcard_count": 12,
+      "card_ids": [
+        138,
+        141,
+        144,
+        151,
+        152,
+        154,
+        157,
+        161,
+        163,
+        165,
+        172
+      ]
+    },
+    {
+      "id": 6,
+      "name": "Cardio Insights - Indicadores Cirugia",
+      "enable_embedding": true,
+      "parameters": [
+        {
+          "id": "17e28864",
+          "name": "Seleccionar año",
+          "slug": "seleccionar_a%C3%B1o",
+          "type": "string/="
+        }
+      ],
+      "embedding_params": {
+        "seleccionar_a%C3%B1o": "enabled"
+      },
+      "dashcard_count": 22,
+      "card_ids": [
+        178,
+        187,
+        190,
+        191,
+        192,
+        193,
+        195,
+        201,
+        209,
+        212,
+        214,
+        216,
+        220,
+        221,
+        314,
+        315,
+        316,
+        320,
+        321,
+        322,
+        323
+      ]
+    },
+    {
+      "id": 7,
+      "name": "Cardio Insights - Indicadores Hemodinamia",
+      "enable_embedding": true,
+      "parameters": [
+        {
+          "id": "17e28864",
+          "name": "Seleccionar año",
+          "slug": "seleccionar_a%C3%B1o",
+          "type": "string/="
+        },
+        {
+          "id": "f1sede01",
+          "name": "Sede",
+          "slug": "sede",
+          "type": "string/="
+        },
+        {
+          "id": "f1fact01",
+          "name": "Facturacion",
+          "slug": "facturacion",
+          "type": "string/="
+        }
+      ],
+      "embedding_params": {
+        "seleccionar_a%C3%B1o": "enabled",
+        "sede": "enabled",
+        "facturacion": "enabled"
+      },
+      "dashcard_count": 15,
+      "card_ids": [
+        222,
+        224,
+        225,
+        227,
+        233,
+        239,
+        245,
+        248,
+        249,
+        250,
+        252,
+        256,
+        258,
+        263,
+        264
+      ]
+    },
+    {
+      "id": 8,
+      "name": "Cardio Insights - Factores de Riesgo",
+      "enable_embedding": true,
+      "parameters": [
+        {
+          "id": "17e28864",
+          "name": "Seleccionar año",
+          "slug": "seleccionar_a%C3%B1o",
+          "type": "string/="
+        },
+        {
+          "id": "f1sede01",
+          "name": "Sede",
+          "slug": "sede",
+          "type": "string/="
+        },
+        {
+          "id": "f1fact01",
+          "name": "Facturacion",
+          "slug": "facturacion",
+          "type": "string/="
+        }
+      ],
+      "embedding_params": {
+        "seleccionar_a%C3%B1o": "enabled",
+        "sede": "enabled",
+        "facturacion": "enabled"
+      },
+      "dashcard_count": 6,
+      "card_ids": [
+        271,
+        274,
+        275,
+        282,
+        288,
+        295
+      ]
+    },
+    {
+      "id": 10,
+      "name": "Cardio Insights - Actos - Volumen y origen",
+      "enable_embedding": true,
+      "parameters": [
+        {
+          "id": "17e28864",
+          "name": "Seleccionar año",
+          "slug": "seleccionar_a%C3%B1o",
+          "type": "string/="
+        },
+        {
+          "id": "f1sede01",
+          "name": "Sede",
+          "slug": "sede",
+          "type": "string/="
+        },
+        {
+          "id": "f1fact01",
+          "name": "Facturacion",
+          "slug": "facturacion",
+          "type": "string/="
+        }
+      ],
+      "embedding_params": {
+        "seleccionar_a%C3%B1o": "enabled",
+        "sede": "enabled",
+        "facturacion": "enabled"
+      },
+      "dashcard_count": 6,
+      "card_ids": [
+        336,
+        339,
+        340,
+        341,
+        343,
+        345
+      ]
+    },
+    {
+      "id": 11,
+      "name": "Cardio Insights - Actos - Por procedimiento",
+      "enable_embedding": true,
+      "parameters": [
+        {
+          "id": "17e28864",
+          "name": "Seleccionar año",
+          "slug": "seleccionar_a%C3%B1o",
+          "type": "string/="
+        },
+        {
+          "id": "f1sede01",
+          "name": "Sede",
+          "slug": "sede",
+          "type": "string/="
+        },
+        {
+          "id": "f1fact01",
+          "name": "Facturacion",
+          "slug": "facturacion",
+          "type": "string/="
+        }
+      ],
+      "embedding_params": {
+        "seleccionar_a%C3%B1o": "enabled",
+        "sede": "enabled",
+        "facturacion": "enabled"
+      },
+      "dashcard_count": 5,
+      "card_ids": [
+        346,
+        348,
+        349,
+        353,
+        355
+      ]
+    },
+    {
+      "id": 12,
+      "name": "Cardio Insights - Cirugia - Indicadores",
+      "enable_embedding": true,
+      "parameters": [
+        {
+          "id": "17e28864",
+          "name": "Seleccionar año",
+          "slug": "seleccionar_a%C3%B1o",
+          "type": "string/="
+        },
+        {
+          "id": "f1sede01",
+          "name": "Sede",
+          "slug": "sede",
+          "type": "string/="
+        },
+        {
+          "id": "f1fact01",
+          "name": "Facturacion",
+          "slug": "facturacion",
+          "type": "string/="
+        }
+      ],
+      "embedding_params": {
+        "seleccionar_a%C3%B1o": "enabled",
+        "sede": "enabled",
+        "facturacion": "enabled"
+      },
+      "dashcard_count": 7,
+      "card_ids": [
+        358,
+        359,
+        361,
+        362,
+        370,
+        371,
+        376
+      ]
+    },
+    {
+      "id": 13,
+      "name": "Cardio Insights - Cirugia - Pacientes y reintervenciones",
+      "enable_embedding": true,
+      "parameters": [
+        {
+          "id": "17e28864",
+          "name": "Seleccionar año",
+          "slug": "seleccionar_a%C3%B1o",
+          "type": "string/="
+        },
+        {
+          "id": "f1sede01",
+          "name": "Sede",
+          "slug": "sede",
+          "type": "string/="
+        },
+        {
+          "id": "f1fact01",
+          "name": "Facturacion",
+          "slug": "facturacion",
+          "type": "string/="
+        }
+      ],
+      "embedding_params": {
+        "seleccionar_a%C3%B1o": "enabled",
+        "sede": "enabled",
+        "facturacion": "enabled"
+      },
+      "dashcard_count": 9,
+      "card_ids": [
+        381,
+        384,
+        385,
+        386,
+        387,
+        388,
+        389,
+        393,
+        396
+      ]
+    },
+    {
+      "id": 14,
+      "name": "Cardio Insights - Cirugia - Perfil clinico",
+      "enable_embedding": true,
+      "parameters": [
+        {
+          "id": "17e28864",
+          "name": "Seleccionar año",
+          "slug": "seleccionar_a%C3%B1o",
+          "type": "string/="
+        },
+        {
+          "id": "f1sede01",
+          "name": "Sede",
+          "slug": "sede",
+          "type": "string/="
+        },
+        {
+          "id": "f1fact01",
+          "name": "Facturacion",
+          "slug": "facturacion",
+          "type": "string/="
+        }
+      ],
+      "embedding_params": {
+        "seleccionar_a%C3%B1o": "enabled",
+        "sede": "enabled",
+        "facturacion": "enabled"
+      },
+      "dashcard_count": 5,
+      "card_ids": [
+        399,
+        411,
+        415,
+        416,
+        419
+      ]
+    },
+    {
+      "id": 15,
+      "name": "Cardio Insights - Hemodinamia - Resumen",
+      "enable_embedding": true,
+      "parameters": [
+        {
+          "id": "17e28864",
+          "name": "Seleccionar año",
+          "slug": "seleccionar_a%C3%B1o",
+          "type": "string/="
+        },
+        {
+          "id": "f1sede01",
+          "name": "Sede",
+          "slug": "sede",
+          "type": "string/="
+        },
+        {
+          "id": "f1fact01",
+          "name": "Facturacion",
+          "slug": "facturacion",
+          "type": "string/="
+        }
+      ],
+      "embedding_params": {
+        "seleccionar_a%C3%B1o": "enabled",
+        "sede": "enabled",
+        "facturacion": "enabled"
+      },
+      "dashcard_count": 11,
+      "card_ids": [
+        421,
+        422,
+        425,
+        426,
+        427,
+        428,
+        430,
+        431,
+        432,
+        433,
+        434
+      ]
+    },
+    {
+      "id": 16,
+      "name": "Cardio Insights - Hemodinamia - Evolucion",
+      "enable_embedding": true,
+      "parameters": [
+        {
+          "id": "17e28864",
+          "name": "Seleccionar año",
+          "slug": "seleccionar_a%C3%B1o",
+          "type": "string/="
+        },
+        {
+          "id": "f1sede01",
+          "name": "Sede",
+          "slug": "sede",
+          "type": "string/="
+        },
+        {
+          "id": "f1fact01",
+          "name": "Facturacion",
+          "slug": "facturacion",
+          "type": "string/="
+        }
+      ],
+      "embedding_params": {
+        "seleccionar_a%C3%B1o": "enabled",
+        "sede": "enabled",
+        "facturacion": "enabled"
+      },
+      "dashcard_count": 4,
+      "card_ids": [
+        435,
+        438,
+        439,
+        444
+      ]
+    },
+    {
+      "id": 17,
+      "name": "Cardio Insights - Mortalidad",
+      "enable_embedding": true,
+      "parameters": [
+        {
+          "id": "17e28864",
+          "name": "Seleccionar año",
+          "slug": "seleccionar_a%C3%B1o",
+          "type": "string/="
+        },
+        {
+          "id": "f1sede01",
+          "name": "Sede",
+          "slug": "sede",
+          "type": "string/="
+        },
+        {
+          "id": "f1fact01",
+          "name": "Facturacion",
+          "slug": "facturacion",
+          "type": "string/="
+        }
+      ],
+      "embedding_params": {
+        "seleccionar_a%C3%B1o": "enabled",
+        "sede": "enabled",
+        "facturacion": "enabled"
+      },
+      "dashcard_count": 8,
+      "card_ids": [
+        451,
+        452,
+        453,
+        454,
+        455,
+        456,
+        457,
+        458
+      ]
+    }
+  ],
+  "card_count": 155,
+  "card_ids": [
+    41,
+    42,
+    43,
+    44,
+    45,
+    46,
+    47,
+    48,
+    49,
+    50,
+    51,
+    52,
+    53,
+    54,
+    55,
+    56,
+    57,
+    58,
+    59,
+    60,
+    61,
+    62,
+    63,
+    64,
+    65,
+    68,
+    69,
+    70,
+    71,
+    72,
+    73,
+    74,
+    75,
+    76,
+    77,
+    78,
+    79,
+    80,
+    81,
+    82,
+    83,
+    84,
+    85,
+    86,
+    138,
+    141,
+    144,
+    151,
+    152,
+    154,
+    157,
+    161,
+    163,
+    165,
+    172,
+    178,
+    187,
+    190,
+    191,
+    192,
+    193,
+    195,
+    201,
+    209,
+    212,
+    214,
+    216,
+    220,
+    221,
+    222,
+    224,
+    225,
+    227,
+    233,
+    239,
+    245,
+    248,
+    249,
+    250,
+    252,
+    256,
+    258,
+    263,
+    264,
+    271,
+    274,
+    275,
+    282,
+    288,
+    295,
+    312,
+    314,
+    315,
+    316,
+    318,
+    319,
+    320,
+    321,
+    322,
+    323,
+    336,
+    339,
+    340,
+    341,
+    343,
+    345,
+    346,
+    348,
+    349,
+    353,
+    355,
+    358,
+    359,
+    361,
+    362,
+    370,
+    371,
+    376,
+    381,
+    384,
+    385,
+    386,
+    387,
+    388,
+    389,
+    393,
+    396,
+    399,
+    411,
+    415,
+    416,
+    419,
+    421,
+    422,
+    425,
+    426,
+    427,
+    428,
+    430,
+    431,
+    432,
+    433,
+    434,
+    435,
+    438,
+    439,
+    444,
+    451,
+    452,
+    453,
+    454,
+    455,
+    456,
+    457,
+    458
+  ],
+  "notes": "Full JSON dump of KPI-related dashboards and cards. To roll back after experiments, recreate from these definitions or restore card SQL/dataset_query and dashboard layout/params manually via API."
+}

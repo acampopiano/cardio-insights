@@ -64,3 +64,23 @@ def get_current_claims(token: str = Depends(get_current_token)) -> dict[str, Any
     if not jti or blocklist.contains(jti):
         raise AuthError(detail="Sesión expirada")
     return payload
+
+
+def require_roles(*allowed_roles: str):
+    """Dependency factory: exige que el JWT tenga uno de los roles indicados."""
+    allowed = {role.strip().lower() for role in allowed_roles if role and role.strip()}
+
+    def _dependency(claims: dict[str, Any] = Depends(get_current_claims)) -> dict[str, Any]:
+        role = str(claims.get("role") or "").strip().lower()
+        if role not in allowed:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="No tiene permisos para esta operación",
+            )
+        return claims
+
+    return _dependency
+
+
+# Predicciones ML: solo admin y personal clínico.
+ML_ACCESS_ROLES = ("admin", "clinico")

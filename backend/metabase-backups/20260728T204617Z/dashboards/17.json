@@ -1,0 +1,1765 @@
+{
+  "description": "Mortalidad a 30 días post-acto (cirugía y PTCA) vía sqlsalud_fallece, más desglose por causa.",
+  "archived": false,
+  "view_count": 9,
+  "collection_position": null,
+  "dashcards": [
+    {
+      "size_x": 6,
+      "dashboard_tab_id": null,
+      "series": [],
+      "inline_parameters": [],
+      "action_id": null,
+      "collection_authority_level": null,
+      "card": {
+        "cache_invalidated_at": null,
+        "description": null,
+        "archived": false,
+        "view_count": 4,
+        "collection_position": null,
+        "source_card_id": null,
+        "table_id": null,
+        "result_metadata": [
+          {
+            "database_type": "DECIMAL",
+            "semantic_type": null,
+            "lib/deduplicated-name": "mortalidad_30d_pct",
+            "lib/original-name": "mortalidad_30d_pct",
+            "name": "mortalidad_30d_pct",
+            "lib/source": "source/native",
+            "lib/source-column-alias": "mortalidad_30d_pct",
+            "source": "native",
+            "field_ref": [
+              "field",
+              "mortalidad_30d_pct",
+              {
+                "base-type": "type/Decimal"
+              }
+            ],
+            "effective_type": "type/Decimal",
+            "lib/desired-column-alias": "mortalidad_30d_pct",
+            "display_name": "mortalidad_30d_pct",
+            "fingerprint": {
+              "global": {
+                "distinct-count": 1,
+                "nil%": 0.0
+              },
+              "type": {
+                "type/Number": {
+                  "skewness": null,
+                  "min": 8.88,
+                  "q1": 8.88,
+                  "q3": 8.88,
+                  "excess-kurtosis": null,
+                  "zero-fraction": 0.0,
+                  "mode-fraction": 1.0,
+                  "top-3-fraction": 1.0,
+                  "max": 8.88,
+                  "sd": 0.0,
+                  "avg": 8.88
+                }
+              }
+            },
+            "base_type": "type/Decimal"
+          }
+        ],
+        "embedding_type": null,
+        "initially_published_at": null,
+        "can_write": true,
+        "card_schema": 23,
+        "database_id": 2,
+        "enable_embedding": false,
+        "collection_id": 4,
+        "query_type": "native",
+        "download_perms": "full",
+        "name": "Mortalidad cirugía 30d % (año seleccionado)",
+        "document_id": null,
+        "last_used_at": "2026-07-28T20:25:49.799267Z",
+        "type": "question",
+        "dimensions": null,
+        "query_average_duration": null,
+        "creator_id": 13371339,
+        "moderation_reviews": [],
+        "updated_at": "2026-07-28T20:24:27.488329Z",
+        "made_public_by_id": null,
+        "embedding_params": null,
+        "cache_ttl": null,
+        "dataset_query": {
+          "lib/type": "mbql/query",
+          "database": 2,
+          "stages": [
+            {
+              "template-tags": {
+                "sede": {
+                  "type": "text",
+                  "id": "00cca295-8ca2-4123-9634-d022225889c9",
+                  "name": "sede",
+                  "display-name": "Sede",
+                  "required": false
+                },
+                "anio": {
+                  "required": true,
+                  "id": "5166f106-e200-4fb9-bd52-59be3ea15987",
+                  "name": "anio",
+                  "display-name": "Anio",
+                  "type": "text",
+                  "default": [
+                    "2025"
+                  ]
+                },
+                "facturacion": {
+                  "type": "text",
+                  "id": "5c3526d9-570c-42ff-80f7-a727b11cdae2",
+                  "name": "facturacion",
+                  "display-name": "Facturacion",
+                  "required": false
+                }
+              },
+              "lib/type": "mbql.stage/native",
+              "native": "SELECT ROUND(\n  100.0 * SUM(CASE WHEN sf.Fecha > '1900-01-01' AND DATEDIFF(sf.Fecha, f.FechaRealizado) BETWEEN 0 AND 30 THEN 1 ELSE 0 END)\n  / NULLIF(COUNT(*), 0), 2\n) AS mortalidad_30d_pct\nFROM dat_cirugia d\nJOIN flow_coordina f ON f.Cod = d.CodCoordina\nLEFT JOIN sqlsalud_fallece sf\n  ON sf.NroHistoria = f.CodPac AND sf.NroHistoria > 0\nWHERE f.Realizado = 255\n  AND f.FechaRealizado > '1900-01-01'\n  AND YEAR(f.FechaRealizado) = {{anio}}\n  [[AND (({{sede}} = 'SMI' AND COALESCE(f.Hbritanico, 0) = 0) OR ({{sede}} = 'Britanico' AND f.Hbritanico = 1))]]\n  [[AND (({{facturacion}} = 'FNR' AND f.CodDestinoFact = 3) OR ({{facturacion}} = 'Otro' AND COALESCE(f.CodDestinoFact, 0) <> 3))]]"
+            }
+          ]
+        },
+        "dimension_mappings": null,
+        "id": 451,
+        "legacy_query": null,
+        "parameter_mappings": [],
+        "display": "scalar",
+        "archived_directly": false,
+        "entity_id": "ZcGM4Oy9EhN2ajCjN1nDz",
+        "collection_preview": true,
+        "visualization_settings": {
+          "scalar.field": "mortalidad_30d_pct"
+        },
+        "metabase_version": "v0.62.2.1 (b29c5af)",
+        "parameters": [],
+        "dashboard_id": null,
+        "created_at": "2026-07-28T20:24:27.488329Z",
+        "public_uuid": null
+      },
+      "updated_at": "2026-07-28T20:24:31.654483Z",
+      "col": 0,
+      "id": 561,
+      "parameter_mappings": [
+        {
+          "parameter_id": "17e28864",
+          "card_id": 451,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "anio"
+            ]
+          ]
+        },
+        {
+          "parameter_id": "f1sede01",
+          "card_id": 451,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "sede"
+            ]
+          ]
+        },
+        {
+          "parameter_id": "f1fact01",
+          "card_id": 451,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "facturacion"
+            ]
+          ]
+        }
+      ],
+      "card_id": 451,
+      "entity_id": "-ACkSi5f-4pN8xzRqRE5K",
+      "visualization_settings": {},
+      "size_y": 4,
+      "dashboard_id": 17,
+      "created_at": "2026-07-28T20:24:31.654483Z",
+      "row": 0
+    },
+    {
+      "size_x": 6,
+      "dashboard_tab_id": null,
+      "series": [],
+      "inline_parameters": [],
+      "action_id": null,
+      "collection_authority_level": null,
+      "card": {
+        "cache_invalidated_at": null,
+        "description": null,
+        "archived": false,
+        "view_count": 3,
+        "collection_position": null,
+        "source_card_id": null,
+        "table_id": null,
+        "result_metadata": [
+          {
+            "database_type": "DECIMAL",
+            "semantic_type": null,
+            "lib/deduplicated-name": "muertes_30d",
+            "lib/original-name": "muertes_30d",
+            "name": "muertes_30d",
+            "lib/source": "source/native",
+            "lib/source-column-alias": "muertes_30d",
+            "source": "native",
+            "field_ref": [
+              "field",
+              "muertes_30d",
+              {
+                "base-type": "type/Decimal"
+              }
+            ],
+            "effective_type": "type/Decimal",
+            "lib/desired-column-alias": "muertes_30d",
+            "display_name": "muertes_30d",
+            "fingerprint": {
+              "global": {
+                "distinct-count": 1,
+                "nil%": 0.0
+              },
+              "type": {
+                "type/Number": {
+                  "skewness": null,
+                  "min": 39.0,
+                  "q1": 39.0,
+                  "q3": 39.0,
+                  "excess-kurtosis": null,
+                  "zero-fraction": 0.0,
+                  "mode-fraction": 1.0,
+                  "top-3-fraction": 1.0,
+                  "max": 39.0,
+                  "sd": 0.0,
+                  "avg": 39.0
+                }
+              }
+            },
+            "base_type": "type/Decimal"
+          }
+        ],
+        "embedding_type": null,
+        "initially_published_at": null,
+        "can_write": true,
+        "card_schema": 23,
+        "database_id": 2,
+        "enable_embedding": false,
+        "collection_id": 4,
+        "query_type": "native",
+        "download_perms": "full",
+        "name": "Muertes cirugía 30d (año seleccionado)",
+        "document_id": null,
+        "last_used_at": "2026-07-28T20:24:27.894999Z",
+        "type": "question",
+        "dimensions": null,
+        "query_average_duration": null,
+        "creator_id": 13371339,
+        "moderation_reviews": [],
+        "updated_at": "2026-07-28T20:24:27.894999Z",
+        "made_public_by_id": null,
+        "embedding_params": null,
+        "cache_ttl": null,
+        "dataset_query": {
+          "lib/type": "mbql/query",
+          "database": 2,
+          "stages": [
+            {
+              "template-tags": {
+                "sede": {
+                  "type": "text",
+                  "id": "cff0ccc3-f20d-4f78-8319-e1cf4b1a357c",
+                  "name": "sede",
+                  "display-name": "Sede",
+                  "required": false
+                },
+                "anio": {
+                  "required": true,
+                  "id": "d7c17b2f-bc46-404b-9e73-57f3f5936de3",
+                  "name": "anio",
+                  "display-name": "Anio",
+                  "type": "text",
+                  "default": [
+                    "2025"
+                  ]
+                },
+                "facturacion": {
+                  "type": "text",
+                  "id": "e7b380a1-267d-4a84-ada7-43671e9128b3",
+                  "name": "facturacion",
+                  "display-name": "Facturacion",
+                  "required": false
+                }
+              },
+              "lib/type": "mbql.stage/native",
+              "native": "SELECT SUM(CASE WHEN sf.Fecha > '1900-01-01' AND DATEDIFF(sf.Fecha, f.FechaRealizado) BETWEEN 0 AND 30 THEN 1 ELSE 0 END) AS muertes_30d\nFROM dat_cirugia d\nJOIN flow_coordina f ON f.Cod = d.CodCoordina\nLEFT JOIN sqlsalud_fallece sf\n  ON sf.NroHistoria = f.CodPac AND sf.NroHistoria > 0\nWHERE f.Realizado = 255\n  AND f.FechaRealizado > '1900-01-01'\n  AND YEAR(f.FechaRealizado) = {{anio}}\n  [[AND (({{sede}} = 'SMI' AND COALESCE(f.Hbritanico, 0) = 0) OR ({{sede}} = 'Britanico' AND f.Hbritanico = 1))]]\n  [[AND (({{facturacion}} = 'FNR' AND f.CodDestinoFact = 3) OR ({{facturacion}} = 'Otro' AND COALESCE(f.CodDestinoFact, 0) <> 3))]]"
+            }
+          ]
+        },
+        "dimension_mappings": null,
+        "id": 452,
+        "legacy_query": null,
+        "parameter_mappings": [],
+        "display": "scalar",
+        "archived_directly": false,
+        "entity_id": "JW67t4GBqNH27G_kcuJp9",
+        "collection_preview": true,
+        "visualization_settings": {},
+        "metabase_version": "v0.62.2.1 (b29c5af)",
+        "parameters": [],
+        "dashboard_id": null,
+        "created_at": "2026-07-28T20:24:27.894999Z",
+        "public_uuid": null
+      },
+      "updated_at": "2026-07-28T20:24:31.654483Z",
+      "col": 6,
+      "id": 562,
+      "parameter_mappings": [
+        {
+          "parameter_id": "17e28864",
+          "card_id": 452,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "anio"
+            ]
+          ]
+        },
+        {
+          "parameter_id": "f1sede01",
+          "card_id": 452,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "sede"
+            ]
+          ]
+        },
+        {
+          "parameter_id": "f1fact01",
+          "card_id": 452,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "facturacion"
+            ]
+          ]
+        }
+      ],
+      "card_id": 452,
+      "entity_id": "zp3kcfYyf9hnrGEALSeTR",
+      "visualization_settings": {},
+      "size_y": 4,
+      "dashboard_id": 17,
+      "created_at": "2026-07-28T20:24:31.654483Z",
+      "row": 0
+    },
+    {
+      "size_x": 6,
+      "dashboard_tab_id": null,
+      "series": [],
+      "inline_parameters": [],
+      "action_id": null,
+      "collection_authority_level": null,
+      "card": {
+        "cache_invalidated_at": null,
+        "description": null,
+        "archived": false,
+        "view_count": 4,
+        "collection_position": null,
+        "source_card_id": null,
+        "table_id": null,
+        "result_metadata": [
+          {
+            "database_type": "DECIMAL",
+            "semantic_type": null,
+            "lib/deduplicated-name": "mortalidad_30d_pct",
+            "lib/original-name": "mortalidad_30d_pct",
+            "name": "mortalidad_30d_pct",
+            "lib/source": "source/native",
+            "lib/source-column-alias": "mortalidad_30d_pct",
+            "source": "native",
+            "field_ref": [
+              "field",
+              "mortalidad_30d_pct",
+              {
+                "base-type": "type/Decimal"
+              }
+            ],
+            "effective_type": "type/Decimal",
+            "lib/desired-column-alias": "mortalidad_30d_pct",
+            "display_name": "mortalidad_30d_pct",
+            "fingerprint": {
+              "global": {
+                "distinct-count": 1,
+                "nil%": 0.0
+              },
+              "type": {
+                "type/Number": {
+                  "skewness": null,
+                  "min": 1.79,
+                  "q1": 1.79,
+                  "q3": 1.79,
+                  "excess-kurtosis": null,
+                  "zero-fraction": 0.0,
+                  "mode-fraction": 1.0,
+                  "top-3-fraction": 1.0,
+                  "max": 1.79,
+                  "sd": 0.0,
+                  "avg": 1.79
+                }
+              }
+            },
+            "base_type": "type/Decimal"
+          }
+        ],
+        "embedding_type": null,
+        "initially_published_at": null,
+        "can_write": true,
+        "card_schema": 23,
+        "database_id": 2,
+        "enable_embedding": false,
+        "collection_id": 4,
+        "query_type": "native",
+        "download_perms": "full",
+        "name": "Mortalidad PTCA 30d % (año seleccionado)",
+        "document_id": null,
+        "last_used_at": "2026-07-28T20:25:50.193702Z",
+        "type": "question",
+        "dimensions": null,
+        "query_average_duration": null,
+        "creator_id": 13371339,
+        "moderation_reviews": [],
+        "updated_at": "2026-07-28T20:24:28.506873Z",
+        "made_public_by_id": null,
+        "embedding_params": null,
+        "cache_ttl": null,
+        "dataset_query": {
+          "lib/type": "mbql/query",
+          "database": 2,
+          "stages": [
+            {
+              "template-tags": {
+                "sede": {
+                  "type": "text",
+                  "id": "b902a5b2-a500-4728-a6c7-1238d47ca2aa",
+                  "name": "sede",
+                  "display-name": "Sede",
+                  "required": false
+                },
+                "anio": {
+                  "required": true,
+                  "id": "50a2de2a-5865-4f29-89a5-62e3aa8697e8",
+                  "name": "anio",
+                  "display-name": "Anio",
+                  "type": "text",
+                  "default": [
+                    "2025"
+                  ]
+                },
+                "facturacion": {
+                  "type": "text",
+                  "id": "f386b60b-b813-44f1-a96a-1dd764f4495e",
+                  "name": "facturacion",
+                  "display-name": "Facturacion",
+                  "required": false
+                }
+              },
+              "lib/type": "mbql.stage/native",
+              "native": "SELECT ROUND(\n  100.0 * SUM(CASE WHEN sf.Fecha > '1900-01-01' AND DATEDIFF(sf.Fecha, f.FechaRealizado) BETWEEN 0 AND 30 THEN 1 ELSE 0 END)\n  / NULLIF(COUNT(*), 0), 2\n) AS mortalidad_30d_pct\nFROM call_ptcamaster c\nJOIN flow_coordina f ON f.Cod = c.CodCoordina\nLEFT JOIN sqlsalud_fallece sf\n  ON sf.NroHistoria = f.CodPac AND sf.NroHistoria > 0\nWHERE f.Realizado = 255\n  AND f.FechaRealizado > '1900-01-01'\n  AND YEAR(f.FechaRealizado) = {{anio}}\n  [[AND (({{sede}} = 'SMI' AND COALESCE(f.Hbritanico, 0) = 0) OR ({{sede}} = 'Britanico' AND f.Hbritanico = 1))]]\n  [[AND (({{facturacion}} = 'FNR' AND f.CodDestinoFact = 3) OR ({{facturacion}} = 'Otro' AND COALESCE(f.CodDestinoFact, 0) <> 3))]]"
+            }
+          ]
+        },
+        "dimension_mappings": null,
+        "id": 453,
+        "legacy_query": null,
+        "parameter_mappings": [],
+        "display": "scalar",
+        "archived_directly": false,
+        "entity_id": "HBkJEe_oTb4aMlQmzZipC",
+        "collection_preview": true,
+        "visualization_settings": {
+          "scalar.field": "mortalidad_30d_pct"
+        },
+        "metabase_version": "v0.62.2.1 (b29c5af)",
+        "parameters": [],
+        "dashboard_id": null,
+        "created_at": "2026-07-28T20:24:28.506873Z",
+        "public_uuid": null
+      },
+      "updated_at": "2026-07-28T20:24:31.654483Z",
+      "col": 12,
+      "id": 563,
+      "parameter_mappings": [
+        {
+          "parameter_id": "17e28864",
+          "card_id": 453,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "anio"
+            ]
+          ]
+        },
+        {
+          "parameter_id": "f1sede01",
+          "card_id": 453,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "sede"
+            ]
+          ]
+        },
+        {
+          "parameter_id": "f1fact01",
+          "card_id": 453,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "facturacion"
+            ]
+          ]
+        }
+      ],
+      "card_id": 453,
+      "entity_id": "AA0NM1nSYtP-S4NO_5a2o",
+      "visualization_settings": {},
+      "size_y": 4,
+      "dashboard_id": 17,
+      "created_at": "2026-07-28T20:24:31.654483Z",
+      "row": 0
+    },
+    {
+      "size_x": 6,
+      "dashboard_tab_id": null,
+      "series": [],
+      "inline_parameters": [],
+      "action_id": null,
+      "collection_authority_level": null,
+      "card": {
+        "cache_invalidated_at": null,
+        "description": null,
+        "archived": false,
+        "view_count": 3,
+        "collection_position": null,
+        "source_card_id": null,
+        "table_id": null,
+        "result_metadata": [
+          {
+            "database_type": "DECIMAL",
+            "semantic_type": null,
+            "lib/deduplicated-name": "muertes_30d",
+            "lib/original-name": "muertes_30d",
+            "name": "muertes_30d",
+            "lib/source": "source/native",
+            "lib/source-column-alias": "muertes_30d",
+            "source": "native",
+            "field_ref": [
+              "field",
+              "muertes_30d",
+              {
+                "base-type": "type/Decimal"
+              }
+            ],
+            "effective_type": "type/Decimal",
+            "lib/desired-column-alias": "muertes_30d",
+            "display_name": "muertes_30d",
+            "fingerprint": {
+              "global": {
+                "distinct-count": 1,
+                "nil%": 0.0
+              },
+              "type": {
+                "type/Number": {
+                  "skewness": null,
+                  "min": 11.0,
+                  "q1": 11.0,
+                  "q3": 11.0,
+                  "excess-kurtosis": null,
+                  "zero-fraction": 0.0,
+                  "mode-fraction": 1.0,
+                  "top-3-fraction": 1.0,
+                  "max": 11.0,
+                  "sd": 0.0,
+                  "avg": 11.0
+                }
+              }
+            },
+            "base_type": "type/Decimal"
+          }
+        ],
+        "embedding_type": null,
+        "initially_published_at": null,
+        "can_write": true,
+        "card_schema": 23,
+        "database_id": 2,
+        "enable_embedding": false,
+        "collection_id": 4,
+        "query_type": "native",
+        "download_perms": "full",
+        "name": "Muertes PTCA 30d (año seleccionado)",
+        "document_id": null,
+        "last_used_at": "2026-07-28T20:24:29.224335Z",
+        "type": "question",
+        "dimensions": null,
+        "query_average_duration": null,
+        "creator_id": 13371339,
+        "moderation_reviews": [],
+        "updated_at": "2026-07-28T20:24:29.224335Z",
+        "made_public_by_id": null,
+        "embedding_params": null,
+        "cache_ttl": null,
+        "dataset_query": {
+          "lib/type": "mbql/query",
+          "database": 2,
+          "stages": [
+            {
+              "template-tags": {
+                "sede": {
+                  "type": "text",
+                  "id": "694d0b08-aab2-4666-9ecc-ea6b3edd3876",
+                  "name": "sede",
+                  "display-name": "Sede",
+                  "required": false
+                },
+                "anio": {
+                  "required": true,
+                  "id": "e8578d15-4f49-499b-bd1b-1d23301523c7",
+                  "name": "anio",
+                  "display-name": "Anio",
+                  "type": "text",
+                  "default": [
+                    "2025"
+                  ]
+                },
+                "facturacion": {
+                  "type": "text",
+                  "id": "b9e59962-c1f7-4d09-ae91-ed717c0f939e",
+                  "name": "facturacion",
+                  "display-name": "Facturacion",
+                  "required": false
+                }
+              },
+              "lib/type": "mbql.stage/native",
+              "native": "SELECT SUM(CASE WHEN sf.Fecha > '1900-01-01' AND DATEDIFF(sf.Fecha, f.FechaRealizado) BETWEEN 0 AND 30 THEN 1 ELSE 0 END) AS muertes_30d\nFROM call_ptcamaster c\nJOIN flow_coordina f ON f.Cod = c.CodCoordina\nLEFT JOIN sqlsalud_fallece sf\n  ON sf.NroHistoria = f.CodPac AND sf.NroHistoria > 0\nWHERE f.Realizado = 255\n  AND f.FechaRealizado > '1900-01-01'\n  AND YEAR(f.FechaRealizado) = {{anio}}\n  [[AND (({{sede}} = 'SMI' AND COALESCE(f.Hbritanico, 0) = 0) OR ({{sede}} = 'Britanico' AND f.Hbritanico = 1))]]\n  [[AND (({{facturacion}} = 'FNR' AND f.CodDestinoFact = 3) OR ({{facturacion}} = 'Otro' AND COALESCE(f.CodDestinoFact, 0) <> 3))]]"
+            }
+          ]
+        },
+        "dimension_mappings": null,
+        "id": 454,
+        "legacy_query": null,
+        "parameter_mappings": [],
+        "display": "scalar",
+        "archived_directly": false,
+        "entity_id": "uChjgEgdYYhsO9Y-HFTxf",
+        "collection_preview": true,
+        "visualization_settings": {},
+        "metabase_version": "v0.62.2.1 (b29c5af)",
+        "parameters": [],
+        "dashboard_id": null,
+        "created_at": "2026-07-28T20:24:29.224335Z",
+        "public_uuid": null
+      },
+      "updated_at": "2026-07-28T20:24:31.654483Z",
+      "col": 18,
+      "id": 564,
+      "parameter_mappings": [
+        {
+          "parameter_id": "17e28864",
+          "card_id": 454,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "anio"
+            ]
+          ]
+        },
+        {
+          "parameter_id": "f1sede01",
+          "card_id": 454,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "sede"
+            ]
+          ]
+        },
+        {
+          "parameter_id": "f1fact01",
+          "card_id": 454,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "facturacion"
+            ]
+          ]
+        }
+      ],
+      "card_id": 454,
+      "entity_id": "iCpTqUdzLLtwyqf2IVrxf",
+      "visualization_settings": {},
+      "size_y": 4,
+      "dashboard_id": 17,
+      "created_at": "2026-07-28T20:24:31.654483Z",
+      "row": 0
+    },
+    {
+      "size_x": 12,
+      "dashboard_tab_id": null,
+      "series": [],
+      "inline_parameters": [],
+      "action_id": null,
+      "collection_authority_level": null,
+      "card": {
+        "cache_invalidated_at": null,
+        "description": null,
+        "archived": false,
+        "view_count": 3,
+        "collection_position": null,
+        "source_card_id": null,
+        "table_id": null,
+        "result_metadata": [
+          {
+            "database_type": "INTEGER",
+            "semantic_type": null,
+            "lib/deduplicated-name": "anio",
+            "lib/original-name": "anio",
+            "name": "anio",
+            "lib/source": "source/native",
+            "lib/source-column-alias": "anio",
+            "source": "native",
+            "field_ref": [
+              "field",
+              "anio",
+              {
+                "base-type": "type/Integer"
+              }
+            ],
+            "effective_type": "type/Integer",
+            "lib/desired-column-alias": "anio",
+            "display_name": "anio",
+            "fingerprint": {
+              "global": {
+                "distinct-count": 8,
+                "nil%": 0.0
+              },
+              "type": {
+                "type/Number": {
+                  "skewness": 0.0,
+                  "min": 2019.0,
+                  "q1": 2020.0,
+                  "q3": 2024.0,
+                  "excess-kurtosis": -1.2000000000000002,
+                  "zero-fraction": 0.0,
+                  "mode-fraction": 0.125,
+                  "top-3-fraction": 0.375,
+                  "max": 2026.0,
+                  "sd": 2.449489742783178,
+                  "avg": 2022.5
+                }
+              }
+            },
+            "base_type": "type/Integer"
+          },
+          {
+            "database_type": "DECIMAL",
+            "semantic_type": null,
+            "lib/deduplicated-name": "mortalidad_30d_pct",
+            "lib/original-name": "mortalidad_30d_pct",
+            "name": "mortalidad_30d_pct",
+            "lib/source": "source/native",
+            "lib/source-column-alias": "mortalidad_30d_pct",
+            "source": "native",
+            "field_ref": [
+              "field",
+              "mortalidad_30d_pct",
+              {
+                "base-type": "type/Decimal"
+              }
+            ],
+            "effective_type": "type/Decimal",
+            "lib/desired-column-alias": "mortalidad_30d_pct",
+            "display_name": "mortalidad_30d_pct",
+            "fingerprint": {
+              "global": {
+                "distinct-count": 6,
+                "nil%": 0.0
+              },
+              "type": {
+                "type/Number": {
+                  "skewness": 2.1844987818269175,
+                  "min": 7.73,
+                  "q1": 7.73,
+                  "q3": 8.88,
+                  "excess-kurtosis": 5.013309068014506,
+                  "zero-fraction": 0.0,
+                  "mode-fraction": 0.25,
+                  "top-3-fraction": 0.625,
+                  "max": 11.86,
+                  "sd": 1.4297695868315885,
+                  "avg": 8.55875
+                }
+              }
+            },
+            "base_type": "type/Decimal"
+          }
+        ],
+        "embedding_type": null,
+        "initially_published_at": null,
+        "can_write": true,
+        "card_schema": 23,
+        "database_id": 2,
+        "enable_embedding": false,
+        "collection_id": 4,
+        "query_type": "native",
+        "download_perms": "full",
+        "name": "Mortalidad cirugía 30d % por año",
+        "document_id": null,
+        "last_used_at": "2026-07-28T20:24:29.650684Z",
+        "type": "question",
+        "dimensions": null,
+        "query_average_duration": null,
+        "creator_id": 13371339,
+        "moderation_reviews": [],
+        "updated_at": "2026-07-28T20:24:29.650684Z",
+        "made_public_by_id": null,
+        "embedding_params": null,
+        "cache_ttl": null,
+        "dataset_query": {
+          "lib/type": "mbql/query",
+          "database": 2,
+          "stages": [
+            {
+              "template-tags": {
+                "sede": {
+                  "type": "text",
+                  "id": "285c921d-d8b2-4653-80b1-9099e14d13c4",
+                  "name": "sede",
+                  "display-name": "Sede",
+                  "required": false
+                },
+                "facturacion": {
+                  "type": "text",
+                  "id": "301b1db5-64df-46be-ad14-7c19dfd4a9fe",
+                  "name": "facturacion",
+                  "display-name": "Facturacion",
+                  "required": false
+                }
+              },
+              "lib/type": "mbql.stage/native",
+              "native": "SELECT YEAR(f.FechaRealizado) AS anio,\n  ROUND(\n    100.0 * SUM(CASE WHEN sf.Fecha > '1900-01-01' AND DATEDIFF(sf.Fecha, f.FechaRealizado) BETWEEN 0 AND 30 THEN 1 ELSE 0 END)\n    / NULLIF(COUNT(*), 0), 2\n  ) AS mortalidad_30d_pct\nFROM dat_cirugia d\nJOIN flow_coordina f ON f.Cod = d.CodCoordina\nLEFT JOIN sqlsalud_fallece sf\n  ON sf.NroHistoria = f.CodPac AND sf.NroHistoria > 0\nWHERE f.Realizado = 255\n  AND f.FechaRealizado > '1900-01-01'\n  [[AND (({{sede}} = 'SMI' AND COALESCE(f.Hbritanico, 0) = 0) OR ({{sede}} = 'Britanico' AND f.Hbritanico = 1))]]\n  [[AND (({{facturacion}} = 'FNR' AND f.CodDestinoFact = 3) OR ({{facturacion}} = 'Otro' AND COALESCE(f.CodDestinoFact, 0) <> 3))]]\nGROUP BY YEAR(f.FechaRealizado)\nORDER BY anio"
+            }
+          ]
+        },
+        "dimension_mappings": null,
+        "id": 455,
+        "legacy_query": null,
+        "parameter_mappings": [],
+        "display": "line",
+        "archived_directly": false,
+        "entity_id": "gtJEVBJl1UqdvISmrsV9k",
+        "collection_preview": true,
+        "visualization_settings": {
+          "graph.dimensions": [
+            "anio"
+          ],
+          "graph.x_axis.title_text": "Año",
+          "graph.y_axis.title_text": "% mortalidad 30d",
+          "graph.metrics": [
+            "mortalidad_30d_pct"
+          ]
+        },
+        "metabase_version": "v0.62.2.1 (b29c5af)",
+        "parameters": [],
+        "dashboard_id": null,
+        "created_at": "2026-07-28T20:24:29.650684Z",
+        "public_uuid": null
+      },
+      "updated_at": "2026-07-28T20:24:31.654483Z",
+      "col": 0,
+      "id": 565,
+      "parameter_mappings": [
+        {
+          "parameter_id": "f1sede01",
+          "card_id": 455,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "sede"
+            ]
+          ]
+        },
+        {
+          "parameter_id": "f1fact01",
+          "card_id": 455,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "facturacion"
+            ]
+          ]
+        }
+      ],
+      "card_id": 455,
+      "entity_id": "-A6ujEuj75CdObZDyEs_R",
+      "visualization_settings": {},
+      "size_y": 8,
+      "dashboard_id": 17,
+      "created_at": "2026-07-28T20:24:31.654483Z",
+      "row": 4
+    },
+    {
+      "size_x": 12,
+      "dashboard_tab_id": null,
+      "series": [],
+      "inline_parameters": [],
+      "action_id": null,
+      "collection_authority_level": null,
+      "card": {
+        "cache_invalidated_at": null,
+        "description": null,
+        "archived": false,
+        "view_count": 3,
+        "collection_position": null,
+        "source_card_id": null,
+        "table_id": null,
+        "result_metadata": [
+          {
+            "database_type": "INTEGER",
+            "semantic_type": null,
+            "lib/deduplicated-name": "anio",
+            "lib/original-name": "anio",
+            "name": "anio",
+            "lib/source": "source/native",
+            "lib/source-column-alias": "anio",
+            "source": "native",
+            "field_ref": [
+              "field",
+              "anio",
+              {
+                "base-type": "type/Integer"
+              }
+            ],
+            "effective_type": "type/Integer",
+            "lib/desired-column-alias": "anio",
+            "display_name": "anio",
+            "fingerprint": {
+              "global": {
+                "distinct-count": 39,
+                "nil%": 0.0
+              },
+              "type": {
+                "type/Number": {
+                  "skewness": 0.0,
+                  "min": 1988.0,
+                  "q1": 1997.0,
+                  "q3": 2017.0,
+                  "excess-kurtosis": -1.2000000000000002,
+                  "zero-fraction": 0.0,
+                  "mode-fraction": 0.02564102564102564,
+                  "top-3-fraction": 0.07692307692307693,
+                  "max": 2026.0,
+                  "sd": 11.40175425099138,
+                  "avg": 2007.0
+                }
+              }
+            },
+            "base_type": "type/Integer"
+          },
+          {
+            "database_type": "DECIMAL",
+            "semantic_type": null,
+            "lib/deduplicated-name": "mortalidad_30d_pct",
+            "lib/original-name": "mortalidad_30d_pct",
+            "name": "mortalidad_30d_pct",
+            "lib/source": "source/native",
+            "lib/source-column-alias": "mortalidad_30d_pct",
+            "source": "native",
+            "field_ref": [
+              "field",
+              "mortalidad_30d_pct",
+              {
+                "base-type": "type/Decimal"
+              }
+            ],
+            "effective_type": "type/Decimal",
+            "lib/desired-column-alias": "mortalidad_30d_pct",
+            "display_name": "mortalidad_30d_pct",
+            "fingerprint": {
+              "global": {
+                "distinct-count": 34,
+                "nil%": 0.0
+              },
+              "type": {
+                "type/Number": {
+                  "skewness": -0.13653305464609733,
+                  "min": 0.0,
+                  "q1": 1.08,
+                  "q3": 2.38,
+                  "excess-kurtosis": -0.8830097307437437,
+                  "zero-fraction": 0.1282051282051282,
+                  "mode-fraction": 0.1282051282051282,
+                  "top-3-fraction": 0.20512820512820512,
+                  "max": 3.39,
+                  "sd": 1.0596891174495593,
+                  "avg": 1.7456410256410253
+                }
+              }
+            },
+            "base_type": "type/Decimal"
+          }
+        ],
+        "embedding_type": null,
+        "initially_published_at": null,
+        "can_write": true,
+        "card_schema": 23,
+        "database_id": 2,
+        "enable_embedding": false,
+        "collection_id": 4,
+        "query_type": "native",
+        "download_perms": "full",
+        "name": "Mortalidad PTCA 30d % por año",
+        "document_id": null,
+        "last_used_at": "2026-07-28T20:24:30.048179Z",
+        "type": "question",
+        "dimensions": null,
+        "query_average_duration": null,
+        "creator_id": 13371339,
+        "moderation_reviews": [],
+        "updated_at": "2026-07-28T20:24:30.048179Z",
+        "made_public_by_id": null,
+        "embedding_params": null,
+        "cache_ttl": null,
+        "dataset_query": {
+          "lib/type": "mbql/query",
+          "database": 2,
+          "stages": [
+            {
+              "template-tags": {
+                "sede": {
+                  "type": "text",
+                  "id": "e74f899e-2b42-4999-9518-c077cb977e8d",
+                  "name": "sede",
+                  "display-name": "Sede",
+                  "required": false
+                },
+                "facturacion": {
+                  "type": "text",
+                  "id": "e9457b3b-f648-4756-acb3-6782a4872c44",
+                  "name": "facturacion",
+                  "display-name": "Facturacion",
+                  "required": false
+                }
+              },
+              "lib/type": "mbql.stage/native",
+              "native": "SELECT YEAR(f.FechaRealizado) AS anio,\n  ROUND(\n    100.0 * SUM(CASE WHEN sf.Fecha > '1900-01-01' AND DATEDIFF(sf.Fecha, f.FechaRealizado) BETWEEN 0 AND 30 THEN 1 ELSE 0 END)\n    / NULLIF(COUNT(*), 0), 2\n  ) AS mortalidad_30d_pct\nFROM call_ptcamaster c\nJOIN flow_coordina f ON f.Cod = c.CodCoordina\nLEFT JOIN sqlsalud_fallece sf\n  ON sf.NroHistoria = f.CodPac AND sf.NroHistoria > 0\nWHERE f.Realizado = 255\n  AND f.FechaRealizado > '1900-01-01'\n  [[AND (({{sede}} = 'SMI' AND COALESCE(f.Hbritanico, 0) = 0) OR ({{sede}} = 'Britanico' AND f.Hbritanico = 1))]]\n  [[AND (({{facturacion}} = 'FNR' AND f.CodDestinoFact = 3) OR ({{facturacion}} = 'Otro' AND COALESCE(f.CodDestinoFact, 0) <> 3))]]\nGROUP BY YEAR(f.FechaRealizado)\nORDER BY anio"
+            }
+          ]
+        },
+        "dimension_mappings": null,
+        "id": 456,
+        "legacy_query": null,
+        "parameter_mappings": [],
+        "display": "line",
+        "archived_directly": false,
+        "entity_id": "nNDa80rBkntPRkm-G1KTB",
+        "collection_preview": true,
+        "visualization_settings": {
+          "graph.dimensions": [
+            "anio"
+          ],
+          "graph.x_axis.title_text": "Año",
+          "graph.y_axis.title_text": "% mortalidad 30d",
+          "graph.metrics": [
+            "mortalidad_30d_pct"
+          ]
+        },
+        "metabase_version": "v0.62.2.1 (b29c5af)",
+        "parameters": [],
+        "dashboard_id": null,
+        "created_at": "2026-07-28T20:24:30.048179Z",
+        "public_uuid": null
+      },
+      "updated_at": "2026-07-28T20:24:31.654483Z",
+      "col": 12,
+      "id": 566,
+      "parameter_mappings": [
+        {
+          "parameter_id": "f1sede01",
+          "card_id": 456,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "sede"
+            ]
+          ]
+        },
+        {
+          "parameter_id": "f1fact01",
+          "card_id": 456,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "facturacion"
+            ]
+          ]
+        }
+      ],
+      "card_id": 456,
+      "entity_id": "f6wEqtdHUR4cvaiILD6jR",
+      "visualization_settings": {},
+      "size_y": 8,
+      "dashboard_id": 17,
+      "created_at": "2026-07-28T20:24:31.654483Z",
+      "row": 4
+    },
+    {
+      "size_x": 12,
+      "dashboard_tab_id": null,
+      "series": [],
+      "inline_parameters": [],
+      "action_id": null,
+      "collection_authority_level": null,
+      "card": {
+        "cache_invalidated_at": "2026-07-28T20:30:50.923938Z",
+        "description": null,
+        "archived": false,
+        "view_count": 4,
+        "collection_position": null,
+        "source_card_id": null,
+        "table_id": null,
+        "result_metadata": [
+          {
+            "database_type": "VARCHAR",
+            "semantic_type": null,
+            "lib/deduplicated-name": "causa",
+            "lib/original-name": "causa",
+            "name": "causa",
+            "lib/source": "source/native",
+            "lib/source-column-alias": "causa",
+            "source": "native",
+            "field_ref": [
+              "field",
+              "causa",
+              {
+                "base-type": "type/Text"
+              }
+            ],
+            "effective_type": "type/Text",
+            "lib/desired-column-alias": "causa",
+            "display_name": "causa",
+            "fingerprint": {
+              "global": {
+                "distinct-count": 3,
+                "nil%": 0.0
+              },
+              "type": {
+                "type/Text": {
+                  "percent-json": 0.0,
+                  "percent-url": 0.0,
+                  "percent-email": 0.0,
+                  "percent-state": 0.0,
+                  "percent-blank": 0.0,
+                  "average-length": 9.333333333333334,
+                  "mode-fraction": 0.3333333333333333,
+                  "top-3-fraction": 1.0
+                }
+              }
+            },
+            "base_type": "type/Text"
+          },
+          {
+            "database_type": "BIGINT",
+            "semantic_type": null,
+            "lib/deduplicated-name": "total",
+            "lib/original-name": "total",
+            "name": "total",
+            "lib/source": "source/native",
+            "lib/source-column-alias": "total",
+            "source": "native",
+            "field_ref": [
+              "field",
+              "total",
+              {
+                "base-type": "type/BigInteger"
+              }
+            ],
+            "effective_type": "type/BigInteger",
+            "lib/desired-column-alias": "total",
+            "display_name": "total",
+            "fingerprint": {
+              "global": {
+                "distinct-count": 3,
+                "nil%": 0.0
+              },
+              "type": {
+                "type/Number": {
+                  "skewness": 0.6337161414221205,
+                  "min": 8.0,
+                  "q1": 8.0,
+                  "q3": 77.0,
+                  "excess-kurtosis": null,
+                  "zero-fraction": 0.0,
+                  "mode-fraction": 0.3333333333333333,
+                  "top-3-fraction": 1.0,
+                  "max": 77.0,
+                  "sd": 34.77067730142742,
+                  "avg": 40.0
+                }
+              }
+            },
+            "base_type": "type/BigInteger"
+          }
+        ],
+        "embedding_type": null,
+        "initially_published_at": null,
+        "can_write": true,
+        "card_schema": 23,
+        "database_id": 2,
+        "enable_embedding": false,
+        "collection_id": 4,
+        "query_type": "native",
+        "download_perms": "full",
+        "name": "Todas las muertes del año · por causa",
+        "document_id": null,
+        "last_used_at": "2026-07-28T20:25:50.81923Z",
+        "type": "question",
+        "dimensions": null,
+        "query_average_duration": null,
+        "creator_id": 13371339,
+        "moderation_reviews": [],
+        "updated_at": "2026-07-28T20:30:50.938845Z",
+        "made_public_by_id": null,
+        "embedding_params": null,
+        "cache_ttl": null,
+        "dataset_query": {
+          "lib/type": "mbql/query",
+          "database": 2,
+          "stages": [
+            {
+              "template-tags": {
+                "anio": {
+                  "required": true,
+                  "id": "547bf440-c954-4634-a118-c48a73b4f929",
+                  "name": "anio",
+                  "display-name": "Anio",
+                  "type": "text",
+                  "default": [
+                    "2025"
+                  ]
+                }
+              },
+              "lib/type": "mbql.stage/native",
+              "native": "SELECT COALESCE(NULLIF(TRIM(sf.Tipo), ''), 'Sin identificar') AS causa,\n  COUNT(*) AS total\nFROM sqlsalud_fallece sf\nWHERE sf.Fecha > '1900-01-01'\n  AND sf.NroHistoria > 0\n  AND YEAR(sf.Fecha) = {{anio}}\nGROUP BY causa\nORDER BY total DESC"
+            }
+          ]
+        },
+        "dimension_mappings": null,
+        "id": 457,
+        "legacy_query": null,
+        "parameter_mappings": [],
+        "display": "pie",
+        "archived_directly": false,
+        "entity_id": "oL_OMarBv4JP7V5dbWNmA",
+        "collection_preview": true,
+        "visualization_settings": {
+          "pie.dimension": "causa",
+          "pie.metric": "total",
+          "pie.show_legend": true,
+          "pie.show_labels": true,
+          "pie.percent_visibility": "inside",
+          "pie.slice_threshold": 0,
+          "series_settings": {
+            "Hemorragia": {
+              "color": "#BE123C"
+            },
+            "Vascular": {
+              "color": "#EA580C"
+            },
+            "Otras": {
+              "color": "#64748B"
+            },
+            "Neurológica": {
+              "color": "#7C3AED"
+            },
+            "Tumor": {
+              "color": "#4F46E5"
+            },
+            "Sepsis": {
+              "color": "#CA8A04"
+            },
+            "Pulmonar": {
+              "color": "#0891B2"
+            },
+            "Cardíaca": {
+              "color": "#DC2626"
+            },
+            "Renal": {
+              "color": "#2563EB"
+            },
+            "Suicidio": {
+              "color": "#57534E"
+            },
+            "Sin Identificar": {
+              "color": "#94A3B8"
+            }
+          }
+        },
+        "metabase_version": "v0.62.2.1 (b29c5af)",
+        "parameters": [],
+        "dashboard_id": null,
+        "created_at": "2026-07-28T20:24:30.459196Z",
+        "public_uuid": null
+      },
+      "updated_at": "2026-07-28T20:24:31.654483Z",
+      "col": 0,
+      "id": 567,
+      "parameter_mappings": [
+        {
+          "parameter_id": "17e28864",
+          "card_id": 457,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "anio"
+            ]
+          ]
+        }
+      ],
+      "card_id": 457,
+      "entity_id": "Kyx7XdV6Mb2JX5yq8ziho",
+      "visualization_settings": {},
+      "size_y": 8,
+      "dashboard_id": 17,
+      "created_at": "2026-07-28T20:24:31.654483Z",
+      "row": 12
+    },
+    {
+      "size_x": 12,
+      "dashboard_tab_id": null,
+      "series": [],
+      "inline_parameters": [],
+      "action_id": null,
+      "collection_authority_level": null,
+      "card": {
+        "cache_invalidated_at": "2026-07-28T20:30:51.38022Z",
+        "description": null,
+        "archived": false,
+        "view_count": 3,
+        "collection_position": null,
+        "source_card_id": null,
+        "table_id": null,
+        "result_metadata": [
+          {
+            "database_type": "VARCHAR",
+            "semantic_type": null,
+            "lib/deduplicated-name": "causa",
+            "lib/original-name": "causa",
+            "name": "causa",
+            "lib/source": "source/native",
+            "lib/source-column-alias": "causa",
+            "source": "native",
+            "field_ref": [
+              "field",
+              "causa",
+              {
+                "base-type": "type/Text"
+              }
+            ],
+            "effective_type": "type/Text",
+            "lib/desired-column-alias": "causa",
+            "display_name": "causa",
+            "fingerprint": {
+              "global": {
+                "distinct-count": 3,
+                "nil%": 0.0
+              },
+              "type": {
+                "type/Text": {
+                  "percent-json": 0.0,
+                  "percent-url": 0.0,
+                  "percent-email": 0.0,
+                  "percent-state": 0.0,
+                  "percent-blank": 0.0,
+                  "average-length": 9.333333333333334,
+                  "mode-fraction": 0.3333333333333333,
+                  "top-3-fraction": 1.0
+                }
+              }
+            },
+            "base_type": "type/Text"
+          },
+          {
+            "database_type": "BIGINT",
+            "semantic_type": null,
+            "lib/deduplicated-name": "total",
+            "lib/original-name": "total",
+            "name": "total",
+            "lib/source": "source/native",
+            "lib/source-column-alias": "total",
+            "source": "native",
+            "field_ref": [
+              "field",
+              "total",
+              {
+                "base-type": "type/BigInteger"
+              }
+            ],
+            "effective_type": "type/BigInteger",
+            "lib/desired-column-alias": "total",
+            "display_name": "total",
+            "fingerprint": {
+              "global": {
+                "distinct-count": 3,
+                "nil%": 0.0
+              },
+              "type": {
+                "type/Number": {
+                  "skewness": 1.6066834278056383,
+                  "min": 2.0,
+                  "q1": 2.0,
+                  "q3": 31.0,
+                  "excess-kurtosis": null,
+                  "zero-fraction": 0.0,
+                  "mode-fraction": 0.3333333333333333,
+                  "top-3-fraction": 1.0,
+                  "max": 31.0,
+                  "sd": 15.716233645501712,
+                  "avg": 13.0
+                }
+              }
+            },
+            "base_type": "type/BigInteger"
+          }
+        ],
+        "embedding_type": null,
+        "initially_published_at": null,
+        "can_write": true,
+        "card_schema": 23,
+        "database_id": 2,
+        "enable_embedding": false,
+        "collection_id": 4,
+        "query_type": "native",
+        "download_perms": "full",
+        "name": "Solo muertes 30d post-cirugía · por causa",
+        "document_id": null,
+        "last_used_at": "2026-07-28T20:24:30.887151Z",
+        "type": "question",
+        "dimensions": null,
+        "query_average_duration": null,
+        "creator_id": 13371339,
+        "moderation_reviews": [],
+        "updated_at": "2026-07-28T20:30:51.560998Z",
+        "made_public_by_id": null,
+        "embedding_params": null,
+        "cache_ttl": null,
+        "dataset_query": {
+          "lib/type": "mbql/query",
+          "database": 2,
+          "stages": [
+            {
+              "template-tags": {
+                "sede": {
+                  "type": "text",
+                  "id": "1c3a4ab9-4320-4a99-988e-ae3b1a630b28",
+                  "name": "sede",
+                  "display-name": "Sede",
+                  "required": false
+                },
+                "anio": {
+                  "required": true,
+                  "id": "be0c33d0-e9a7-4bb8-9073-d1171439a95d",
+                  "name": "anio",
+                  "display-name": "Anio",
+                  "type": "text",
+                  "default": [
+                    "2025"
+                  ]
+                },
+                "facturacion": {
+                  "type": "text",
+                  "id": "1131f21a-01e0-49a6-bef4-07bfc6f40079",
+                  "name": "facturacion",
+                  "display-name": "Facturacion",
+                  "required": false
+                }
+              },
+              "lib/type": "mbql.stage/native",
+              "native": "SELECT COALESCE(NULLIF(TRIM(sf.Tipo), ''), 'Sin identificar') AS causa,\n  COUNT(*) AS total\nFROM dat_cirugia d\nJOIN flow_coordina f ON f.Cod = d.CodCoordina\nJOIN sqlsalud_fallece sf\n  ON sf.NroHistoria = f.CodPac AND sf.NroHistoria > 0\nWHERE f.Realizado = 255\n  AND f.FechaRealizado > '1900-01-01'\n  AND YEAR(f.FechaRealizado) = {{anio}}\n  AND sf.Fecha > '1900-01-01' AND DATEDIFF(sf.Fecha, f.FechaRealizado) BETWEEN 0 AND 30\n  [[AND (({{sede}} = 'SMI' AND COALESCE(f.Hbritanico, 0) = 0) OR ({{sede}} = 'Britanico' AND f.Hbritanico = 1))]]\n  [[AND (({{facturacion}} = 'FNR' AND f.CodDestinoFact = 3) OR ({{facturacion}} = 'Otro' AND COALESCE(f.CodDestinoFact, 0) <> 3))]]\nGROUP BY causa\nORDER BY total DESC"
+            }
+          ]
+        },
+        "dimension_mappings": null,
+        "id": 458,
+        "legacy_query": null,
+        "parameter_mappings": [],
+        "display": "row",
+        "archived_directly": false,
+        "entity_id": "WElfn-pzOxxzUDQRm81uO",
+        "collection_preview": true,
+        "visualization_settings": {
+          "graph.dimensions": [
+            "causa"
+          ],
+          "graph.colors": [
+            "#0F766E"
+          ],
+          "graph.x_axis.title_text": "fallecidos",
+          "graph.y_axis.title_text": "",
+          "graph.show_values": true,
+          "series_settings": {
+            "total": {
+              "color": "#0F766E",
+              "title": "fallecidos"
+            }
+          },
+          "graph.metrics": [
+            "total"
+          ]
+        },
+        "metabase_version": "v0.62.2.1 (b29c5af)",
+        "parameters": [],
+        "dashboard_id": null,
+        "created_at": "2026-07-28T20:24:30.887151Z",
+        "public_uuid": null
+      },
+      "updated_at": "2026-07-28T20:24:31.654483Z",
+      "col": 12,
+      "id": 568,
+      "parameter_mappings": [
+        {
+          "parameter_id": "17e28864",
+          "card_id": 458,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "anio"
+            ]
+          ]
+        },
+        {
+          "parameter_id": "f1sede01",
+          "card_id": 458,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "sede"
+            ]
+          ]
+        },
+        {
+          "parameter_id": "f1fact01",
+          "card_id": 458,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "facturacion"
+            ]
+          ]
+        }
+      ],
+      "card_id": 458,
+      "entity_id": "684RjCvq9r02ZDWPKzZs1",
+      "visualization_settings": {},
+      "size_y": 8,
+      "dashboard_id": 17,
+      "created_at": "2026-07-28T20:24:31.654483Z",
+      "row": 12
+    }
+  ],
+  "embedding_type": null,
+  "initially_published_at": "2026-07-28T20:24:31Z",
+  "can_write": true,
+  "can_set_cache_policy": true,
+  "tabs": [],
+  "enable_embedding": true,
+  "collection_id": 4,
+  "show_in_getting_started": false,
+  "name": "Cardio Insights - Mortalidad",
+  "is_remote_synced": false,
+  "width": "fixed",
+  "caveats": null,
+  "collection_authority_level": null,
+  "creator_id": 13371339,
+  "can_restore": false,
+  "moderation_reviews": [],
+  "updated_at": "2026-07-28T20:24:31.595542Z",
+  "made_public_by_id": null,
+  "embedding_params": {
+    "seleccionar_a%C3%B1o": "enabled",
+    "sede": "enabled",
+    "facturacion": "enabled"
+  },
+  "cache_ttl": null,
+  "last_used_param_values": {},
+  "id": 17,
+  "last_viewed_at": "2026-07-28T20:33:00.625872Z",
+  "position": null,
+  "archived_directly": false,
+  "entity_id": "xDVa3QO7IhscftwQBla3h",
+  "param_fields": {},
+  "last-edit-info": {
+    "id": 13371339,
+    "email": "gervasiojaviergarcia@gmail.com",
+    "first_name": "Gervasio",
+    "last_name": "Garcia",
+    "timestamp": "2026-07-28T20:24:31Z"
+  },
+  "collection": {
+    "authority_level": null,
+    "description": null,
+    "archived": false,
+    "slug": "coleccion_personal_de_gervasio_garcia",
+    "archive_operation_id": null,
+    "name": "Colección personal de Gervasio Garcia",
+    "is_remote_synced": false,
+    "personal_owner_id": 13371339,
+    "type": null,
+    "is_sample": false,
+    "effective_location": "/",
+    "id": 4,
+    "archived_directly": null,
+    "entity_id": "kzemoKQszjj-KKvcj0jaa",
+    "location": "/",
+    "namespace": null,
+    "is_personal": true,
+    "created_at": "2026-06-26T19:25:17.578869Z"
+  },
+  "parameters": [
+    {
+      "slug": "seleccionar_a%C3%B1o",
+      "values_query_type": "list",
+      "default": [
+        "2025"
+      ],
+      "name": "Seleccionar año",
+      "type": "string/=",
+      "sectionId": "string",
+      "values_source_type": "static-list",
+      "id": "17e28864",
+      "values_source_config": {
+        "values": [
+          [
+            "2025"
+          ],
+          [
+            "2024"
+          ],
+          [
+            "2023"
+          ],
+          [
+            "2022"
+          ],
+          [
+            "2021"
+          ],
+          [
+            "2020"
+          ],
+          [
+            "2019"
+          ],
+          [
+            "2018"
+          ],
+          [
+            "2017"
+          ],
+          [
+            "2016"
+          ],
+          [
+            "2015"
+          ],
+          [
+            "2014"
+          ],
+          [
+            "2013"
+          ],
+          [
+            "2012"
+          ],
+          [
+            "2011"
+          ],
+          [
+            "2010"
+          ],
+          [
+            "2009"
+          ],
+          [
+            "2008"
+          ],
+          [
+            "2007"
+          ],
+          [
+            "2006"
+          ],
+          [
+            "2005"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "f1sede01",
+      "name": "Sede",
+      "slug": "sede",
+      "type": "string/=",
+      "sectionId": "string",
+      "values_query_type": "list",
+      "values_source_type": "static-list",
+      "values_source_config": {
+        "values": [
+          "SMI",
+          "Britanico"
+        ]
+      }
+    },
+    {
+      "id": "f1fact01",
+      "name": "Facturacion",
+      "slug": "facturacion",
+      "type": "string/=",
+      "sectionId": "string",
+      "values_query_type": "list",
+      "values_source_type": "static-list",
+      "values_source_config": {
+        "values": [
+          "FNR",
+          "Otro"
+        ]
+      }
+    }
+  ],
+  "auto_apply_filters": true,
+  "created_at": "2026-07-28T20:24:31.265971Z",
+  "public_uuid": null,
+  "points_of_interest": null,
+  "can_delete": false
+}

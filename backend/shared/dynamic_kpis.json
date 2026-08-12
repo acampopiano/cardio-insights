@@ -75,5 +75,54 @@
     "description": "Porcentaje de pacientes con espera superior a 30 dias entre coordinacion y realizado.",
     "sql_query_template": "SELECT {period_expr} AS period, ROUND(100.0 * SUM(CASE WHEN DATEDIFF(f.FechaRealizado, f.FechaCoordina) > 30 THEN 1 ELSE 0 END) / NULLIF(COUNT(*), 0), 2) AS value FROM flow_coordina f WHERE f.FechaRealizado > '1900-01-01' AND f.FechaCoordina > '1900-01-01' AND DATEDIFF(f.FechaRealizado, f.FechaCoordina) >= 0 {date_clause} GROUP BY {period_expr} ORDER BY period",
     "default_granularity": "month"
+  },
+  {
+    "key": "espera_maxima_en_dias",
+    "label": "Espera m\u00e1xima en d\u00edas",
+    "description": "M\u00e1ximo de d\u00edas de espera entre coordinaci\u00f3n y realizado por per\u00edodo.",
+    "sql_query_template": "SELECT {period_expr} AS period, MAX(DATEDIFF(f.FechaRealizado, f.FechaCoordina)) AS value FROM flow_coordina f WHERE f.Realizado = 255 AND f.FechaRealizado > '1900-01-01' AND f.FechaCoordina > '1900-01-01' AND DATEDIFF(f.FechaRealizado, f.FechaCoordina) >= 0 {date_clause} GROUP BY {period_expr} ORDER BY period",
+    "default_granularity": "month"
+  },
+  {
+    "key": "dyn_ok",
+    "label": "Dyn",
+    "description": "ok",
+    "sql_query_template": "SELECT {period_expr} AS period, 2 AS value FROM flow_coordina f WHERE 1=1 {date_clause}",
+    "default_granularity": "month"
+  },
+  {
+    "key": "custom_dyn_kpi",
+    "label": "Custom",
+    "description": "custom",
+    "sql_query_template": "SELECT {period_expr} AS period, COUNT(*) AS value FROM flow_coordina f WHERE 1=1 {date_clause}",
+    "default_granularity": "month"
+  },
+  {
+    "key": "integration_dyn_kpi",
+    "label": "Integration KPI",
+    "description": "KPI din\u00e1mico de integraci\u00f3n",
+    "sql_query_template": "SELECT {period_expr} AS period, COUNT(*) AS value FROM flow_coordina f WHERE f.Realizado = 255 {date_clause} GROUP BY {period_expr} ORDER BY period",
+    "default_granularity": "month"
+  },
+  {
+    "key": "dyn_helper",
+    "label": "d",
+    "description": "d",
+    "sql_query_template": "SELECT 1",
+    "default_granularity": "month"
+  },
+  {
+    "key": "reg_kpi_unit",
+    "label": "Reg KPI",
+    "description": "Descripcion valida del KPI",
+    "sql_query_template": "SELECT {period_expr} AS period, COUNT(*) AS value FROM flow_coordina f WHERE f.Realizado = 255 {date_clause} GROUP BY {period_expr} ORDER BY period",
+    "default_granularity": "month"
+  },
+  {
+    "key": "reg_kpi_mysql",
+    "label": "Reg KPI MySQL",
+    "description": "Descripcion valida del KPI",
+    "sql_query_template": "SELECT {period_expr} AS period, COUNT(*) AS value FROM flow_coordina f WHERE f.Realizado = 255 {date_clause} GROUP BY {period_expr} ORDER BY period",
+    "default_granularity": "week"
   }
 ]

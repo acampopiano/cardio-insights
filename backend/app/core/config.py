@@ -35,8 +35,22 @@ class Settings(BaseSettings):
     mysql_password: str = Field(default="cardio")
     mysql_database: str = Field(default="incc")
 
+    # Conversational chat (natural language -> SQL over clinical data).
+    chat_enabled: bool = Field(default=False)
+    openai_api_key: str = Field(default="")
+    openai_model: str = Field(default="gpt-4o-mini")
+    # Dedicated read-only MySQL user used ONLY by the chat to execute generated SQL.
+    chat_mysql_user: str = Field(default="cardio_chat")
+    chat_mysql_password: str = Field(default="cardio_chat_readonly")
+    chat_max_rows: int = Field(default=500)
+    chat_query_timeout_ms: int = Field(default=5000)
+    # Intentos totales de generación de SQL (1 = sin reintento; >1 habilita auto-corrección).
+    chat_max_sql_attempts: int = Field(default=3)
+
     metabase_site_url: str = Field(default="http://localhost:3000")
     metabase_secret_key: str = Field(default="change-me")
+    metabase_default_dashboard_id: int = Field(default=2)
+    metabase_embed_token_ttl_seconds: int = Field(default=3600)
 
     model_config = SettingsConfigDict(
         env_file=".env",

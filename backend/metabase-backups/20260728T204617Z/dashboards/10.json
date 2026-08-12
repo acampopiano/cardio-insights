@@ -1,0 +1,2165 @@
+{
+  "description": null,
+  "archived": false,
+  "view_count": 53,
+  "collection_position": null,
+  "dashcards": [
+    {
+      "size_x": 12,
+      "dashboard_tab_id": null,
+      "series": [],
+      "inline_parameters": [],
+      "action_id": null,
+      "collection_authority_level": null,
+      "card": {
+        "cache_invalidated_at": "2026-07-28T20:11:44.124523Z",
+        "description": null,
+        "archived": false,
+        "view_count": 20,
+        "collection_position": null,
+        "source_card_id": null,
+        "table_id": null,
+        "result_metadata": [
+          {
+            "database_type": "VARCHAR",
+            "semantic_type": null,
+            "lib/deduplicated-name": "Departamento",
+            "lib/original-name": "Departamento",
+            "name": "Departamento",
+            "lib/source": "source/native",
+            "lib/source-column-alias": "Departamento",
+            "source": "native",
+            "field_ref": [
+              "field",
+              "Departamento",
+              {
+                "base-type": "type/Text"
+              }
+            ],
+            "effective_type": "type/Text",
+            "lib/desired-column-alias": "Departamento",
+            "display_name": "Departamento",
+            "fingerprint": {
+              "global": {
+                "distinct-count": 20,
+                "nil%": 0.0
+              },
+              "type": {
+                "type/Text": {
+                  "percent-json": 0.0,
+                  "percent-url": 0.0,
+                  "percent-email": 0.0,
+                  "percent-state": 0.05,
+                  "percent-blank": 0.0,
+                  "average-length": 8.55,
+                  "mode-fraction": 0.05,
+                  "top-3-fraction": 0.15
+                }
+              }
+            },
+            "base_type": "type/Text"
+          },
+          {
+            "database_type": "BIGINT",
+            "semantic_type": null,
+            "lib/deduplicated-name": "TotalRegistros",
+            "lib/original-name": "TotalRegistros",
+            "name": "TotalRegistros",
+            "lib/source": "source/native",
+            "lib/source-column-alias": "TotalRegistros",
+            "source": "native",
+            "field_ref": [
+              "field",
+              "TotalRegistros",
+              {
+                "base-type": "type/BigInteger"
+              }
+            ],
+            "effective_type": "type/BigInteger",
+            "lib/desired-column-alias": "TotalRegistros",
+            "display_name": "TotalRegistros",
+            "fingerprint": {
+              "global": {
+                "distinct-count": 18,
+                "nil%": 0.0
+              },
+              "type": {
+                "type/Number": {
+                  "skewness": 4.110771461888478,
+                  "min": 1.0,
+                  "q1": 8.0,
+                  "q3": 29.0,
+                  "excess-kurtosis": 17.589595177357776,
+                  "zero-fraction": 0.0,
+                  "mode-fraction": 0.1,
+                  "top-3-fraction": 0.25,
+                  "max": 1494.0,
+                  "sd": 332.35580173568263,
+                  "avg": 119.80000000000001
+                }
+              }
+            },
+            "base_type": "type/BigInteger"
+          }
+        ],
+        "embedding_type": null,
+        "initially_published_at": null,
+        "can_write": true,
+        "card_schema": 23,
+        "database_id": 2,
+        "enable_embedding": false,
+        "collection_id": 4,
+        "query_type": "native",
+        "download_perms": "full",
+        "name": "Pacientes por departamento (año seleccionado)",
+        "document_id": null,
+        "last_used_at": "2026-07-27T18:58:45.878494Z",
+        "type": "question",
+        "dimensions": null,
+        "query_average_duration": null,
+        "creator_id": 13371339,
+        "moderation_reviews": [],
+        "updated_at": "2026-07-28T20:11:44.14082Z",
+        "made_public_by_id": null,
+        "embedding_params": null,
+        "cache_ttl": null,
+        "dataset_query": {
+          "lib/type": "mbql/query",
+          "database": 2,
+          "stages": [
+            {
+              "native": "SELECT \n  dir_paissubdiv.Descr AS Departamento,\n  COUNT(*) AS TotalRegistros\nFROM\n  flow_coordina f\n  INNER JOIN pac_ficha ON f.CodPac = pac_ficha.Cod\n  INNER JOIN salud_paciente ON pac_ficha.Cod = salud_paciente.NroHistoria\n  INNER JOIN dir_comunica ON salud_paciente.k_id = dir_comunica.IdRegistro\n  INNER JOIN dir_comunicadir ON dir_comunicadir.IdComunica = dir_comunica.k_id\n  INNER JOIN dir_paislocalidad ON dir_paislocalidad.k_id = dir_comunicadir.IdLocalidad\n  INNER JOIN dir_paissubdiv ON dir_paissubdiv.k_id = dir_paislocalidad.IdPaisSubDiv\nWHERE\n  dir_comunicadir.IdLocalidad > 0 AND DATE_FORMAT(f.FechaRealizado, '%Y') = {{Anio}} AND f.CodCoordinaReglaMotivo IN (101, 108, 119, 105, 109, 120, 138, 171, 172, 260, 261, 262, 263, 264, 265, 266, 267, 268, 112, 113, 117, 128)\n\n      [[AND (({{sede}} = 'SMI' AND COALESCE(f.Hbritanico, 0) = 0) OR ({{sede}} = 'Britanico' AND f.Hbritanico = 1))]]\n      [[AND (({{facturacion}} = 'FNR' AND f.CodDestinoFact = 3) OR ({{facturacion}} = 'Otro' AND COALESCE(f.CodDestinoFact, 0) <> 3))]]\nGROUP BY\n  dir_paissubdiv.Descr\nORDER BY\n  TotalRegistros DESC;",
+              "lib/type": "mbql.stage/native",
+              "template-tags": {
+                "Anio": {
+                  "required": true,
+                  "id": "6bf4ab23-b738-4e81-8d0e-09f6a246030c",
+                  "display-name": "Anio",
+                  "type": "text",
+                  "name": "Anio",
+                  "default": [
+                    "2025"
+                  ]
+                },
+                "sede": {
+                  "type": "text",
+                  "id": "0035189f-2b26-481b-b07a-6a0a53bb6327",
+                  "name": "sede",
+                  "display-name": "Sede",
+                  "required": false
+                },
+                "facturacion": {
+                  "type": "text",
+                  "id": "5207845b-1dfa-4987-aeac-6364b86dcdf0",
+                  "name": "facturacion",
+                  "display-name": "Facturacion",
+                  "required": false
+                }
+              }
+            }
+          ]
+        },
+        "dimension_mappings": null,
+        "id": 345,
+        "legacy_query": null,
+        "parameter_mappings": [],
+        "display": "pie",
+        "archived_directly": false,
+        "entity_id": "P5UAu666NhRAKyv1zfCZG",
+        "collection_preview": true,
+        "visualization_settings": {
+          "pie.rows": [
+            {
+              "key": "Montevideo",
+              "name": "Montevideo",
+              "originalName": "Montevideo",
+              "color": "#509EE3",
+              "defaultColor": true,
+              "enabled": true,
+              "hidden": false,
+              "isOther": false
+            },
+            {
+              "key": "Colonia",
+              "name": "Colonia",
+              "originalName": "Colonia",
+              "color": "#EF8C8C",
+              "defaultColor": false,
+              "enabled": true,
+              "hidden": false,
+              "isOther": false
+            },
+            {
+              "key": "Canelones",
+              "name": "Canelones",
+              "originalName": "Canelones",
+              "color": "#F7C41F",
+              "defaultColor": false,
+              "enabled": true,
+              "hidden": false,
+              "isOther": false
+            },
+            {
+              "key": "Cerro Largo",
+              "name": "Cerro Largo",
+              "originalName": "Cerro Largo",
+              "color": "#689636",
+              "defaultColor": false,
+              "enabled": true,
+              "hidden": false,
+              "isOther": false
+            },
+            {
+              "key": "Florida",
+              "name": "Florida",
+              "originalName": "Florida",
+              "color": "#227FD2",
+              "defaultColor": true,
+              "enabled": true,
+              "hidden": false,
+              "isOther": true
+            },
+            {
+              "key": "Soriano",
+              "name": "Soriano",
+              "originalName": "Soriano",
+              "color": "#88BF4D",
+              "defaultColor": true,
+              "enabled": true,
+              "hidden": false,
+              "isOther": true
+            },
+            {
+              "key": "Treinta y Tres",
+              "name": "Treinta y Tres",
+              "originalName": "Treinta y Tres",
+              "color": "#A7D07C",
+              "defaultColor": true,
+              "enabled": true,
+              "hidden": false,
+              "isOther": true
+            },
+            {
+              "key": "San José",
+              "name": "San José",
+              "originalName": "San José",
+              "color": "#689636",
+              "defaultColor": true,
+              "enabled": true,
+              "hidden": false,
+              "isOther": true
+            },
+            {
+              "key": "Tacuarembó",
+              "name": "Tacuarembó",
+              "originalName": "Tacuarembó",
+              "color": "#A989C5",
+              "defaultColor": true,
+              "enabled": true,
+              "hidden": false,
+              "isOther": true
+            },
+            {
+              "key": "Paysandú",
+              "name": "Paysandú",
+              "originalName": "Paysandú",
+              "color": "#C8B4DA",
+              "defaultColor": true,
+              "enabled": true,
+              "hidden": false,
+              "isOther": true
+            },
+            {
+              "key": "Maldonado",
+              "name": "Maldonado",
+              "originalName": "Maldonado",
+              "color": "#8A5EB0",
+              "defaultColor": true,
+              "enabled": true,
+              "hidden": false,
+              "isOther": true
+            },
+            {
+              "key": "Rivera",
+              "name": "Rivera",
+              "originalName": "Rivera",
+              "color": "#F7C4C4",
+              "defaultColor": true,
+              "enabled": true,
+              "hidden": false,
+              "isOther": true
+            },
+            {
+              "key": "Artigas",
+              "name": "Artigas",
+              "originalName": "Artigas",
+              "color": "#E75454",
+              "defaultColor": true,
+              "enabled": true,
+              "hidden": false,
+              "isOther": true
+            },
+            {
+              "key": "Río Negro",
+              "name": "Río Negro",
+              "originalName": "Río Negro",
+              "color": "#F9D45C",
+              "defaultColor": true,
+              "enabled": true,
+              "hidden": false,
+              "isOther": true
+            },
+            {
+              "key": "Rocha",
+              "name": "Rocha",
+              "originalName": "Rocha",
+              "color": "#FBE499",
+              "defaultColor": true,
+              "enabled": true,
+              "hidden": false,
+              "isOther": true
+            },
+            {
+              "key": "Durazno",
+              "name": "Durazno",
+              "originalName": "Durazno",
+              "color": "#F2A86F",
+              "defaultColor": true,
+              "enabled": true,
+              "hidden": false,
+              "isOther": true
+            },
+            {
+              "key": "Lavalleja",
+              "name": "Lavalleja",
+              "originalName": "Lavalleja",
+              "color": "#F7CBA9",
+              "defaultColor": true,
+              "enabled": true,
+              "hidden": false,
+              "isOther": true
+            },
+            {
+              "key": "Salto",
+              "name": "Salto",
+              "originalName": "Salto",
+              "color": "#ED8535",
+              "defaultColor": true,
+              "enabled": true,
+              "hidden": false,
+              "isOther": true
+            },
+            {
+              "key": "Flores",
+              "name": "Flores",
+              "originalName": "Flores",
+              "color": "#98D9D9",
+              "defaultColor": true,
+              "enabled": true,
+              "hidden": false,
+              "isOther": true
+            },
+            {
+              "key": "Rio Grande do Sul",
+              "name": "Rio Grande do Sul",
+              "originalName": "Rio Grande do Sul",
+              "color": "#C7EAEA",
+              "defaultColor": true,
+              "enabled": true,
+              "hidden": false,
+              "isOther": true
+            }
+          ],
+          "pie.show_labels": false,
+          "pie.percent_visibility": "both",
+          "map.region": "world_countries",
+          "map.type": "region",
+          "pie.show_total": true
+        },
+        "metabase_version": "v0.62.2.1 (b29c5af)",
+        "parameters": [
+          {
+            "slug": "Anio",
+            "values_query_type": "list",
+            "default": [
+              "2025"
+            ],
+            "name": "Anio",
+            "isMultiSelect": false,
+            "type": "string/=",
+            "values_source_type": "static-list",
+            "id": "6bf4ab23-b738-4e81-8d0e-09f6a246030c",
+            "target": [
+              "variable",
+              [
+                "template-tag",
+                "Anio"
+              ]
+            ],
+            "values_source_config": {
+              "values": [
+                [
+                  "2010"
+                ],
+                [
+                  "2011"
+                ],
+                [
+                  "2012"
+                ],
+                [
+                  "2013"
+                ],
+                [
+                  "2014"
+                ],
+                [
+                  "2015"
+                ],
+                [
+                  "2016"
+                ],
+                [
+                  "2017"
+                ],
+                [
+                  "2018"
+                ],
+                [
+                  "2019"
+                ],
+                [
+                  "2020"
+                ],
+                [
+                  "2021"
+                ],
+                [
+                  "2022"
+                ],
+                [
+                  "2023"
+                ],
+                [
+                  "2024"
+                ],
+                [
+                  "2025"
+                ]
+              ]
+            },
+            "required": true
+          }
+        ],
+        "dashboard_id": 10,
+        "created_at": "2026-07-27T18:58:45.878494Z",
+        "public_uuid": null
+      },
+      "updated_at": "2026-07-28T19:27:57.369481Z",
+      "col": 12,
+      "id": 439,
+      "parameter_mappings": [
+        {
+          "parameter_id": "17e28864",
+          "card_id": 345,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "Anio"
+            ]
+          ]
+        },
+        {
+          "parameter_id": "f1sede01",
+          "card_id": 345,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "sede"
+            ]
+          ]
+        },
+        {
+          "parameter_id": "f1fact01",
+          "card_id": 345,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "facturacion"
+            ]
+          ]
+        }
+      ],
+      "card_id": 345,
+      "entity_id": "lqxS5s0ZJFCSmkRHFRTGM",
+      "visualization_settings": {},
+      "size_y": 9,
+      "dashboard_id": 10,
+      "created_at": "2026-07-27T18:58:45.889095Z",
+      "row": 18
+    },
+    {
+      "size_x": 24,
+      "dashboard_tab_id": null,
+      "series": [],
+      "inline_parameters": [],
+      "action_id": null,
+      "collection_authority_level": null,
+      "card": {
+        "cache_invalidated_at": "2026-07-28T20:11:44.759597Z",
+        "description": null,
+        "archived": false,
+        "view_count": 23,
+        "collection_position": null,
+        "source_card_id": null,
+        "table_id": null,
+        "result_metadata": [
+          {
+            "database_type": "VARCHAR",
+            "semantic_type": null,
+            "lib/deduplicated-name": "Periodo",
+            "lib/original-name": "Periodo",
+            "name": "Periodo",
+            "lib/source": "source/native",
+            "lib/source-column-alias": "Periodo",
+            "source": "native",
+            "field_ref": [
+              "field",
+              "Periodo",
+              {
+                "base-type": "type/Text"
+              }
+            ],
+            "effective_type": "type/Text",
+            "lib/desired-column-alias": "Periodo",
+            "display_name": "Periodo",
+            "fingerprint": {
+              "global": {
+                "distinct-count": 13,
+                "nil%": 0.0
+              },
+              "type": {
+                "type/Text": {
+                  "percent-json": 0.0,
+                  "percent-url": 0.0,
+                  "percent-email": 0.0,
+                  "percent-state": 0.0,
+                  "percent-blank": 0.0,
+                  "average-length": 10.692307692307692,
+                  "mode-fraction": 0.07692307692307693,
+                  "top-3-fraction": 0.23076923076923078
+                }
+              }
+            },
+            "base_type": "type/Text"
+          },
+          {
+            "database_type": "BIGINT",
+            "semantic_type": null,
+            "lib/deduplicated-name": "Total",
+            "lib/original-name": "Total",
+            "name": "Total",
+            "lib/source": "source/native",
+            "lib/source-column-alias": "Total",
+            "source": "native",
+            "field_ref": [
+              "field",
+              "Total",
+              {
+                "base-type": "type/BigInteger"
+              }
+            ],
+            "effective_type": "type/BigInteger",
+            "lib/desired-column-alias": "Total",
+            "display_name": "Total",
+            "fingerprint": {
+              "global": {
+                "distinct-count": 13,
+                "nil%": 0.0
+              },
+              "type": {
+                "type/Number": {
+                  "skewness": 3.6032512487989328,
+                  "min": 357.0,
+                  "q1": 377.0,
+                  "q3": 415.0,
+                  "excess-kurtosis": 12.988091553964933,
+                  "zero-fraction": 0.0,
+                  "mode-fraction": 0.07692307692307693,
+                  "top-3-fraction": 0.23076923076923078,
+                  "max": 4709.0,
+                  "sd": 1197.4203254903584,
+                  "avg": 724.4615384615385
+                }
+              }
+            },
+            "base_type": "type/BigInteger"
+          }
+        ],
+        "embedding_type": null,
+        "initially_published_at": null,
+        "can_write": true,
+        "card_schema": 23,
+        "database_id": 2,
+        "enable_embedding": false,
+        "collection_id": 4,
+        "query_type": "native",
+        "download_perms": "full",
+        "name": "Total de Actos (año seleccionado)",
+        "document_id": null,
+        "last_used_at": "2026-07-28T01:33:56.751287Z",
+        "type": "question",
+        "dimensions": null,
+        "query_average_duration": null,
+        "creator_id": 13371339,
+        "moderation_reviews": [],
+        "updated_at": "2026-07-28T20:11:44.775959Z",
+        "made_public_by_id": null,
+        "embedding_params": null,
+        "cache_ttl": null,
+        "dataset_query": {
+          "lib/type": "mbql/query",
+          "database": 2,
+          "stages": [
+            {
+              "native": "SELECT \n    COALESCE(Periodo, 'TOTAL') AS Periodo,\n    Total\nFROM (\n    SELECT \n        DATE_FORMAT(f.FechaRealizado, '%M-%Y') AS Periodo, \n        COUNT(*) AS Total,\n        CASE WHEN DATE_FORMAT(f.FechaRealizado, '%M-%Y') IS NULL THEN 1 ELSE 0 END AS es_total\n    FROM flow_coordina f\n    WHERE f.`Realizado` = 255 \n      AND DATE_FORMAT(f.FechaRealizado, '%Y') = {{anio}} \n\n      [[AND (({{sede}} = 'SMI' AND COALESCE(f.Hbritanico, 0) = 0) OR ({{sede}} = 'Britanico' AND f.Hbritanico = 1))]]\n      [[AND (({{facturacion}} = 'FNR' AND f.CodDestinoFact = 3) OR ({{facturacion}} = 'Otro' AND COALESCE(f.CodDestinoFact, 0) <> 3))]]\n      AND f.CodCoordinaReglaMotivo IN (\n        101, 108, 119, 105, 109, 120, 138, 171, 172,\n        260, 261, 262, 263, 264, 265, 266, 267, 268,\n        112, 113, 117, 128, 124, 125, 126, 127, 228\n      )\n    GROUP BY DATE_FORMAT(f.FechaRealizado, '%M-%Y') WITH ROLLUP\n) AS t\nORDER BY es_total, STR_TO_DATE(Periodo, '%M-%Y');",
+              "lib/type": "mbql.stage/native",
+              "template-tags": {
+                "anio": {
+                  "id": "0d059ae5-c62e-4d3c-89e7-2b1df49e14ea",
+                  "required": true,
+                  "type": "text",
+                  "display-name": "Anio",
+                  "name": "anio",
+                  "default": [
+                    "2025"
+                  ]
+                },
+                "sede": {
+                  "type": "text",
+                  "id": "7bff9a32-e63e-44af-8a92-f94e1dec24dc",
+                  "name": "sede",
+                  "display-name": "Sede",
+                  "required": false
+                },
+                "facturacion": {
+                  "type": "text",
+                  "id": "eef0fbcf-90df-4c63-9171-d02835f7a10f",
+                  "name": "facturacion",
+                  "display-name": "Facturacion",
+                  "required": false
+                }
+              }
+            }
+          ]
+        },
+        "dimension_mappings": null,
+        "id": 339,
+        "legacy_query": null,
+        "parameter_mappings": [],
+        "display": "table",
+        "archived_directly": false,
+        "entity_id": "ViDSCYTRcsjgyfpCs-WEC",
+        "collection_preview": true,
+        "visualization_settings": {
+          "table.pivot_column": "Periodo",
+          "table.cell_column": "Total"
+        },
+        "metabase_version": "v0.62.2.1 (b29c5af)",
+        "parameters": [
+          {
+            "slug": "anio",
+            "values_query_type": "list",
+            "default": [
+              "2025"
+            ],
+            "name": "Anio",
+            "isMultiSelect": false,
+            "type": "string/=",
+            "id": "0d059ae5-c62e-4d3c-89e7-2b1df49e14ea",
+            "target": [
+              "variable",
+              [
+                "template-tag",
+                "anio"
+              ]
+            ],
+            "required": true
+          }
+        ],
+        "dashboard_id": 10,
+        "created_at": "2026-07-27T18:58:45.813141Z",
+        "public_uuid": null
+      },
+      "updated_at": "2026-07-28T20:45:40.739789Z",
+      "col": 0,
+      "id": 440,
+      "parameter_mappings": [
+        {
+          "parameter_id": "17e28864",
+          "card_id": 339,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "anio"
+            ]
+          ]
+        },
+        {
+          "parameter_id": "f1sede01",
+          "card_id": 339,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "sede"
+            ]
+          ]
+        },
+        {
+          "parameter_id": "f1fact01",
+          "card_id": 339,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "facturacion"
+            ]
+          ]
+        }
+      ],
+      "card_id": 339,
+      "entity_id": "aIxPYB0HwnyvyqismjDFd",
+      "visualization_settings": {
+        "column_settings": {
+          "[\"name\",\"Periodo\"]": {}
+        }
+      },
+      "size_y": 9,
+      "dashboard_id": 10,
+      "created_at": "2026-07-27T18:58:45.889095Z",
+      "row": 0
+    },
+    {
+      "size_x": 12,
+      "dashboard_tab_id": null,
+      "series": [],
+      "inline_parameters": [],
+      "action_id": null,
+      "collection_authority_level": null,
+      "card": {
+        "cache_invalidated_at": "2026-07-28T20:11:45.388376Z",
+        "description": null,
+        "archived": false,
+        "view_count": 20,
+        "collection_position": null,
+        "source_card_id": null,
+        "table_id": null,
+        "result_metadata": [
+          {
+            "database_type": "VARCHAR",
+            "semantic_type": null,
+            "lib/deduplicated-name": "Departamento",
+            "lib/original-name": "Departamento",
+            "name": "Departamento",
+            "lib/source": "source/native",
+            "lib/source-column-alias": "Departamento",
+            "source": "native",
+            "field_ref": [
+              "field",
+              "Departamento",
+              {
+                "base-type": "type/Text"
+              }
+            ],
+            "effective_type": "type/Text",
+            "lib/desired-column-alias": "Departamento",
+            "display_name": "Departamento",
+            "fingerprint": {
+              "global": {
+                "distinct-count": 20,
+                "nil%": 0.0
+              },
+              "type": {
+                "type/Text": {
+                  "percent-json": 0.0,
+                  "percent-url": 0.0,
+                  "percent-email": 0.0,
+                  "percent-state": 0.05,
+                  "percent-blank": 0.0,
+                  "average-length": 8.55,
+                  "mode-fraction": 0.05,
+                  "top-3-fraction": 0.15
+                }
+              }
+            },
+            "base_type": "type/Text"
+          },
+          {
+            "database_type": "BIGINT",
+            "semantic_type": null,
+            "lib/deduplicated-name": "TotalRegistros",
+            "lib/original-name": "TotalRegistros",
+            "name": "TotalRegistros",
+            "lib/source": "source/native",
+            "lib/source-column-alias": "TotalRegistros",
+            "source": "native",
+            "field_ref": [
+              "field",
+              "TotalRegistros",
+              {
+                "base-type": "type/BigInteger"
+              }
+            ],
+            "effective_type": "type/BigInteger",
+            "lib/desired-column-alias": "TotalRegistros",
+            "display_name": "TotalRegistros",
+            "fingerprint": {
+              "global": {
+                "distinct-count": 18,
+                "nil%": 0.0
+              },
+              "type": {
+                "type/Number": {
+                  "skewness": 4.110771461888478,
+                  "min": 1.0,
+                  "q1": 8.0,
+                  "q3": 29.0,
+                  "excess-kurtosis": 17.589595177357776,
+                  "zero-fraction": 0.0,
+                  "mode-fraction": 0.1,
+                  "top-3-fraction": 0.25,
+                  "max": 1494.0,
+                  "sd": 332.35580173568263,
+                  "avg": 119.80000000000001
+                }
+              }
+            },
+            "base_type": "type/BigInteger"
+          }
+        ],
+        "embedding_type": null,
+        "initially_published_at": null,
+        "can_write": true,
+        "card_schema": 23,
+        "database_id": 2,
+        "enable_embedding": false,
+        "collection_id": 4,
+        "query_type": "native",
+        "download_perms": "full",
+        "name": "Mapa de pacientes por departamento (año seleccionado)",
+        "document_id": null,
+        "last_used_at": "2026-07-27T18:58:45.857338Z",
+        "type": "question",
+        "dimensions": null,
+        "query_average_duration": null,
+        "creator_id": 13371339,
+        "moderation_reviews": [],
+        "updated_at": "2026-07-28T20:11:45.403207Z",
+        "made_public_by_id": null,
+        "embedding_params": null,
+        "cache_ttl": null,
+        "dataset_query": {
+          "lib/type": "mbql/query",
+          "database": 2,
+          "stages": [
+            {
+              "lib/type": "mbql.stage/native",
+              "native": "SELECT \n  dir_paissubdiv.Descr AS Departamento,\n  COUNT(*) AS TotalRegistros\nFROM\n  flow_coordina f\n  INNER JOIN pac_ficha ON f.CodPac = pac_ficha.Cod\n  INNER JOIN salud_paciente ON pac_ficha.Cod = salud_paciente.NroHistoria\n  INNER JOIN dir_comunica ON salud_paciente.k_id = dir_comunica.IdRegistro\n  INNER JOIN dir_comunicadir ON dir_comunicadir.IdComunica = dir_comunica.k_id\n  INNER JOIN dir_paislocalidad ON dir_paislocalidad.k_id = dir_comunicadir.IdLocalidad\n  INNER JOIN dir_paissubdiv ON dir_paissubdiv.k_id = dir_paislocalidad.IdPaisSubDiv\nWHERE\n  dir_comunicadir.IdLocalidad > 0 AND DATE_FORMAT(f.FechaRealizado, '%Y') = {{Anio}} AND f.CodCoordinaReglaMotivo IN (101, 108, 119, 105, 109, 120, 138, 171, 172, 260, 261, 262, 263, 264, 265, 266, 267, 268, 112, 113, 117, 128)\n\n      [[AND (({{sede}} = 'SMI' AND COALESCE(f.Hbritanico, 0) = 0) OR ({{sede}} = 'Britanico' AND f.Hbritanico = 1))]]\n      [[AND (({{facturacion}} = 'FNR' AND f.CodDestinoFact = 3) OR ({{facturacion}} = 'Otro' AND COALESCE(f.CodDestinoFact, 0) <> 3))]]\nGROUP BY\n  dir_paissubdiv.Descr\nORDER BY\n  TotalRegistros DESC;",
+              "template-tags": {
+                "Anio": {
+                  "type": "text",
+                  "required": true,
+                  "name": "Anio",
+                  "display-name": "Anio",
+                  "id": "8822aa42-5b3b-4e1f-9cf9-bdd7187c1ddf",
+                  "default": "2025"
+                },
+                "sede": {
+                  "type": "text",
+                  "id": "daf73c72-8c83-4549-9a4d-57f82872f206",
+                  "name": "sede",
+                  "display-name": "Sede",
+                  "required": false
+                },
+                "facturacion": {
+                  "type": "text",
+                  "id": "6f3efcf8-f1e5-4505-a2f7-3978a8f2a4db",
+                  "name": "facturacion",
+                  "display-name": "Facturacion",
+                  "required": false
+                }
+              }
+            }
+          ]
+        },
+        "dimension_mappings": null,
+        "id": 343,
+        "legacy_query": null,
+        "parameter_mappings": [],
+        "display": "map",
+        "archived_directly": false,
+        "entity_id": "l-1ladra64GHiZk-A36hr",
+        "collection_preview": true,
+        "visualization_settings": {
+          "map.region": "962796e6-54ef-dda5-6d7b-4eb553d232cf",
+          "map.colors": [
+            "rgb(235, 245, 224)",
+            "rgb(210, 233, 185)",
+            "rgb(185, 221, 147)",
+            "rgb(159, 208, 108)",
+            "hsl(89.30000000000001, 51.9%, 45.6%)"
+          ]
+        },
+        "metabase_version": "v0.62.2.1 (b29c5af)",
+        "parameters": [
+          {
+            "id": "8822aa42-5b3b-4e1f-9cf9-bdd7187c1ddf",
+            "type": "string/=",
+            "target": [
+              "variable",
+              [
+                "template-tag",
+                "Anio"
+              ]
+            ],
+            "name": "Anio",
+            "slug": "Anio",
+            "default": "2025",
+            "required": true,
+            "isMultiSelect": false
+          }
+        ],
+        "dashboard_id": 10,
+        "created_at": "2026-07-27T18:58:45.857338Z",
+        "public_uuid": null
+      },
+      "updated_at": "2026-07-28T20:45:40.741811Z",
+      "col": 0,
+      "id": 441,
+      "parameter_mappings": [
+        {
+          "parameter_id": "17e28864",
+          "card_id": 343,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "Anio"
+            ]
+          ]
+        },
+        {
+          "parameter_id": "f1sede01",
+          "card_id": 343,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "sede"
+            ]
+          ]
+        },
+        {
+          "parameter_id": "f1fact01",
+          "card_id": 343,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "facturacion"
+            ]
+          ]
+        }
+      ],
+      "card_id": 343,
+      "entity_id": "gQxM9fLWnJ5ExDKoJM9gZ",
+      "visualization_settings": {},
+      "size_y": 9,
+      "dashboard_id": 10,
+      "created_at": "2026-07-27T18:58:45.889095Z",
+      "row": 18
+    },
+    {
+      "size_x": 24,
+      "dashboard_tab_id": null,
+      "series": [],
+      "inline_parameters": [],
+      "action_id": null,
+      "collection_authority_level": null,
+      "card": {
+        "cache_invalidated_at": "2026-07-28T20:11:45.908539Z",
+        "description": null,
+        "archived": false,
+        "view_count": 12,
+        "collection_position": null,
+        "source_card_id": null,
+        "table_id": null,
+        "result_metadata": [
+          {
+            "database_type": "VARCHAR",
+            "semantic_type": null,
+            "lib/deduplicated-name": "Medico",
+            "lib/original-name": "Medico",
+            "name": "Medico",
+            "lib/source": "source/native",
+            "lib/source-column-alias": "Medico",
+            "source": "native",
+            "field_ref": [
+              "field",
+              "Medico",
+              {
+                "base-type": "type/Text"
+              }
+            ],
+            "effective_type": "type/Text",
+            "lib/desired-column-alias": "Medico",
+            "display_name": "Medico",
+            "fingerprint": {
+              "global": {
+                "distinct-count": 392,
+                "nil%": 0.0
+              },
+              "type": {
+                "type/Text": {
+                  "percent-json": 0.0,
+                  "percent-url": 0.0,
+                  "percent-email": 0.0,
+                  "percent-state": 0.0,
+                  "percent-blank": 0.0,
+                  "average-length": 28.854591836734695,
+                  "mode-fraction": 0.002551020408163265,
+                  "top-3-fraction": 0.007653061224489796
+                }
+              }
+            },
+            "base_type": "type/Text"
+          },
+          {
+            "database_type": "DECIMAL",
+            "semantic_type": null,
+            "lib/deduplicated-name": "202501",
+            "lib/original-name": "202501",
+            "name": "202501",
+            "lib/source": "source/native",
+            "lib/source-column-alias": "202501",
+            "source": "native",
+            "field_ref": [
+              "field",
+              "202501",
+              {
+                "base-type": "type/Decimal"
+              }
+            ],
+            "effective_type": "type/Decimal",
+            "lib/desired-column-alias": "202501",
+            "display_name": "202501",
+            "fingerprint": {
+              "global": {
+                "distinct-count": 8,
+                "nil%": 0.0
+              },
+              "type": {
+                "type/Number": {
+                  "skewness": 6.401595952029737,
+                  "min": 0.0,
+                  "q1": 0.0,
+                  "q3": 0.0,
+                  "excess-kurtosis": 65.0570319757784,
+                  "zero-fraction": 0.7755102040816327,
+                  "mode-fraction": 0.7755102040816326,
+                  "top-3-fraction": 0.9668367346938775,
+                  "max": 15.0,
+                  "sd": 1.168644043434849,
+                  "avg": 0.42857142857142855
+                }
+              }
+            },
+            "base_type": "type/Decimal"
+          },
+          {
+            "database_type": "DECIMAL",
+            "semantic_type": null,
+            "lib/deduplicated-name": "202502",
+            "lib/original-name": "202502",
+            "name": "202502",
+            "lib/source": "source/native",
+            "lib/source-column-alias": "202502",
+            "source": "native",
+            "field_ref": [
+              "field",
+              "202502",
+              {
+                "base-type": "type/Decimal"
+              }
+            ],
+            "effective_type": "type/Decimal",
+            "lib/desired-column-alias": "202502",
+            "display_name": "202502",
+            "fingerprint": {
+              "global": {
+                "distinct-count": 10,
+                "nil%": 0.0
+              },
+              "type": {
+                "type/Number": {
+                  "skewness": 3.5978683004417777,
+                  "min": 0.0,
+                  "q1": 0.0,
+                  "q3": 1.0,
+                  "excess-kurtosis": 15.560525390608433,
+                  "zero-fraction": 0.7474489795918366,
+                  "mode-fraction": 0.7474489795918368,
+                  "top-3-fraction": 0.9387755102040817,
+                  "max": 9.0,
+                  "sd": 1.2179151201703078,
+                  "avg": 0.5076530612244895
+                }
+              }
+            },
+            "base_type": "type/Decimal"
+          },
+          {
+            "database_type": "DECIMAL",
+            "semantic_type": null,
+            "lib/deduplicated-name": "202503",
+            "lib/original-name": "202503",
+            "name": "202503",
+            "lib/source": "source/native",
+            "lib/source-column-alias": "202503",
+            "source": "native",
+            "field_ref": [
+              "field",
+              "202503",
+              {
+                "base-type": "type/Decimal"
+              }
+            ],
+            "effective_type": "type/Decimal",
+            "lib/desired-column-alias": "202503",
+            "display_name": "202503",
+            "fingerprint": {
+              "global": {
+                "distinct-count": 9,
+                "nil%": 0.0
+              },
+              "type": {
+                "type/Number": {
+                  "skewness": 5.020975533076587,
+                  "min": 0.0,
+                  "q1": 0.0,
+                  "q3": 0.0,
+                  "excess-kurtosis": 36.72996663234557,
+                  "zero-fraction": 0.7551020408163265,
+                  "mode-fraction": 0.7551020408163265,
+                  "top-3-fraction": 0.9566326530612245,
+                  "max": 12.0,
+                  "sd": 1.2114912287930342,
+                  "avg": 0.48214285714285754
+                }
+              }
+            },
+            "base_type": "type/Decimal"
+          },
+          {
+            "database_type": "DECIMAL",
+            "semantic_type": null,
+            "lib/deduplicated-name": "202504",
+            "lib/original-name": "202504",
+            "name": "202504",
+            "lib/source": "source/native",
+            "lib/source-column-alias": "202504",
+            "source": "native",
+            "field_ref": [
+              "field",
+              "202504",
+              {
+                "base-type": "type/Decimal"
+              }
+            ],
+            "effective_type": "type/Decimal",
+            "lib/desired-column-alias": "202504",
+            "display_name": "202504",
+            "fingerprint": {
+              "global": {
+                "distinct-count": 10,
+                "nil%": 0.0
+              },
+              "type": {
+                "type/Number": {
+                  "skewness": 4.228158369829888,
+                  "min": 0.0,
+                  "q1": 0.0,
+                  "q3": 0.0,
+                  "excess-kurtosis": 21.920267896613815,
+                  "zero-fraction": 0.7729591836734694,
+                  "mode-fraction": 0.7729591836734694,
+                  "top-3-fraction": 0.9464285714285714,
+                  "max": 11.0,
+                  "sd": 1.3399021234021198,
+                  "avg": 0.50765306122449
+                }
+              }
+            },
+            "base_type": "type/Decimal"
+          },
+          {
+            "database_type": "DECIMAL",
+            "semantic_type": null,
+            "lib/deduplicated-name": "202505",
+            "lib/original-name": "202505",
+            "name": "202505",
+            "lib/source": "source/native",
+            "lib/source-column-alias": "202505",
+            "source": "native",
+            "field_ref": [
+              "field",
+              "202505",
+              {
+                "base-type": "type/Decimal"
+              }
+            ],
+            "effective_type": "type/Decimal",
+            "lib/desired-column-alias": "202505",
+            "display_name": "202505",
+            "fingerprint": {
+              "global": {
+                "distinct-count": 10,
+                "nil%": 0.0
+              },
+              "type": {
+                "type/Number": {
+                  "skewness": 4.237508172361504,
+                  "min": 0.0,
+                  "q1": 0.0,
+                  "q3": 0.0,
+                  "excess-kurtosis": 22.221466181506013,
+                  "zero-fraction": 0.7729591836734694,
+                  "mode-fraction": 0.7729591836734694,
+                  "top-3-fraction": 0.9489795918367347,
+                  "max": 11.0,
+                  "sd": 1.3226315017652774,
+                  "avg": 0.5025510204081641
+                }
+              }
+            },
+            "base_type": "type/Decimal"
+          },
+          {
+            "database_type": "DECIMAL",
+            "semantic_type": null,
+            "lib/deduplicated-name": "202506",
+            "lib/original-name": "202506",
+            "name": "202506",
+            "lib/source": "source/native",
+            "lib/source-column-alias": "202506",
+            "source": "native",
+            "field_ref": [
+              "field",
+              "202506",
+              {
+                "base-type": "type/Decimal"
+              }
+            ],
+            "effective_type": "type/Decimal",
+            "lib/desired-column-alias": "202506",
+            "display_name": "202506",
+            "fingerprint": {
+              "global": {
+                "distinct-count": 10,
+                "nil%": 0.0
+              },
+              "type": {
+                "type/Number": {
+                  "skewness": 5.496297017302487,
+                  "min": 0.0,
+                  "q1": 0.0,
+                  "q3": 0.0,
+                  "excess-kurtosis": 38.79933888843045,
+                  "zero-fraction": 0.7780612244897959,
+                  "mode-fraction": 0.7780612244897959,
+                  "top-3-fraction": 0.9489795918367347,
+                  "max": 14.0,
+                  "sd": 1.5303785683795554,
+                  "avg": 0.5255102040816327
+                }
+              }
+            },
+            "base_type": "type/Decimal"
+          },
+          {
+            "database_type": "DECIMAL",
+            "semantic_type": null,
+            "lib/deduplicated-name": "202507",
+            "lib/original-name": "202507",
+            "name": "202507",
+            "lib/source": "source/native",
+            "lib/source-column-alias": "202507",
+            "source": "native",
+            "field_ref": [
+              "field",
+              "202507",
+              {
+                "base-type": "type/Decimal"
+              }
+            ],
+            "effective_type": "type/Decimal",
+            "lib/desired-column-alias": "202507",
+            "display_name": "202507",
+            "fingerprint": {
+              "global": {
+                "distinct-count": 11,
+                "nil%": 0.0
+              },
+              "type": {
+                "type/Number": {
+                  "skewness": 4.724127116692146,
+                  "min": 0.0,
+                  "q1": 0.0,
+                  "q3": 0.0,
+                  "excess-kurtosis": 29.1416631735188,
+                  "zero-fraction": 0.7678571428571429,
+                  "mode-fraction": 0.7678571428571429,
+                  "top-3-fraction": 0.9438775510204082,
+                  "max": 13.0,
+                  "sd": 1.4104439948626775,
+                  "avg": 0.5204081632653061
+                }
+              }
+            },
+            "base_type": "type/Decimal"
+          },
+          {
+            "database_type": "DECIMAL",
+            "semantic_type": null,
+            "lib/deduplicated-name": "202508",
+            "lib/original-name": "202508",
+            "name": "202508",
+            "lib/source": "source/native",
+            "lib/source-column-alias": "202508",
+            "source": "native",
+            "field_ref": [
+              "field",
+              "202508",
+              {
+                "base-type": "type/Decimal"
+              }
+            ],
+            "effective_type": "type/Decimal",
+            "lib/desired-column-alias": "202508",
+            "display_name": "202508",
+            "fingerprint": {
+              "global": {
+                "distinct-count": 10,
+                "nil%": 0.0
+              },
+              "type": {
+                "type/Number": {
+                  "skewness": 5.715341019743927,
+                  "min": 0.0,
+                  "q1": 0.0,
+                  "q3": 0.0,
+                  "excess-kurtosis": 47.22656887768038,
+                  "zero-fraction": 0.7780612244897959,
+                  "mode-fraction": 0.7780612244897959,
+                  "top-3-fraction": 0.9566326530612245,
+                  "max": 15.0,
+                  "sd": 1.3224341728616484,
+                  "avg": 0.47704081632653045
+                }
+              }
+            },
+            "base_type": "type/Decimal"
+          },
+          {
+            "database_type": "DECIMAL",
+            "semantic_type": null,
+            "lib/deduplicated-name": "202509",
+            "lib/original-name": "202509",
+            "name": "202509",
+            "lib/source": "source/native",
+            "lib/source-column-alias": "202509",
+            "source": "native",
+            "field_ref": [
+              "field",
+              "202509",
+              {
+                "base-type": "type/Decimal"
+              }
+            ],
+            "effective_type": "type/Decimal",
+            "lib/desired-column-alias": "202509",
+            "display_name": "202509",
+            "fingerprint": {
+              "global": {
+                "distinct-count": 11,
+                "nil%": 0.0
+              },
+              "type": {
+                "type/Number": {
+                  "skewness": 5.844164204095608,
+                  "min": 0.0,
+                  "q1": 0.0,
+                  "q3": 0.0,
+                  "excess-kurtosis": 46.77000970888387,
+                  "zero-fraction": 0.7959183673469388,
+                  "mode-fraction": 0.7959183673469388,
+                  "top-3-fraction": 0.9489795918367347,
+                  "max": 17.0,
+                  "sd": 1.5069973540473438,
+                  "avg": 0.49234693877551033
+                }
+              }
+            },
+            "base_type": "type/Decimal"
+          },
+          {
+            "database_type": "DECIMAL",
+            "semantic_type": null,
+            "lib/deduplicated-name": "202510",
+            "lib/original-name": "202510",
+            "name": "202510",
+            "lib/source": "source/native",
+            "lib/source-column-alias": "202510",
+            "source": "native",
+            "field_ref": [
+              "field",
+              "202510",
+              {
+                "base-type": "type/Decimal"
+              }
+            ],
+            "effective_type": "type/Decimal",
+            "lib/desired-column-alias": "202510",
+            "display_name": "202510",
+            "fingerprint": {
+              "global": {
+                "distinct-count": 11,
+                "nil%": 0.0
+              },
+              "type": {
+                "type/Number": {
+                  "skewness": 5.649414805245606,
+                  "min": 0.0,
+                  "q1": 0.0,
+                  "q3": 0.0,
+                  "excess-kurtosis": 45.40460381447095,
+                  "zero-fraction": 0.7831632653061223,
+                  "mode-fraction": 0.7831632653061225,
+                  "top-3-fraction": 0.9464285714285714,
+                  "max": 17.0,
+                  "sd": 1.496764783651462,
+                  "avg": 0.5102040816326532
+                }
+              }
+            },
+            "base_type": "type/Decimal"
+          },
+          {
+            "database_type": "DECIMAL",
+            "semantic_type": null,
+            "lib/deduplicated-name": "202511",
+            "lib/original-name": "202511",
+            "name": "202511",
+            "lib/source": "source/native",
+            "lib/source-column-alias": "202511",
+            "source": "native",
+            "field_ref": [
+              "field",
+              "202511",
+              {
+                "base-type": "type/Decimal"
+              }
+            ],
+            "effective_type": "type/Decimal",
+            "lib/desired-column-alias": "202511",
+            "display_name": "202511",
+            "fingerprint": {
+              "global": {
+                "distinct-count": 10,
+                "nil%": 0.0
+              },
+              "type": {
+                "type/Number": {
+                  "skewness": 7.9324289371385035,
+                  "min": 0.0,
+                  "q1": 0.0,
+                  "q3": 0.0,
+                  "excess-kurtosis": 85.75152526754923,
+                  "zero-fraction": 0.7602040816326531,
+                  "mode-fraction": 0.7602040816326531,
+                  "top-3-fraction": 0.9566326530612245,
+                  "max": 22.0,
+                  "sd": 1.6433832615331334,
+                  "avg": 0.50765306122449
+                }
+              }
+            },
+            "base_type": "type/Decimal"
+          },
+          {
+            "database_type": "DECIMAL",
+            "semantic_type": null,
+            "lib/deduplicated-name": "202512",
+            "lib/original-name": "202512",
+            "name": "202512",
+            "lib/source": "source/native",
+            "lib/source-column-alias": "202512",
+            "source": "native",
+            "field_ref": [
+              "field",
+              "202512",
+              {
+                "base-type": "type/Decimal"
+              }
+            ],
+            "effective_type": "type/Decimal",
+            "lib/desired-column-alias": "202512",
+            "display_name": "202512",
+            "fingerprint": {
+              "global": {
+                "distinct-count": 11,
+                "nil%": 0.0
+              },
+              "type": {
+                "type/Number": {
+                  "skewness": 5.671360140692051,
+                  "min": 0.0,
+                  "q1": 0.0,
+                  "q3": 0.0,
+                  "excess-kurtosis": 42.17304663019189,
+                  "zero-fraction": 0.7780612244897959,
+                  "mode-fraction": 0.7780612244897959,
+                  "top-3-fraction": 0.9464285714285714,
+                  "max": 15.0,
+                  "sd": 1.4622179452750248,
+                  "avg": 0.49489795918367413
+                }
+              }
+            },
+            "base_type": "type/Decimal"
+          },
+          {
+            "database_type": "DECIMAL",
+            "semantic_type": null,
+            "lib/deduplicated-name": "Total",
+            "lib/original-name": "Total",
+            "name": "Total",
+            "lib/source": "source/native",
+            "lib/source-column-alias": "Total",
+            "source": "native",
+            "field_ref": [
+              "field",
+              "Total",
+              {
+                "base-type": "type/Decimal"
+              }
+            ],
+            "effective_type": "type/Decimal",
+            "lib/desired-column-alias": "Total",
+            "display_name": "Total",
+            "fingerprint": {
+              "global": {
+                "distinct-count": 36,
+                "nil%": 0.0
+              },
+              "type": {
+                "type/Number": {
+                  "skewness": 6.4163862485093155,
+                  "min": 1.0,
+                  "q1": 1.0,
+                  "q3": 4.0,
+                  "excess-kurtosis": 54.956061480056896,
+                  "zero-fraction": 0.0,
+                  "mode-fraction": 0.34438775510204084,
+                  "top-3-fraction": 0.6887755102040817,
+                  "max": 157.0,
+                  "sd": 13.480331675617627,
+                  "avg": 5.956632653061227
+                }
+              }
+            },
+            "base_type": "type/Decimal"
+          }
+        ],
+        "embedding_type": null,
+        "initially_published_at": null,
+        "can_write": true,
+        "card_schema": 23,
+        "database_id": 2,
+        "enable_embedding": false,
+        "collection_id": 4,
+        "query_type": "native",
+        "download_perms": "full",
+        "name": "Actos por mes enviados por los Medicos Tratantes (año seleccionado)",
+        "document_id": null,
+        "last_used_at": "2026-07-27T18:58:45.781239Z",
+        "type": "question",
+        "dimensions": null,
+        "query_average_duration": 495,
+        "creator_id": 13371339,
+        "moderation_reviews": [],
+        "updated_at": "2026-07-28T20:11:45.931396Z",
+        "made_public_by_id": null,
+        "embedding_params": null,
+        "cache_ttl": null,
+        "dataset_query": {
+          "lib/type": "mbql/query",
+          "database": 2,
+          "stages": [
+            {
+              "native": "CALL MedicosPorMes({{anio}});",
+              "lib/type": "mbql.stage/native",
+              "template-tags": {
+                "anio": {
+                  "type": "text",
+                  "display-name": "Anio",
+                  "default": "2025",
+                  "name": "anio",
+                  "id": "c01adace-1c6d-411e-a875-bf04f9a0d478",
+                  "required": true
+                }
+              }
+            }
+          ]
+        },
+        "dimension_mappings": null,
+        "id": 336,
+        "legacy_query": null,
+        "parameter_mappings": [],
+        "display": "table",
+        "archived_directly": false,
+        "entity_id": "gx8KqBXgaVcrNwSFBTDtX",
+        "collection_preview": true,
+        "visualization_settings": {
+          "table.pivot_column": "202504",
+          "table.cell_column": "202501"
+        },
+        "metabase_version": "v0.62.2.1 (b29c5af)",
+        "parameters": [
+          {
+            "id": "c01adace-1c6d-411e-a875-bf04f9a0d478",
+            "type": "string/=",
+            "target": [
+              "variable",
+              [
+                "template-tag",
+                "anio"
+              ]
+            ],
+            "name": "Anio",
+            "slug": "anio",
+            "default": "2025",
+            "required": true,
+            "isMultiSelect": false
+          }
+        ],
+        "dashboard_id": 10,
+        "created_at": "2026-07-27T18:58:45.781239Z",
+        "public_uuid": null
+      },
+      "updated_at": "2026-07-28T20:45:39.567381Z",
+      "col": 0,
+      "id": 442,
+      "parameter_mappings": [
+        {
+          "parameter_id": "17e28864",
+          "card_id": 336,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "anio"
+            ]
+          ]
+        }
+      ],
+      "card_id": 336,
+      "entity_id": "Ha94e4Mkz8cE5krOAxIYB",
+      "visualization_settings": {},
+      "size_y": 7,
+      "dashboard_id": 10,
+      "created_at": "2026-07-27T18:58:45.889095Z",
+      "row": 37
+    },
+    {
+      "size_x": 24,
+      "dashboard_tab_id": null,
+      "series": [],
+      "inline_parameters": [],
+      "action_id": null,
+      "collection_authority_level": null,
+      "card": {
+        "cache_invalidated_at": "2026-07-28T20:11:46.391501Z",
+        "description": null,
+        "archived": false,
+        "view_count": 20,
+        "collection_position": null,
+        "source_card_id": null,
+        "table_id": null,
+        "result_metadata": [
+          {
+            "name": "Procedimiento",
+            "database_type": "VARCHAR",
+            "base_type": "type/Text",
+            "display_name": "Procedimiento",
+            "field_ref": [
+              "field",
+              "Procedimiento",
+              {
+                "base-type": "type/Text"
+              }
+            ]
+          },
+          {
+            "name": "SMI_FNR",
+            "database_type": "DECIMAL",
+            "base_type": "type/Decimal",
+            "display_name": "SMI_FNR",
+            "field_ref": [
+              "field",
+              "SMI_FNR",
+              {
+                "base-type": "type/Decimal"
+              }
+            ]
+          },
+          {
+            "name": "SMI_Otro",
+            "database_type": "DECIMAL",
+            "base_type": "type/Decimal",
+            "display_name": "SMI_Otro",
+            "field_ref": [
+              "field",
+              "SMI_Otro",
+              {
+                "base-type": "type/Decimal"
+              }
+            ]
+          },
+          {
+            "name": "Britanico_FNR",
+            "database_type": "DECIMAL",
+            "base_type": "type/Decimal",
+            "display_name": "Britanico_FNR",
+            "field_ref": [
+              "field",
+              "Britanico_FNR",
+              {
+                "base-type": "type/Decimal"
+              }
+            ]
+          },
+          {
+            "name": "Britanico_Otro",
+            "database_type": "DECIMAL",
+            "base_type": "type/Decimal",
+            "display_name": "Britanico_Otro",
+            "field_ref": [
+              "field",
+              "Britanico_Otro",
+              {
+                "base-type": "type/Decimal"
+              }
+            ]
+          }
+        ],
+        "embedding_type": null,
+        "initially_published_at": null,
+        "can_write": true,
+        "card_schema": 23,
+        "database_id": 2,
+        "enable_embedding": false,
+        "collection_id": 4,
+        "query_type": "native",
+        "download_perms": "full",
+        "name": "Donde se realizo el Acto y a quien se le factura (año seleccionado)",
+        "document_id": null,
+        "last_used_at": "2026-07-27T18:58:45.835922Z",
+        "type": "question",
+        "dimensions": null,
+        "query_average_duration": null,
+        "creator_id": 13371339,
+        "moderation_reviews": [],
+        "updated_at": "2026-07-28T20:11:46.4055Z",
+        "made_public_by_id": null,
+        "embedding_params": null,
+        "cache_ttl": null,
+        "dataset_query": {
+          "lib/type": "mbql/query",
+          "database": 2,
+          "stages": [
+            {
+              "native": "SELECT \n    COALESCE(Procedimiento, 'TOTAL') AS Procedimiento,\n    SMI_FNR,\n    SMI_Otro,\n    Britanico_FNR,\n    Britanico_Otro\nFROM (\n    SELECT \n        sqlflow_coordina.TecnicaDetalle AS Procedimiento,\n        SUM(CASE WHEN sqlflow_coordina.Hbritanico = 0 AND sqlflow_coordina.CodDestinoFact = 3 THEN 1 ELSE 0 END) AS SMI_FNR,\n        SUM(CASE WHEN sqlflow_coordina.Hbritanico = 0 AND sqlflow_coordina.CodDestinoFact <> 3 THEN 1 ELSE 0 END) AS SMI_Otro,\n        SUM(CASE WHEN sqlflow_coordina.Hbritanico = 1 AND sqlflow_coordina.CodDestinoFact = 3 THEN 1 ELSE 0 END) AS Britanico_FNR,\n        SUM(CASE WHEN sqlflow_coordina.Hbritanico = 1 AND sqlflow_coordina.CodDestinoFact <> 3 THEN 1 ELSE 0 END) AS Britanico_Otro,\n        -- Flag para ordenar: 0 = fila normal, 1 = total\n        CASE WHEN sqlflow_coordina.TecnicaDetalle IS NULL THEN 1 ELSE 0 END AS es_total\n    FROM sqlflow_coordina\n    WHERE (\n            (NOT CodCoordinaReglaMotivo = 190 AND CodCoordinaReglaMotivo < 1000)\n            OR (CodCoordinaReglaMotivo = 1004 OR CodCoordinaReglaMotivo = 1031)\n          )\n      AND Realizado = 255\n      AND DATE_FORMAT(FechaRealizado, '%Y') >= {{anio}}\n    GROUP BY sqlflow_coordina.TecnicaDetalle WITH ROLLUP\n) AS t\nORDER BY es_total, Procedimiento;\n\n",
+              "lib/type": "mbql.stage/native",
+              "template-tags": {
+                "anio": {
+                  "type": "text",
+                  "required": true,
+                  "name": "anio",
+                  "display-name": "Anio",
+                  "id": "b7a439b4-0a4d-4f54-91eb-8bd028ff2397",
+                  "default": "2025"
+                }
+              }
+            }
+          ]
+        },
+        "dimension_mappings": null,
+        "id": 341,
+        "legacy_query": null,
+        "parameter_mappings": [],
+        "display": "table",
+        "archived_directly": false,
+        "entity_id": "nolkkG43damQ6PBRVnQkH",
+        "collection_preview": true,
+        "visualization_settings": {
+          "table.pivot_column": "Britanico_Otro",
+          "table.cell_column": "SMI_FNR"
+        },
+        "metabase_version": "v0.62.2.1 (b29c5af)",
+        "parameters": [
+          {
+            "id": "b7a439b4-0a4d-4f54-91eb-8bd028ff2397",
+            "type": "string/=",
+            "target": [
+              "variable",
+              [
+                "template-tag",
+                "anio"
+              ]
+            ],
+            "name": "Anio",
+            "slug": "anio",
+            "default": "2025",
+            "required": true,
+            "isMultiSelect": false
+          }
+        ],
+        "dashboard_id": 10,
+        "created_at": "2026-07-27T18:58:45.835922Z",
+        "public_uuid": null
+      },
+      "updated_at": "2026-07-28T19:27:57.378854Z",
+      "col": 0,
+      "id": 443,
+      "parameter_mappings": [
+        {
+          "parameter_id": "17e28864",
+          "card_id": 341,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "anio"
+            ]
+          ]
+        }
+      ],
+      "card_id": 341,
+      "entity_id": "HTKja5I5gUTtxF6ev-BjD",
+      "visualization_settings": {
+        "table.freeze_rows": false,
+        "table.column_formatting": []
+      },
+      "size_y": 9,
+      "dashboard_id": 10,
+      "created_at": "2026-07-27T18:58:45.889095Z",
+      "row": 9
+    },
+    {
+      "size_x": 24,
+      "dashboard_tab_id": null,
+      "series": [],
+      "inline_parameters": [],
+      "action_id": null,
+      "collection_authority_level": null,
+      "card": {
+        "cache_invalidated_at": "2026-07-28T20:11:46.857813Z",
+        "description": null,
+        "archived": false,
+        "view_count": 21,
+        "collection_position": null,
+        "source_card_id": null,
+        "table_id": null,
+        "result_metadata": null,
+        "embedding_type": null,
+        "initially_published_at": null,
+        "can_write": true,
+        "card_schema": 23,
+        "database_id": 2,
+        "enable_embedding": false,
+        "collection_id": 4,
+        "query_type": "native",
+        "download_perms": "full",
+        "name": "Actos por mes enviados por los Centros Asistenciales (año seleccionado)",
+        "document_id": null,
+        "last_used_at": "2026-07-28T19:58:51.481973Z",
+        "type": "question",
+        "dimensions": null,
+        "query_average_duration": 401,
+        "creator_id": 13371339,
+        "moderation_reviews": [],
+        "updated_at": "2026-07-28T20:11:46.879046Z",
+        "made_public_by_id": null,
+        "embedding_params": null,
+        "cache_ttl": null,
+        "dataset_query": {
+          "lib/type": "mbql/query",
+          "database": 2,
+          "stages": [
+            {
+              "lib/type": "mbql.stage/native",
+              "native": "CALL ActosPorMes({{anio}});",
+              "template-tags": {
+                "anio": {
+                  "name": "anio",
+                  "id": "c01adace-1c6d-411e-a875-bf04f9a0d478",
+                  "type": "text",
+                  "display-name": "Anio",
+                  "default": "2025",
+                  "required": true
+                }
+              }
+            }
+          ]
+        },
+        "dimension_mappings": null,
+        "id": 340,
+        "legacy_query": null,
+        "parameter_mappings": [],
+        "display": "table",
+        "archived_directly": false,
+        "entity_id": "9hXfNVm5xx93dwVYPJWUm",
+        "collection_preview": true,
+        "visualization_settings": {
+          "table.pivot_column": "202504",
+          "table.cell_column": "202501"
+        },
+        "metabase_version": "v0.62.2.1 (b29c5af)",
+        "parameters": [
+          {
+            "id": "c01adace-1c6d-411e-a875-bf04f9a0d478",
+            "type": "string/=",
+            "target": [
+              "variable",
+              [
+                "template-tag",
+                "anio"
+              ]
+            ],
+            "name": "Anio",
+            "slug": "anio",
+            "default": "2025",
+            "required": true,
+            "isMultiSelect": false
+          }
+        ],
+        "dashboard_id": 10,
+        "created_at": "2026-07-27T18:58:45.824997Z",
+        "public_uuid": null
+      },
+      "updated_at": "2026-07-28T20:01:32.753804Z",
+      "col": 0,
+      "id": 444,
+      "parameter_mappings": [
+        {
+          "parameter_id": "17e28864",
+          "card_id": 340,
+          "target": [
+            "variable",
+            [
+              "template-tag",
+              "anio"
+            ]
+          ]
+        }
+      ],
+      "card_id": 340,
+      "entity_id": "W6B9RtTgad-xs2S3Nuc0a",
+      "visualization_settings": {},
+      "size_y": 7,
+      "dashboard_id": 10,
+      "created_at": "2026-07-27T18:58:45.889095Z",
+      "row": 27
+    }
+  ],
+  "embedding_type": null,
+  "initially_published_at": "2026-07-27T18:58:49Z",
+  "can_write": true,
+  "can_set_cache_policy": true,
+  "tabs": [],
+  "enable_embedding": true,
+  "collection_id": 4,
+  "show_in_getting_started": false,
+  "name": "Cardio Insights - Actos - Volumen y origen",
+  "is_remote_synced": false,
+  "width": "fixed",
+  "caveats": null,
+  "collection_authority_level": null,
+  "creator_id": 13371339,
+  "can_restore": false,
+  "moderation_reviews": [],
+  "updated_at": "2026-07-28T01:33:10.353609Z",
+  "made_public_by_id": null,
+  "embedding_params": {
+    "seleccionar_a%C3%B1o": "enabled",
+    "sede": "enabled",
+    "facturacion": "enabled"
+  },
+  "cache_ttl": null,
+  "last_used_param_values": {},
+  "id": 10,
+  "last_viewed_at": "2026-07-28T20:41:36.821278Z",
+  "position": null,
+  "archived_directly": false,
+  "entity_id": "tcRPXgmdppn7Sfs0BKgXh",
+  "param_fields": {},
+  "last-edit-info": {
+    "id": 13371339,
+    "email": "gervasiojaviergarcia@gmail.com",
+    "first_name": "Gervasio",
+    "last_name": "Garcia",
+    "timestamp": "2026-07-28T20:45:40Z"
+  },
+  "collection": {
+    "authority_level": null,
+    "description": null,
+    "archived": false,
+    "slug": "coleccion_personal_de_gervasio_garcia",
+    "archive_operation_id": null,
+    "name": "Colección personal de Gervasio Garcia",
+    "is_remote_synced": false,
+    "personal_owner_id": 13371339,
+    "type": null,
+    "is_sample": false,
+    "effective_location": "/",
+    "id": 4,
+    "archived_directly": null,
+    "entity_id": "kzemoKQszjj-KKvcj0jaa",
+    "location": "/",
+    "namespace": null,
+    "is_personal": true,
+    "created_at": "2026-06-26T19:25:17.578869Z"
+  },
+  "parameters": [
+    {
+      "slug": "seleccionar_a%C3%B1o",
+      "values_query_type": "list",
+      "default": [
+        "2025"
+      ],
+      "name": "Seleccionar año",
+      "type": "string/=",
+      "sectionId": "string",
+      "values_source_type": "static-list",
+      "id": "17e28864",
+      "values_source_config": {
+        "values": [
+          [
+            "2025"
+          ],
+          [
+            "2024"
+          ],
+          [
+            "2023"
+          ],
+          [
+            "2022"
+          ],
+          [
+            "2021"
+          ],
+          [
+            "2020"
+          ],
+          [
+            "2019"
+          ],
+          [
+            "2018"
+          ],
+          [
+            "2017"
+          ],
+          [
+            "2016"
+          ],
+          [
+            "2015"
+          ],
+          [
+            "2014"
+          ],
+          [
+            "2013"
+          ],
+          [
+            "2012"
+          ],
+          [
+            "2011"
+          ],
+          [
+            "2010"
+          ],
+          [
+            "2009"
+          ],
+          [
+            "2008"
+          ],
+          [
+            "2007"
+          ],
+          [
+            "2006"
+          ],
+          [
+            "2005"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "f1sede01",
+      "name": "Sede",
+      "slug": "sede",
+      "type": "string/=",
+      "sectionId": "string",
+      "values_query_type": "list",
+      "values_source_type": "static-list",
+      "values_source_config": {
+        "values": [
+          "SMI",
+          "Britanico"
+        ]
+      }
+    },
+    {
+      "id": "f1fact01",
+      "name": "Facturacion",
+      "slug": "facturacion",
+      "type": "string/=",
+      "sectionId": "string",
+      "values_query_type": "list",
+      "values_source_type": "static-list",
+      "values_source_config": {
+        "values": [
+          "FNR",
+          "Otro"
+        ]
+      }
+    }
+  ],
+  "auto_apply_filters": true,
+  "created_at": "2026-07-27T18:58:45.582676Z",
+  "public_uuid": null,
+  "points_of_interest": null,
+  "can_delete": false
+}

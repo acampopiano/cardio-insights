@@ -11,7 +11,7 @@ from app.services.llm_gateway_client import LLMGatewayClient
 client = TestClient(app)
 
 
-def _get_token(username: str = "clinician", password: str = "Demo1234!") -> str:
+def _get_token(username: str = "dcaraballo", password: str = "Demo1234!") -> str:
     response = client.post(
         "/api/v1/auth/login",
         json={"username": username, "password": password},

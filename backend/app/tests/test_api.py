@@ -11,7 +11,7 @@ from app.main import app
 client = TestClient(app)
 
 
-def _get_token(username: str = "clinician", password: str = "Demo1234!") -> str:
+def _get_token(username: str = "dcaraballo", password: str = "Demo1234!") -> str:
     response = client.post(
         "/api/v1/auth/login",
         json={"username": username, "password": password},
@@ -55,7 +55,7 @@ def test_login_and_me() -> None:
         headers={"Authorization": f"Bearer {token}"},
     )
     assert me_response.status_code == 200
-    assert me_response.json()["user"]["username"] == "clinician"
+    assert me_response.json()["user"]["username"] == "dcaraballo"
 
 
 def test_dashboard_summary_requires_auth() -> None:
@@ -460,39 +460,39 @@ def test_natural_query_suggest_only_does_not_create_kpi() -> None:
 def test_natural_query_human_approve_requires_opt_in() -> None:
     _set_auto_kpi_mode("human_approve")
     _set_auto_kpi_approver_roles("admin,direccion")
-    clinician_token = _get_token("clinician", "Demo1234!")
+    clinico_token = _get_token("dcaraballo", "Demo1234!")
     try:
         without_approval = client.post(
             "/api/v1/natural-query/run",
             json={"question": "Como viene el volumen total de actividad en 2025?"},
-            headers={"Authorization": f"Bearer {clinician_token}"},
+            headers={"Authorization": f"Bearer {clinico_token}"},
         )
         assert without_approval.status_code == 200
         data_no = without_approval.json()
         assert data_no["auto_kpi"]["created"] is False
         assert data_no["auto_kpi"]["status"] == "pending_approval"
 
-        clinician_with_approval = client.post(
+        clinico_with_approval = client.post(
             "/api/v1/natural-query/run",
             json={
                 "question": "Como viene el volumen total de actividad en 2025?",
                 "approve_auto_kpi": True,
             },
-            headers={"Authorization": f"Bearer {clinician_token}"},
+            headers={"Authorization": f"Bearer {clinico_token}"},
         )
-        assert clinician_with_approval.status_code == 200
-        data_clinician = clinician_with_approval.json()
-        assert data_clinician["auto_kpi"]["created"] is False
-        assert data_clinician["auto_kpi"]["status"] == "not_authorized"
+        assert clinico_with_approval.status_code == 200
+        data_clinico = clinico_with_approval.json()
+        assert data_clinico["auto_kpi"]["created"] is False
+        assert data_clinico["auto_kpi"]["status"] == "not_authorized"
 
-        _set_auto_kpi_approver_roles("clinician")
+        _set_auto_kpi_approver_roles("clinico")
         approved_with_role = client.post(
             "/api/v1/natural-query/run",
             json={
                 "question": "Como viene el volumen total de actividad en 2025?",
                 "approve_auto_kpi": True,
             },
-            headers={"Authorization": f"Bearer {clinician_token}"},
+            headers={"Authorization": f"Bearer {clinico_token}"},
         )
         assert approved_with_role.status_code == 200
         data_yes = approved_with_role.json()

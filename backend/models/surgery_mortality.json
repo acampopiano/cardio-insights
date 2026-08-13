@@ -1,0 +1,578 @@
+{
+  "cohort": "surgery",
+  "title": "Mortalidad quirúrgica (30 días)",
+  "description": "Estima la probabilidad de mortalidad a 30 días de una cirugía cardíaca a partir del EuroSCORE (opcional), comorbilidades, función cardíaca y tipo de procedimiento.",
+  "version": "v1",
+  "trained_at": "2026-07-24T19:28:12.001951+00:00",
+  "n_samples": 1513,
+  "n_deaths": 115,
+  "outcome": "mortalidad",
+  "target": "mortalidad a 30 días",
+  "metrics": {
+    "cutoff_test_year": 2024,
+    "n_train": 925,
+    "n_test": 588,
+    "base_rate": 0.0867,
+    "auc_roc": 0.792,
+    "auc_pr": 0.354,
+    "brier": 0.0709,
+    "cv_auc_roc_mean": 0.714,
+    "youden_threshold": 0.0787,
+    "roc_curve": {
+      "fpr": [
+        0.0,
+        0.0019,
+        0.0074,
+        0.0093,
+        0.0112,
+        0.0186,
+        0.0261,
+        0.0391,
+        0.0447,
+        0.0521,
+        0.067,
+        0.0801,
+        0.0968,
+        0.1043,
+        0.1266,
+        0.1415,
+        0.1527,
+        0.1546,
+        0.1713,
+        0.1881,
+        0.1993,
+        0.2216,
+        0.2346,
+        0.27,
+        0.2812,
+        0.311,
+        0.3222,
+        0.3575,
+        0.3836,
+        0.3892,
+        0.3929,
+        0.3966,
+        0.4264,
+        0.4786,
+        0.4842,
+        0.5922,
+        0.622,
+        0.7095,
+        0.7952,
+        1.0
+      ],
+      "tpr": [
+        0.0,
+        0.0196,
+        0.0784,
+        0.1569,
+        0.1765,
+        0.2549,
+        0.2745,
+        0.3137,
+        0.3333,
+        0.3529,
+        0.3725,
+        0.3922,
+        0.4314,
+        0.451,
+        0.4706,
+        0.4902,
+        0.5294,
+        0.5686,
+        0.5882,
+        0.6078,
+        0.6275,
+        0.6667,
+        0.6667,
+        0.6863,
+        0.7059,
+        0.7059,
+        0.7255,
+        0.7451,
+        0.7647,
+        0.7647,
+        0.8039,
+        0.8235,
+        0.8431,
+        0.8627,
+        0.8824,
+        0.902,
+        0.9216,
+        0.9608,
+        0.9804,
+        1.0
+      ]
+    }
+  },
+  "base_rate": 0.076,
+  "youden_threshold": 0.0787,
+  "categorical_vocab": {
+    "sexo": [
+      "1",
+      "2"
+    ],
+    "clase_cirugia": [
+      "1",
+      "2",
+      "3",
+      "4"
+    ],
+    "prioridad": [
+      "-1",
+      "105",
+      "106",
+      "120"
+    ]
+  },
+  "odds_ratios": [
+    {
+      "feature": "cat__clase_cirugia_4",
+      "odds_ratio": 5.607
+    },
+    {
+      "feature": "bin__CCHemo_EnfermedadAO",
+      "odds_ratio": 0.21
+    },
+    {
+      "feature": "cat__prioridad_106",
+      "odds_ratio": 4.205
+    },
+    {
+      "feature": "bin__SC_IAM",
+      "odds_ratio": 0.242
+    },
+    {
+      "feature": "bin__Procedimiento_Aortico",
+      "odds_ratio": 2.806
+    },
+    {
+      "feature": "bin__FR_FallaRen",
+      "odds_ratio": 2.619
+    },
+    {
+      "feature": "bin__FR_Cig",
+      "odds_ratio": 0.4
+    },
+    {
+      "feature": "bin__FR_Eceva",
+      "odds_ratio": 0.406
+    },
+    {
+      "feature": "num__vasos",
+      "odds_ratio": 0.451
+    },
+    {
+      "feature": "bin__Procedimiento_Tricuspide",
+      "odds_ratio": 0.455
+    },
+    {
+      "feature": "bin__FR_Diab",
+      "odds_ratio": 2.118
+    },
+    {
+      "feature": "bin__Procedimiento_ByPass",
+      "odds_ratio": 0.48
+    },
+    {
+      "feature": "cat__prioridad_-1",
+      "odds_ratio": 0.503
+    },
+    {
+      "feature": "bin__FR_AF",
+      "odds_ratio": 0.511
+    },
+    {
+      "feature": "cat__clase_cirugia_1",
+      "odds_ratio": 0.512
+    }
+  ],
+  "feature_means": [
+    -1.4976637100197915e-16,
+    4.1100449033731525e-16,
+    1.3160508887410562e-16,
+    -1.816862001964235e-16,
+    -5.981115580779677e-16,
+    3.346078646590029e-17,
+    3.3754302136653803e-16,
+    -1.1582128367933556e-15,
+    7.909513537630246e-16,
+    0.3364177131526768,
+    0.6635822868473232,
+    0.767349636483807,
+    0.1830799735624587,
+    0.036351619299405155,
+    0.013218770654329148,
+    0.0019828155981493722,
+    0.9788499669530734,
+    0.0013218770654329147,
+    0.01784534038334435,
+    0.10112359550561797,
+    0.2696629213483146,
+    0.12161269001982816,
+    0.07402511566424323,
+    0.1394580304031725,
+    0.007931262392597489,
+    0.0026437541308658294,
+    0.028420356906807668,
+    0.01255783212161269,
+    0.003304692663582287,
+    0.009253139458030404,
+    0.0039656311962987445,
+    0.05023132848645076,
+    0.0026437541308658294,
+    0.0013218770654329147,
+    0.011235955056179775,
+    0.13879709187045605,
+    0.0,
+    0.0013218770654329147,
+    0.0019828155981493722,
+    0.14937210839391937,
+    0.18506278916060806,
+    0.16391275611368142,
+    0.06873760740251157,
+    0.003304692663582287,
+    0.0006609385327164573,
+    0.018506278916060808,
+    0.15399867812293458,
+    0.06477197620621282,
+    0.01255783212161269
+  ],
+  "features": [
+    {
+      "key": "euroscore",
+      "kind": "number",
+      "label": "EuroSCORE II",
+      "group": "Evaluación",
+      "unit": "%",
+      "min": 0,
+      "max": 100,
+      "step": 0.1,
+      "help": "Score internacional de riesgo quirúrgico. Opcional: dejar vacío si no se calculó."
+    },
+    {
+      "key": "edad",
+      "kind": "number",
+      "label": "Edad",
+      "group": "Demografía",
+      "unit": "años",
+      "min": 0,
+      "max": 110,
+      "step": 1
+    },
+    {
+      "key": "sexo",
+      "kind": "select",
+      "label": "Sexo",
+      "group": "Demografía",
+      "options": [
+        {
+          "value": "1",
+          "label": "Masculino"
+        },
+        {
+          "value": "2",
+          "label": "Femenino"
+        }
+      ]
+    },
+    {
+      "key": "creatinina",
+      "kind": "number",
+      "label": "Creatinina",
+      "group": "Laboratorio",
+      "unit": "mg/dL",
+      "min": 0.1,
+      "max": 20,
+      "step": 0.1
+    },
+    {
+      "key": "hto_pre",
+      "kind": "number",
+      "label": "Hematocrito preoperatorio",
+      "group": "Laboratorio",
+      "unit": "%",
+      "min": 10,
+      "max": 60,
+      "step": 1
+    },
+    {
+      "key": "fe",
+      "kind": "number",
+      "label": "Fracción de eyección",
+      "group": "Función cardíaca",
+      "unit": "%",
+      "min": 5,
+      "max": 90,
+      "step": 1
+    },
+    {
+      "key": "vasos",
+      "kind": "number",
+      "label": "Vasos coronarios afectados",
+      "group": "Función cardíaca",
+      "min": 0,
+      "max": 5,
+      "step": 1
+    },
+    {
+      "key": "nyha",
+      "kind": "number",
+      "label": "Clase funcional (NYHA)",
+      "group": "Función cardíaca",
+      "min": 1,
+      "max": 4,
+      "step": 1
+    },
+    {
+      "key": "insuf_mi",
+      "kind": "number",
+      "label": "Insuficiencia mitral (grado)",
+      "group": "Función cardíaca",
+      "min": 0,
+      "max": 4,
+      "step": 1
+    },
+    {
+      "key": "asa",
+      "kind": "number",
+      "label": "Clasificación de riesgo (ASA)",
+      "group": "Evaluación",
+      "min": 1,
+      "max": 6,
+      "step": 1
+    },
+    {
+      "key": "clase_cirugia",
+      "kind": "select",
+      "label": "Clase de cirugía",
+      "group": "Procedimiento",
+      "options": [
+        {
+          "value": "1",
+          "label": "Clase 1"
+        },
+        {
+          "value": "2",
+          "label": "Clase 2"
+        },
+        {
+          "value": "3",
+          "label": "Clase 3"
+        },
+        {
+          "value": "4",
+          "label": "Clase 4"
+        }
+      ]
+    },
+    {
+      "key": "prioridad",
+      "kind": "select",
+      "label": "Prioridad / urgencia",
+      "group": "Procedimiento",
+      "options": [
+        {
+          "value": "109",
+          "label": "Electiva / coordinada (109)"
+        },
+        {
+          "value": "105",
+          "label": "Prioritaria (105)"
+        },
+        {
+          "value": "120",
+          "label": "Urgente (120)"
+        },
+        {
+          "value": "106",
+          "label": "Emergencia (106)"
+        },
+        {
+          "value": "-1",
+          "label": "Otro"
+        }
+      ]
+    },
+    {
+      "key": "Procedimiento_ByPass",
+      "kind": "bool",
+      "label": "Bypass coronario (CRM)",
+      "group": "Procedimiento"
+    },
+    {
+      "key": "Procedimiento_Aortico",
+      "kind": "bool",
+      "label": "Cirugía de válvula aórtica",
+      "group": "Procedimiento"
+    },
+    {
+      "key": "Procedimiento_Mitral",
+      "kind": "bool",
+      "label": "Cirugía de válvula mitral",
+      "group": "Procedimiento"
+    },
+    {
+      "key": "Procedimiento_Tricuspide",
+      "kind": "bool",
+      "label": "Cirugía de válvula tricúspide",
+      "group": "Procedimiento"
+    },
+    {
+      "key": "Procedimiento_Combinado",
+      "kind": "bool",
+      "label": "Cirugía combinada",
+      "group": "Procedimiento"
+    },
+    {
+      "key": "IP_CCprevio",
+      "kind": "bool",
+      "label": "Cirugía cardíaca previa (reintervención)",
+      "group": "Procedimiento"
+    },
+    {
+      "key": "CCHemo_EnfermedadAO",
+      "kind": "bool",
+      "label": "Enfermedad aórtica",
+      "group": "Procedimiento"
+    },
+    {
+      "key": "CCHemo_EnfermedadMI",
+      "kind": "bool",
+      "label": "Enfermedad mitral",
+      "group": "Procedimiento"
+    },
+    {
+      "key": "DatosCC_CondicionesIAM",
+      "kind": "bool",
+      "label": "IAM reciente",
+      "group": "Procedimiento"
+    },
+    {
+      "key": "FR_Cig",
+      "kind": "bool",
+      "label": "Tabaquismo",
+      "group": "Factores de riesgo"
+    },
+    {
+      "key": "FR_Hiper",
+      "kind": "bool",
+      "label": "Hipertensión arterial",
+      "group": "Factores de riesgo"
+    },
+    {
+      "key": "FR_Diab",
+      "kind": "bool",
+      "label": "Diabetes",
+      "group": "Factores de riesgo"
+    },
+    {
+      "key": "FR_Obeso",
+      "kind": "bool",
+      "label": "Obesidad",
+      "group": "Factores de riesgo"
+    },
+    {
+      "key": "FR_Dislipemia",
+      "kind": "bool",
+      "label": "Dislipemia",
+      "group": "Factores de riesgo"
+    },
+    {
+      "key": "FR_AVE",
+      "kind": "bool",
+      "label": "ACV previo",
+      "group": "Factores de riesgo"
+    },
+    {
+      "key": "FR_Eceva",
+      "kind": "bool",
+      "label": "Enfermedad cerebrovascular",
+      "group": "Factores de riesgo"
+    },
+    {
+      "key": "FR_EPOC",
+      "kind": "bool",
+      "label": "EPOC",
+      "group": "Factores de riesgo"
+    },
+    {
+      "key": "FR_FallaRen",
+      "kind": "bool",
+      "label": "Falla renal",
+      "group": "Factores de riesgo"
+    },
+    {
+      "key": "FR_IRC",
+      "kind": "bool",
+      "label": "Insuficiencia renal crónica",
+      "group": "Factores de riesgo"
+    },
+    {
+      "key": "FR_AF",
+      "kind": "bool",
+      "label": "Antecedentes familiares",
+      "group": "Factores de riesgo"
+    },
+    {
+      "key": "FR_Apnea",
+      "kind": "bool",
+      "label": "Apnea del sueño",
+      "group": "Factores de riesgo"
+    },
+    {
+      "key": "SC_IAM",
+      "kind": "bool",
+      "label": "IAM",
+      "group": "Situación clínica"
+    },
+    {
+      "key": "SC_Shock",
+      "kind": "bool",
+      "label": "Shock",
+      "group": "Situación clínica"
+    },
+    {
+      "key": "SC_BIAC",
+      "kind": "bool",
+      "label": "Balón de contrapulsación",
+      "group": "Situación clínica"
+    },
+    {
+      "key": "SC_Arritmia",
+      "kind": "bool",
+      "label": "Arritmia",
+      "group": "Situación clínica"
+    },
+    {
+      "key": "SC_Angina",
+      "kind": "bool",
+      "label": "Angina",
+      "group": "Situación clínica"
+    },
+    {
+      "key": "SC_Trombo",
+      "kind": "bool",
+      "label": "Trombólisis",
+      "group": "Situación clínica"
+    },
+    {
+      "key": "SC_MP",
+      "kind": "bool",
+      "label": "Marcapasos",
+      "group": "Situación clínica"
+    },
+    {
+      "key": "SC_Tapon",
+      "kind": "bool",
+      "label": "Taponamiento cardíaco",
+      "group": "Situación clínica"
+    },
+    {
+      "key": "SC_Cardia",
+      "kind": "bool",
+      "label": "Situación cardíaca crítica",
+      "group": "Situación clínica"
+    }
+  ]
+}

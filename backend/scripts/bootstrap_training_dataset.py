@@ -81,7 +81,7 @@ def main() -> int:
     )
     parser.add_argument(
         "--username",
-        default="clinician",
+        default="dcaraballo",
         help="Usuario para login API.",
     )
     parser.add_argument(

@@ -1,0 +1,358 @@
+{
+  "cohort": "ptca",
+  "title": "Mortalidad PTCA / angioplastia",
+  "description": "Estima la probabilidad de mortalidad asociada a una angioplastia coronaria (PTCA) a partir de factores de riesgo y cuadro clínico de entrada.",
+  "version": "v1",
+  "trained_at": "2026-07-24T19:28:10.779208+00:00",
+  "n_samples": 13978,
+  "n_deaths": 177,
+  "outcome": "mortalidad",
+  "target": "mortalidad del procedimiento",
+  "metrics": {
+    "cutoff_test_year": 2019,
+    "n_train": 9973,
+    "n_test": 4005,
+    "base_rate": 0.0057,
+    "auc_roc": 0.775,
+    "auc_pr": 0.122,
+    "brier": 0.0056,
+    "cv_auc_roc_mean": 0.848,
+    "youden_threshold": 0.0184,
+    "roc_curve": {
+      "fpr": [
+        0.0,
+        0.0156,
+        0.0429,
+        0.0595,
+        0.0799,
+        0.0974,
+        0.116,
+        0.1288,
+        0.1396,
+        0.162,
+        0.1778,
+        0.1976,
+        0.2195,
+        0.2411,
+        0.2599,
+        0.2911,
+        0.332,
+        0.3757,
+        0.4083,
+        0.4422,
+        0.4641,
+        0.5131,
+        0.5457,
+        0.5819,
+        0.6118,
+        0.6371,
+        0.674,
+        0.7009,
+        0.727,
+        0.7484,
+        0.7755,
+        0.7971,
+        0.8162,
+        0.833,
+        0.8483,
+        0.8609,
+        0.895,
+        0.9199,
+        0.939,
+        1.0
+      ],
+      "tpr": [
+        0.0,
+        0.2174,
+        0.2174,
+        0.3043,
+        0.3478,
+        0.4348,
+        0.4783,
+        0.5652,
+        0.6087,
+        0.6087,
+        0.6522,
+        0.6522,
+        0.6522,
+        0.6522,
+        0.6522,
+        0.6957,
+        0.7826,
+        0.7826,
+        0.8261,
+        0.8261,
+        0.8261,
+        0.8261,
+        0.8696,
+        0.8696,
+        0.913,
+        0.913,
+        0.913,
+        0.913,
+        0.913,
+        0.913,
+        0.913,
+        0.913,
+        0.913,
+        0.913,
+        0.913,
+        0.9565,
+        0.9565,
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  "base_rate": 0.0127,
+  "youden_threshold": 0.0184,
+  "categorical_vocab": {
+    "sexo": [
+      "1",
+      "2"
+    ]
+  },
+  "odds_ratios": [
+    {
+      "feature": "bin__CEiamCurso",
+      "odds_ratio": 10.602
+    },
+    {
+      "feature": "bin__FRanteFamMS",
+      "odds_ratio": 0.117
+    },
+    {
+      "feature": "bin__CEinsufCardiaca",
+      "odds_ratio": 5.109
+    },
+    {
+      "feature": "bin__CEangorEstable",
+      "odds_ratio": 0.214
+    },
+    {
+      "feature": "bin__CEfuncVentricular",
+      "odds_ratio": 3.621
+    },
+    {
+      "feature": "bin__FRanteFam",
+      "odds_ratio": 0.362
+    },
+    {
+      "feature": "bin__CEinsRenalDialis",
+      "odds_ratio": 2.457
+    },
+    {
+      "feature": "bin__CEangorInestable",
+      "odds_ratio": 2.423
+    },
+    {
+      "feature": "cat__sexo_2",
+      "odds_ratio": 0.475
+    },
+    {
+      "feature": "bin__CEarritmia",
+      "odds_ratio": 2.049
+    },
+    {
+      "feature": "bin__CEiamPrevio",
+      "odds_ratio": 1.717
+    },
+    {
+      "feature": "num__edad",
+      "odds_ratio": 1.578
+    },
+    {
+      "feature": "bin__FRdislipemia",
+      "odds_ratio": 0.673
+    },
+    {
+      "feature": "bin__FRhipertension",
+      "odds_ratio": 0.746
+    },
+    {
+      "feature": "bin__FRenfVascular",
+      "odds_ratio": 1.293
+    }
+  ],
+  "feature_means": [
+    1.0350061692581496e-16,
+    0.2963943339533553,
+    0.7036056660466448,
+    0.6372156245528688,
+    0.5334811847188439,
+    0.2694233795965088,
+    0.11847188438975532,
+    0.0,
+    0.5213192159107168,
+    0.07597653455429962,
+    0.0,
+    0.0,
+    0.044355415653169264,
+    0.040420661038775216,
+    0.012448132780082987,
+    0.056875089426241233,
+    0.009085706109600801,
+    0.11131778509085706,
+    0.13657175561596796,
+    0.4375447131206181,
+    0.14580054371154672,
+    0.22070396337101159,
+    0.07175561596794963,
+    0.07890971526684791
+  ],
+  "features": [
+    {
+      "key": "edad",
+      "kind": "number",
+      "label": "Edad",
+      "group": "Demografía",
+      "unit": "años",
+      "min": 0,
+      "max": 110,
+      "step": 1
+    },
+    {
+      "key": "sexo",
+      "kind": "select",
+      "label": "Sexo",
+      "group": "Demografía",
+      "options": [
+        {
+          "value": "1",
+          "label": "Masculino"
+        },
+        {
+          "value": "2",
+          "label": "Femenino"
+        }
+      ]
+    },
+    {
+      "key": "FRhipertension",
+      "kind": "bool",
+      "label": "Hipertensión arterial",
+      "group": "Factores de riesgo"
+    },
+    {
+      "key": "FRtabaco",
+      "kind": "bool",
+      "label": "Tabaquismo",
+      "group": "Factores de riesgo"
+    },
+    {
+      "key": "FRdiabetes",
+      "kind": "bool",
+      "label": "Diabetes",
+      "group": "Factores de riesgo"
+    },
+    {
+      "key": "FRobesidad",
+      "kind": "bool",
+      "label": "Obesidad",
+      "group": "Factores de riesgo"
+    },
+    {
+      "key": "FRsedentario",
+      "kind": "bool",
+      "label": "Sedentarismo",
+      "group": "Factores de riesgo"
+    },
+    {
+      "key": "FRdislipemia",
+      "kind": "bool",
+      "label": "Dislipemia",
+      "group": "Factores de riesgo"
+    },
+    {
+      "key": "FRenfVascular",
+      "kind": "bool",
+      "label": "Enfermedad vascular",
+      "group": "Factores de riesgo"
+    },
+    {
+      "key": "FRenfVascular_MMii",
+      "kind": "bool",
+      "label": "Enf. vascular miembros inferiores",
+      "group": "Factores de riesgo"
+    },
+    {
+      "key": "FRenfVascular_CerebroVascular",
+      "kind": "bool",
+      "label": "Enfermedad cerebrovascular",
+      "group": "Factores de riesgo"
+    },
+    {
+      "key": "FRanteFam",
+      "kind": "bool",
+      "label": "Antecedentes familiares",
+      "group": "Factores de riesgo"
+    },
+    {
+      "key": "FRanteFamCoro",
+      "kind": "bool",
+      "label": "Antec. familiares coronarios",
+      "group": "Factores de riesgo"
+    },
+    {
+      "key": "FRanteFamMS",
+      "kind": "bool",
+      "label": "Antec. familiares de muerte súbita",
+      "group": "Factores de riesgo"
+    },
+    {
+      "key": "CEinsRenal",
+      "kind": "bool",
+      "label": "Insuficiencia renal",
+      "group": "Cuadro de entrada"
+    },
+    {
+      "key": "CEinsRenalDialis",
+      "kind": "bool",
+      "label": "Insuf. renal en diálisis",
+      "group": "Cuadro de entrada"
+    },
+    {
+      "key": "CEfuncVentricular",
+      "kind": "bool",
+      "label": "Disfunción ventricular",
+      "group": "Cuadro de entrada"
+    },
+    {
+      "key": "CEangorEstable",
+      "kind": "bool",
+      "label": "Angor estable",
+      "group": "Cuadro de entrada"
+    },
+    {
+      "key": "CEangorInestable",
+      "kind": "bool",
+      "label": "Angor inestable",
+      "group": "Cuadro de entrada"
+    },
+    {
+      "key": "CEiamPrevio",
+      "kind": "bool",
+      "label": "IAM previo",
+      "group": "Cuadro de entrada"
+    },
+    {
+      "key": "CEiamCurso",
+      "kind": "bool",
+      "label": "IAM en curso",
+      "group": "Cuadro de entrada"
+    },
+    {
+      "key": "CEinsufCardiaca",
+      "kind": "bool",
+      "label": "Insuficiencia cardíaca",
+      "group": "Cuadro de entrada"
+    },
+    {
+      "key": "CEarritmia",
+      "kind": "bool",
+      "label": "Arritmia",
+      "group": "Cuadro de entrada"
+    }
+  ]
+}

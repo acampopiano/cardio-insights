@@ -10,19 +10,35 @@ class MockRepository(AuthRepository, AnalyticsRepository):
         self._users = [
             {
                 "id": 1,
-                "username": "clinician",
-                "full_name": "Dr. Ana Pereira",
-                "role": "clinician",
-                "permissions": ["dashboard:read", "kpis:query"],
-                "hashed_password": get_password_hash("Demo1234!"),
-            },
-            {
-                "id": 2,
                 "username": "admin",
                 "full_name": "Admin INCC",
                 "role": "admin",
                 "permissions": ["dashboard:read", "kpis:query", "users:manage"],
                 "hashed_password": get_password_hash("Admin1234!"),
+            },
+            {
+                "id": 2,
+                "username": "dcaraballo",
+                "full_name": "Diego Caraballo",
+                "role": "clinico",
+                "permissions": ["dashboard:read", "kpis:query"],
+                "hashed_password": get_password_hash("Demo1234!"),
+            },
+            {
+                "id": 3,
+                "username": "ggarcia",
+                "full_name": "Gervasio Garcia",
+                "role": "gestion",
+                "permissions": ["dashboard:read", "kpis:query"],
+                "hashed_password": get_password_hash("Demo1234!"),
+            },
+            {
+                "id": 4,
+                "username": "acampopiano",
+                "full_name": "Andres Campopiano",
+                "role": "clinico",
+                "permissions": ["dashboard:read", "kpis:query"],
+                "hashed_password": get_password_hash("Demo1234!"),
             },
         ]
 

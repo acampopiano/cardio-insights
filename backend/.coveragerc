@@ -1,0 +1,22 @@
+[run]
+source = app
+branch = True
+omit =
+    app/tests/*
+    app/ml/training.py
+    app/repositories/interfaces.py
+    app/api/router.py
+    app/*/__init__.py
+    app/__init__.py
+
+[report]
+precision = 1
+show_missing = True
+skip_covered = False
+exclude_lines =
+    pragma: no cover
+    if TYPE_CHECKING:
+    if __name__ == .__main__.:
+
+[html]
+directory = htmlcov

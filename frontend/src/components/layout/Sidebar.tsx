@@ -2,7 +2,8 @@ import { Link, useLocation } from "react-router-dom"
 import { ChevronsLeft, ChevronsRight, X } from "lucide-react"
 
 import { BrandMark } from "@/components/BrandMark"
-import { NAV_ITEMS } from "@/lib/navigation"
+import { useAuth } from "@/features/auth/useAuth"
+import { getNavItemsForRole } from "@/lib/navigation"
 import { cn } from "@/lib/utils"
 
 interface SidebarProps {
@@ -19,6 +20,8 @@ export function Sidebar({
   onCloseMobile,
 }: SidebarProps) {
   const location = useLocation()
+  const { user } = useAuth()
+  const navItems = getNavItemsForRole(user?.role)
 
   return (
     <>
@@ -73,9 +76,11 @@ export function Sidebar({
         </div>
 
         <nav className="flex-1 space-y-1 overflow-y-auto px-2 py-3">
-          {NAV_ITEMS.map((item) => {
+          {navItems.map((item) => {
             const Icon = item.icon
-            const isActive = location.pathname === item.path
+            const isActive =
+              location.pathname === item.path ||
+              location.pathname.startsWith(`${item.path}/`)
 
             return (
               <Link
@@ -105,16 +110,6 @@ export function Sidebar({
                 >
                   {item.label}
                 </span>
-                {!item.available && (
-                  <span
-                    className={cn(
-                      "rounded-full bg-white/10 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-white/70",
-                      collapsed && "md:hidden"
-                    )}
-                  >
-                    Pronto
-                  </span>
-                )}
               </Link>
             )
           })}

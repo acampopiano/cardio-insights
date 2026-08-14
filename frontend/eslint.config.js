@@ -6,7 +6,7 @@ import tseslint from 'typescript-eslint'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  globalIgnores(['dist']),
+  globalIgnores(['dist', 'coverage']),
   {
     files: ['**/*.{ts,tsx}'],
     extends: [
@@ -17,6 +17,20 @@ export default defineConfig([
     ],
     languageOptions: {
       globals: globals.browser,
+    },
+    rules: {
+      // Patrones intencionales (shadcn exporta variants junto al componente,
+      // AuthContext expone el contexto y el provider). Es solo una pista de
+      // Fast Refresh en dev, no un problema de correctitud: la dejamos en warn.
+      'react-refresh/only-export-components': [
+        'warn',
+        { allowConstantExport: true },
+      ],
+      // Reglas nuevas y agresivas de eslint-plugin-react-hooks v7 (orientadas al
+      // React Compiler). Marcan patrones válidos; se mantienen como aviso para
+      // no bloquear el CI.
+      'react-hooks/set-state-in-effect': 'warn',
+      'react-hooks/immutability': 'warn',
     },
   },
 ])

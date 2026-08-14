@@ -4,8 +4,9 @@ import { cn, getInitials } from "./utils"
 
 describe("cn", () => {
   it("mergea clases de Tailwind", () => {
+    const hidden = false as boolean
     expect(cn("px-2", "px-4")).toContain("px-4")
-    expect(cn("text-sm", false && "hidden", "font-bold")).toContain("font-bold")
+    expect(cn("text-sm", hidden && "hidden", "font-bold")).toContain("font-bold")
   })
 })
 

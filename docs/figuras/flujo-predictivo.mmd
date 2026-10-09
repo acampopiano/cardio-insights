@@ -1,0 +1,20 @@
+---
+config:
+  theme: neutral
+  themeVariables:
+    fontFamily: Calibri, Arial, sans-serif
+    fontSize: 15px
+---
+flowchart LR
+  A["Base institucional<br/>copia de solo lectura"] --> B["Extracción por cohorte<br/>consultas definidas"]
+  B --> C["Limpieza y recodificación<br/>mismas reglas en inferencia"]
+  C --> D["Validación temporal<br/>años previos / años recientes"]
+  D --> E["Entrenamiento y calibración"]
+  E --> F["Evaluación<br/>AUC-ROC, AUC-PR, Brier"]
+  F --> G["Artefactos<br/>modelo + métricas"]
+  G --> H["Consulta en la aplicación<br/>sin acceder a la base"]
+
+  classDef paso fill:#e8f3fb,stroke:#0d3b66,stroke-width:1.4px,color:#0d3b66
+  classDef dato fill:#ffffff,stroke:#64748b,stroke-width:1.4px,color:#334155
+  class A,G,H dato
+  class B,C,D,E,F paso

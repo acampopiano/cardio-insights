@@ -1,0 +1,42 @@
+---
+config:
+  theme: neutral
+  themeVariables:
+    fontFamily: Georgia, 'Times New Roman', serif
+    fontSize: 15px
+---
+flowchart TB
+  subgraph CLIENTE["«dispositivo» Estación de trabajo del usuario"]
+    NAV["«entorno de ejecución»<br/><b>Navegador web</b><br/>Cardio Insights"]
+  end
+
+  subgraph SERVIDOR["«dispositivo» Servidor de aplicación · entorno de contenedores"]
+    WEB["«contenedor»<br/><b>Servidor web</b><br/>artefacto: frontend"]
+    BEC["«contenedor»<br/><b>Backend</b><br/>FastAPI / Uvicorn · 8000"]
+    GWC["«contenedor»<br/><b>LLM Gateway</b><br/>interpretación de la pregunta"]
+    MBC["«contenedor»<br/><b>Metabase</b><br/>servidor de tableros · 3000"]
+    subgraph MYSQLN["«contenedor» MySQL 8.0 · 3306"]
+      DB1[("incc<br/><i>datos institucionales</i>")]
+      DB2[("metabase_app_db<br/><i>configuración</i>")]
+    end
+  end
+
+  LLMP["«servicio externo»<br/><b>Proveedor de modelo de lenguaje</b>"]
+
+  NAV -->|" HTTPS "| WEB
+  NAV -->|" HTTPS · REST autenticado "| BEC
+  NAV -->|"HTTPS · iframe con token firmado"| MBC
+  BEC -->|"HTTP interno · contrato de consulta"| GWC
+  BEC -->|" usuario de solo lectura "| DB1
+  MBC -->|" consultas de tableros "| DB1
+  MBC -->|" configuración propia "| DB2
+  GWC -->|" HTTPS "| LLMP
+
+  classDef nodo fill:#ffffff,stroke:#1f2937,stroke-width:1.2px,color:#111827
+  classDef almacen fill:#f8f8f8,stroke:#1f2937,stroke-width:1.2px,color:#111827
+  class NAV,WEB,BEC,GWC,MBC,LLMP nodo
+  class DB1,DB2 almacen
+
+  style CLIENTE fill:#ffffff,stroke:#1f2937,stroke-width:1.2px,color:#111827
+  style SERVIDOR fill:#ffffff,stroke:#1f2937,stroke-width:1.2px,color:#111827
+  style MYSQLN fill:#fbfbfb,stroke:#6b7280,stroke-width:1px,color:#374151

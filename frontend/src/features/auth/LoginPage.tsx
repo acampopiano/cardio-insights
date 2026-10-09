@@ -35,7 +35,7 @@ interface LoginFormValues {
 const FEATURES = [
   {
     icon: Activity,
-    title: "Analisis clinico en tiempo real",
+    title: "Analisis clinico",
     description: "KPIs de cirugia cardiaca y hemodinamia centralizados.",
   },
   {

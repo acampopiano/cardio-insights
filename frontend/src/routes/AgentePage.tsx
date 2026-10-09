@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react"
 import {
   AlertCircle,
-  Code2,
+  AlertTriangle,
   Loader2,
   MessageSquare,
   Send,
@@ -94,6 +94,15 @@ export function AgentePage() {
           </p>
         </div>
       </header>
+
+      <p className="mb-4 flex items-start gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-sm text-amber-900 dark:text-amber-200">
+        <AlertTriangle className="mt-0.5 size-4 shrink-0 text-amber-600" aria-hidden="true" />
+        <span>
+          Herramienta de <strong>apoyo e investigación</strong>, no un sistema de decisión clínica.
+          Las respuestas se basan en consultas sobre datos históricos del INCC y no reemplazan el
+          juicio médico.
+        </span>
+      </p>
 
       <div
         ref={scrollRef}
@@ -188,30 +197,17 @@ function MessageBubble({ turn }: { turn: ChatTurn }) {
         )}
         <p className="whitespace-pre-wrap leading-relaxed">{turn.content}</p>
 
-        {!isUser && (turn.sql || (turn.rows && turn.rows.length > 0)) && (
+        {!isUser && turn.rows && turn.rows.length > 0 && (
           <div className="space-y-2 pt-1">
-            {turn.sql && (
-              <details className="group">
-                <summary className="flex cursor-pointer list-none items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground">
-                  <Code2 className="size-3.5" />
-                  Ver consulta SQL
-                </summary>
-                <pre className="mt-1.5 overflow-x-auto rounded-md bg-muted p-2 text-xs">
-                  <code>{turn.sql}</code>
-                </pre>
-              </details>
-            )}
-            {turn.rows && turn.rows.length > 0 && (
-              <details className="group" open={turn.rows.length > 1}>
-                <summary className="flex cursor-pointer list-none items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground">
-                  <Table2 className="size-3.5" />
-                  Ver datos ({turn.rowCount})
-                </summary>
-                <div className="mt-1.5">
-                  <ResultTable rows={turn.rows} />
-                </div>
-              </details>
-            )}
+            <details className="group" open={turn.rows.length > 1}>
+              <summary className="flex cursor-pointer list-none items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground">
+                <Table2 className="size-3.5" />
+                Ver datos ({turn.rowCount})
+              </summary>
+              <div className="mt-1.5">
+                <ResultTable rows={turn.rows} />
+              </div>
+            </details>
           </div>
         )}
       </div>

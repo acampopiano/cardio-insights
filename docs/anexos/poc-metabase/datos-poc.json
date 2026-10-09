@@ -1,0 +1,12 @@
+{
+  "metabase_version": {
+    "date": "2026-05-08",
+    "tag": "v0.60.4.4",
+    "hash": "65c9d32"
+  },
+  "card_bar_id": 41,
+  "card_table_id": 42,
+  "dashboard_id": 3,
+  "embed_url": "http://localhost:3001/embed/dashboard/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyZXNvdXJjZSI6eyJkYXNoYm9hcmQiOjN9LCJwYXJhbXMiOnt9LCJleHAiOjE3ODg5Njg4OTJ9.TsfSD_dKeNeco_rJpCdpgRPPePOGGDehabRxra8aMqI#bordered=false&titled=false&background=false",
+  "sql": "SELECT CAST(YEAR(FechaRealizado) AS CHAR) AS anio,\n       CASE CodSeguroCoo\n            WHEN 10 THEN 'FNR'\n            WHEN 20 THEN 'Particular'\n            ELSE 'Otro'\n       END AS financiador,\n       COUNT(*) AS actos\nFROM flow_coordina\nGROUP BY anio, financiador\nORDER BY anio, financiador"
+}

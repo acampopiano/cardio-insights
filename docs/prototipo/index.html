@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cardio Insights — Prototipo UI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --deep: #0d3b66;
+      --primary: #2e8bce;
+      --soft: #e8f3fb;
+      --accent: #c0392b;
+      --figma: #a259ff;
+      --canvas: #2c2c2c;
+      --chrome: #2c2c2c;
+      --panel: #2c2c2c;
+      --panel-2: #383838;
+      --text: #f5f5f5;
+      --muted: #b3b3b3;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; }
+    body {
+      font-family: Inter, system-ui, sans-serif;
+      background: var(--chrome);
+      color: var(--text);
+      overflow: hidden;
+    }
+    button, input, select { font-family: inherit; }
+
+    .app { display: grid; grid-template-rows: 44px 1fr; height: 100%; }
+
+    .top {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 10px; background: #2c2c2c; border-bottom: 1px solid #000;
+      font-size: 12px;
+    }
+    .top-left, .top-right { display: flex; align-items: center; gap: 8px; }
+    .logo {
+      width: 18px; height: 18px; border-radius: 4px;
+      background: conic-gradient(from 180deg, #f24e1e, #ff7262, #a259ff, #1abcfe, #0acf83, #f24e1e);
+    }
+    .filename { font-weight: 600; }
+    .filename span { color: var(--muted); font-weight: 400; margin-left: 8px; }
+    .seg { display: flex; background: #1e1e1e; border-radius: 6px; padding: 2px; }
+    .seg button {
+      background: transparent; color: var(--muted); border: 0;
+      padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 12px;
+    }
+    .seg button.on { background: #444; color: #fff; }
+    .present {
+      background: var(--figma); color: #fff; border: 0; border-radius: 6px;
+      padding: 6px 12px; font-weight: 600; cursor: pointer; font-size: 12px;
+    }
+
+    .work {
+      display: grid; grid-template-columns: 220px 1fr 260px; min-height: 0;
+    }
+    .side {
+      background: #2c2c2c; border-right: 1px solid #111; padding: 10px 8px;
+      font-size: 12px; overflow: auto;
+    }
+    .side h4 {
+      margin: 0 0 8px; font-size: 10px; letter-spacing: .08em;
+      text-transform: uppercase; color: #8d8d8d;
+    }
+    .layer {
+      padding: 6px 8px; border-radius: 4px; color: #ddd; cursor: pointer;
+    }
+    .layer:hover, .layer.on { background: #4a4a4a; }
+    .layer small { color: #888; margin-left: 6px; }
+
+    .board-wrap { overflow: auto; background: var(--canvas); position: relative; }
+    .board {
+      position: relative;
+      width: 1980px; height: 1180px;
+      transform-origin: 0 0;
+    }
+
+    .frame {
+      position: absolute; width: 1280px; height: 800px;
+      background: #f4f7fa; color: #1a2633;
+      border-radius: 2px; box-shadow: 0 12px 40px rgba(0,0,0,.35);
+      overflow: hidden;
+      transform: scale(0.42); transform-origin: 0 0;
+    }
+    .frame-name {
+      position: absolute; top: -22px; left: 0;
+      font-size: 11px; color: #cfcfcf; font-weight: 500; white-space: nowrap;
+    }
+    .f1 { left: 40px; top: 48px; }
+    .f2 { left: 620px; top: 48px; }
+    .f3 { left: 1200px; top: 48px; }
+    .f4 { left: 620px; top: 430px; }
+    .f5 { left: 1200px; top: 430px; }
+
+    .wires { position: absolute; inset: 0; pointer-events: none; }
+    .pin {
+      position: absolute; width: 22px; height: 22px; border-radius: 50%;
+      background: var(--figma); color: #fff; font-size: 11px; font-weight: 700;
+      display: grid; place-items: center; box-shadow: 0 2px 8px rgba(0,0,0,.4);
+      z-index: 5; cursor: default;
+    }
+
+    .right {
+      background: #2c2c2c; border-left: 1px solid #111; padding: 12px;
+      font-size: 12px; overflow: auto;
+    }
+    .right h4 {
+      margin: 0 0 10px; font-size: 10px; letter-spacing: .08em;
+      text-transform: uppercase; color: #8d8d8d;
+    }
+    .comment {
+      background: #383838; border-radius: 8px; padding: 10px; margin-bottom: 8px;
+    }
+    .comment b { color: #fff; }
+    .comment p { margin: 6px 0 0; color: #ccc; line-height: 1.4; }
+
+    /* UI inside frames */
+    .ui { display: flex; height: 100%; }
+    .sb {
+      width: 240px; background: var(--deep); color: #fff;
+      display: flex; flex-direction: column; flex-shrink: 0;
+    }
+    .sb-brand {
+      height: 56px; display: flex; align-items: center; gap: 10px;
+      padding: 0 16px; border-bottom: 1px solid rgba(255,255,255,.1);
+      font-weight: 600; font-size: 15px;
+    }
+    .dot { width: 28px; height: 28px; border-radius: 8px; background: var(--primary); }
+    .sb a {
+      display: block; margin: 4px 10px; padding: 10px 12px; border-radius: 8px;
+      color: rgba(255,255,255,.85); text-decoration: none; font-size: 14px;
+    }
+    .sb a.on, .sb a:hover { background: rgba(255,255,255,.12); color: #fff; }
+    .main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+    .hd {
+      height: 56px; background: #fff; border-bottom: 1px solid #e2e8f0;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 24px; font-size: 13px; color: #64748b;
+    }
+    .avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--soft); color: var(--deep);
+      display: grid; place-items: center; font-weight: 700; font-size: 12px;
+    }
+    .page { padding: 28px 32px; overflow: hidden; }
+    .kicker { color: var(--primary); font-size: 13px; font-weight: 600; margin: 0 0 4px; }
+    .page h1 { margin: 0 0 8px; font-size: 22px; color: var(--deep); }
+    .page p.lead { margin: 0 0 22px; color: #64748b; font-size: 14px; max-width: 640px; }
+    .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .card {
+      background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px;
+    }
+    .ico {
+      width: 40px; height: 40px; border-radius: 10px; background: var(--soft);
+      color: var(--primary); display: grid; place-items: center; font-weight: 700; margin-bottom: 12px;
+    }
+    .card h3 { margin: 0 0 6px; font-size: 16px; color: var(--deep); }
+    .card p { margin: 0; font-size: 13px; color: #64748b; line-height: 1.4; }
+    .ph {
+      height: 420px; border-radius: 12px; border: 1px dashed #b9c9d8;
+      background:
+        repeating-linear-gradient(-45deg, #eef3f8, #eef3f8 10px, #e4edf5 10px, #e4edf5 20px);
+      display: grid; place-items: center; color: #5b6f82; font-size: 14px; text-align: center;
+    }
+    .filters { display: flex; gap: 10px; margin-bottom: 16px; }
+    .chip {
+      background: #fff; border: 1px solid #d5e0ea; border-radius: 8px;
+      padding: 8px 12px; font-size: 13px; color: #334155;
+    }
+    .form { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .field { font-size: 12px; color: #64748b; }
+    .box {
+      margin-top: 6px; background: #fff; border: 1px solid #e2e8f0;
+      border-radius: 8px; padding: 10px 12px; color: #0f172a; font-size: 14px;
+    }
+    .btn {
+      display: inline-block; margin-top: 16px; background: var(--primary); color: #fff;
+      border: 0; border-radius: 8px; padding: 10px 16px; font-weight: 600; font-size: 14px;
+    }
+    .alert {
+      margin-top: 16px; padding: 12px 14px; border-radius: 10px; font-size: 13px; line-height: 1.4;
+    }
+    .alert.warn { background: #fff4f0; color: #9a3412; border: 1px solid #fed7aa; }
+    .alert.ok { background: #ecfdf3; color: #166534; border: 1px solid #bbf7d0; }
+    .chat { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; height: 430px; display: flex; flex-direction: column; }
+    .bubbles { flex: 1; padding: 16px; }
+    .b { max-width: 72%; padding: 10px 12px; border-radius: 12px; font-size: 13px; margin-bottom: 10px; line-height: 1.4; }
+    .b.user { margin-left: auto; background: var(--soft); color: var(--deep); }
+    .b.bot { background: #f1f5f9; color: #334155; }
+    .composer { display: flex; gap: 8px; padding: 12px; border-top: 1px solid #e2e8f0; }
+    .composer .box { flex: 1; margin: 0; color: #94a3b8; }
+
+    .login {
+      height: 100%; display: grid; grid-template-columns: 1.1fr .9fr;
+      background: linear-gradient(160deg, #0d3b66, #164e80);
+    }
+    .login-copy { color: #fff; padding: 72px 56px; }
+    .login-copy h1 { font-size: 36px; margin: 0 0 12px; }
+    .login-copy p { color: rgba(255,255,255,.8); font-size: 15px; line-height: 1.5; }
+    .feat { margin-top: 36px; display: grid; gap: 14px; }
+    .feat div { background: rgba(255,255,255,.08); border-radius: 10px; padding: 12px 14px; font-size: 13px; }
+    .login-card {
+      align-self: center; margin-right: 48px; background: #fff; border-radius: 16px;
+      padding: 32px; color: #0f172a; box-shadow: 0 20px 50px rgba(0,0,0,.25);
+    }
+    .login-card h2 { margin: 0 0 6px; color: var(--deep); }
+    .login-card p { margin: 0 0 18px; color: #64748b; font-size: 13px; }
+
+    .overlay {
+      display: none; position: fixed; inset: 0; background: #111; z-index: 20;
+      flex-direction: column;
+    }
+    .overlay.show { display: flex; }
+    .overlay-bar {
+      height: 48px; display: flex; align-items: center; justify-content: space-between;
+      padding: 0 16px; background: #1b1b1b; font-size: 13px;
+    }
+    .overlay-bar button {
+      background: #333; color: #fff; border: 0; border-radius: 6px; padding: 6px 12px; cursor: pointer;
+    }
+    .overlay-stage {
+      flex: 1; display: grid; place-items: center; padding: 20px;
+    }
+    .overlay-stage .live {
+      width: min(1280px, 96vw); height: min(800px, calc(100vh - 90px));
+      background: #f4f7fa; border-radius: 8px; overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,.5); color: #1a2633;
+    }
+    .hint {
+      position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%);
+      color: #888; font-size: 11px;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="top">
+      <div class="top-left">
+        <div class="logo" aria-hidden="true"></div>
+        <div class="filename">Cardio Insights — Prototipo UI <span>Prototipo · Media fidelidad · INCC</span></div>
+      </div>
+      <div class="seg" role="tablist">
+        <button type="button" class="on">Diseño</button>
+        <button type="button">Prototipo</button>
+      </div>
+      <div class="top-right">
+        <button class="present" type="button" onclick="present()">Presentar</button>
+      </div>
+    </header>
+
+    <div class="work">
+      <aside class="side">
+        <h4>Páginas</h4>
+        <div class="layer on">Prototipo v1</div>
+        <h4 style="margin-top:16px">Frames</h4>
+        <div class="layer">01 Acceso <small>1280×800</small></div>
+        <div class="layer">02 Inicio</div>
+        <div class="layer">03 KPIs</div>
+        <div class="layer">04 Predictivo</div>
+        <div class="layer">05 Asistente</div>
+      </aside>
+
+      <div class="board-wrap">
+        <div class="board">
+          <svg class="wires" viewBox="0 0 1980 1180">
+            <defs>
+              <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                <polygon points="0 0, 8 4, 0 8" fill="#a259ff" />
+              </marker>
+            </defs>
+            <path d="M 580 230 C 600 230, 600 230, 620 230" stroke="#a259ff" stroke-width="2" fill="none" marker-end="url(#arrow)" />
+            <path d="M 1160 180 C 1180 180, 1180 180, 1200 180" stroke="#a259ff" stroke-width="2" fill="none" marker-end="url(#arrow)" />
+            <path d="M 890 400 C 890 420, 890 420, 890 430" stroke="#a259ff" stroke-width="2" fill="none" marker-end="url(#arrow)" />
+            <path d="M 1160 280 C 1180 500, 1180 500, 1200 560" stroke="#a259ff" stroke-width="2" fill="none" marker-end="url(#arrow)" />
+          </svg>
+
+          <div class="frame f1">
+            <div class="frame-name">01 Acceso</div>
+            <div class="login">
+              <div class="login-copy">
+                <p class="kicker" style="color:#7ec8f0">INCC · Plataforma interna</p>
+                <h1>Cardio Insights</h1>
+                <p>Consulta de indicadores clínicos y operativos, estimación de riesgo como apoyo, y preguntas sobre el catálogo de KPIs.</p>
+                <div class="feat">
+                  <div>Indicadores de cirugía y hemodinamia</div>
+                  <div>Acceso autenticado por roles</div>
+                  <div>Uso interno del instituto</div>
+                </div>
+              </div>
+              <div class="login-card">
+                <h2>Ingresar</h2>
+                <p>Usuario institucional</p>
+                <div class="field">Usuario<div class="box">usuario.incc</div></div>
+                <div class="field" style="margin-top:12px">Contraseña<div class="box">••••••••</div></div>
+                <span class="btn">Ingresar</span>
+              </div>
+            </div>
+          </div>
+          <div class="pin" style="left: 520px; top: 70px;">1</div>
+
+          <div class="frame f2">
+            <div class="frame-name">02 Inicio</div>
+            <div class="ui">
+              <aside class="sb">
+                <div class="sb-brand"><span class="dot"></span> Cardio Insights</div>
+                <nav style="padding-top:12px">
+                  <a class="on" href="#">Inicio</a>
+                  <a href="#">KPIs</a>
+                  <a href="#">Predicciones</a>
+                  <a href="#">Asistente</a>
+                </nav>
+              </aside>
+              <div class="main">
+                <header class="hd">Plataforma de análisis clínico <span class="avatar">DC</span></header>
+                <div class="page">
+                  <p class="kicker">Bienvenido</p>
+                  <h1>Herramientas de la plataforma</h1>
+                  <p class="lead">Una sola aplicación: tableros, estimación de riesgo y consulta en lenguaje natural sobre indicadores autorizados.</p>
+                  <div class="cards">
+                    <article class="card"><div class="ico">KPI</div><h3>Indicadores</h3><p>Dashboards embebidos. Filtros por período y procedimiento.</p></article>
+                    <article class="card"><div class="ico">ML</div><h3>Análisis predictivo</h3><p>Apoyo e investigación. Variables previas al procedimiento.</p></article>
+                    <article class="card"><div class="ico">NL</div><h3>Asistente</h3><p>Preguntas del catálogo. Rechazo de pedidos clínicos.</p></article>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="pin" style="left: 1100px; top: 70px;">2</div>
+
+          <div class="frame f3">
+            <div class="frame-name">03 KPIs · Índice de dashboards</div>
+            <div class="ui">
+              <aside class="sb">
+                <div class="sb-brand"><span class="dot"></span> Cardio Insights</div>
+                <nav style="padding-top:12px">
+                  <a href="#">Inicio</a>
+                  <a class="on" href="#">KPIs</a>
+                  <a href="#">Predicciones</a>
+                  <a href="#">Asistente</a>
+                </nav>
+              </aside>
+              <div class="main">
+                <header class="hd">Indicadores agrupados por dashboard <span class="avatar">DC</span></header>
+                <div class="page">
+                  <h1>Elegir un tablero</h1>
+                  <p class="lead">Los KPIs no se listan sueltos: cada card abre una pantalla de dashboard.</p>
+                  <div class="cards" style="grid-template-columns:repeat(3,1fr);gap:10px">
+                    <article class="card" style="padding:12px"><h3 style="font-size:13px">Actos · Volumen</h3><p>Origen, mapa, sede</p></article>
+                    <article class="card" style="padding:12px"><h3 style="font-size:13px">Actos · Procedimiento</h3><p>CAT, cirugía, TAVI</p></article>
+                    <article class="card" style="padding:12px"><h3 style="font-size:13px">Cirugía · Indicadores</h3><p>Euroscore, esperas</p></article>
+                    <article class="card" style="padding:12px"><h3 style="font-size:13px">Cirugía · Pacientes</h3><p>Reintervenciones, IOT</p></article>
+                    <article class="card" style="padding:12px"><h3 style="font-size:13px">Cirugía · Perfil</h3><p>Tops clínicos</p></article>
+                    <article class="card" style="padding:12px"><h3 style="font-size:13px">Hemodinamia</h3><p>Resumen y evolución</p></article>
+                    <article class="card" style="padding:12px"><h3 style="font-size:13px">Factores de riesgo</h3><p>Complicaciones</p></article>
+                    <article class="card" style="padding:12px"><h3 style="font-size:13px">Mortalidad</h3><p>30 días y causas</p></article>
+                    <article class="card" style="padding:12px;opacity:.7"><h3 style="font-size:13px">Bocetos de cada pantalla</h3><p>Ver agrupación de KPIs</p></article>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="frame f4">
+            <div class="frame-name">04 Predictivo</div>
+            <div class="ui">
+              <aside class="sb">
+                <div class="sb-brand"><span class="dot"></span> Cardio Insights</div>
+                <nav style="padding-top:12px">
+                  <a href="#">Inicio</a>
+                  <a href="#">KPIs</a>
+                  <a class="on" href="#">Predicciones</a>
+                  <a href="#">Asistente</a>
+                </nav>
+              </aside>
+              <div class="main">
+                <header class="hd">Estimación de riesgo <span class="avatar">DC</span></header>
+                <div class="page">
+                  <h1>Análisis predictivo</h1>
+                  <p class="lead">Herramienta de apoyo e investigación. No sustituye el criterio médico.</p>
+                  <div class="card">
+                    <div class="form">
+                      <div class="field">Modelo<div class="box">Mortalidad quirúrgica a 30 días</div></div>
+                      <div class="field">Edad<div class="box">68</div></div>
+                      <div class="field">Sexo<div class="box">Masculino</div></div>
+                      <div class="field">Diabetes<div class="box">Sí</div></div>
+                    </div>
+                    <span class="btn">Calcular estimación</span>
+                    <div class="alert warn">Resultado ilustrativo: riesgo moderado. Las estimaciones se leen con la metodología y las limitaciones del modelo. No son una indicación clínica.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="pin" style="left: 1100px; top: 455px;">3</div>
+
+          <div class="frame f5">
+            <div class="frame-name">05 Asistente</div>
+            <div class="ui">
+              <aside class="sb">
+                <div class="sb-brand"><span class="dot"></span> Cardio Insights</div>
+                <nav style="padding-top:12px">
+                  <a href="#">Inicio</a>
+                  <a href="#">KPIs</a>
+                  <a href="#">Predicciones</a>
+                  <a class="on" href="#">Asistente</a>
+                </nav>
+              </aside>
+              <div class="main">
+                <header class="hd">Consulta en lenguaje natural <span class="avatar">DC</span></header>
+                <div class="page">
+                  <h1>Asistente de consulta</h1>
+                  <p class="lead">Preguntas de indicadores. Fuera de catálogo se rechaza.</p>
+                  <div class="chat">
+                    <div class="bubbles">
+                      <div class="b user">¿Cómo vienen las cirugías en 2025, mes a mes?</div>
+                      <div class="b bot">Consulta de catálogo (tendencia / volumen quirúrgico / 2025). Se devolvería la serie del KPI correspondiente.</div>
+                      <div class="b user">¿Qué tratamiento le conviene a este paciente?</div>
+                      <div class="b bot">Fuera de alcance. El asistente no emite recomendaciones clínicas.</div>
+                    </div>
+                    <div class="composer"><div class="box">Escribí tu pregunta…</div><span class="btn" style="margin:0">Enviar</span></div>
+                  </div>
+                  <div class="alert ok">En validación se acordó limitar el chat a indicadores autorizados.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="pin" style="left: 1680px; top: 455px;">4</div>
+        </div>
+        <div class="hint">Capturá el lienzo completo o cada frame. Presentar = prototipo clickeable.</div>
+      </div>
+
+      <aside class="right">
+        <h4>Comentarios de validación</h4>
+        <div class="comment"><b>1 · Acceso</b><p>Uso interno, autenticado. No hay registro público.</p></div>
+        <div class="comment"><b>2 · Una sola app</b><p>Referentes: KPIs, predictivo y chat en el mismo producto, no tres herramientas sueltas.</p></div>
+        <div class="comment"><b>3 · Predictivo</b><p>Disclaimer visible. Apoyo e investigación, no decisión clínica.</p></div>
+        <div class="comment"><b>4 · Chat</b><p>Rechazo explícito de preguntas clínicas / fuera de catálogo.</p></div>
+      </aside>
+    </div>
+  </div>
+
+  <div id="overlay" class="overlay">
+    <div class="overlay-bar">
+      <span>Prototipo · <span id="ov-name">01 Acceso</span></span>
+      <div>
+        <button type="button" onclick="step(-1)">Anterior</button>
+        <button type="button" onclick="step(1)">Siguiente</button>
+        <button type="button" onclick="closePresent()">Cerrar</button>
+      </div>
+    </div>
+    <div class="overlay-stage"><div id="live" class="live"></div></div>
+  </div>
+
+  <script>
+    const names = ["01 Acceso", "02 Inicio", "03 KPIs", "04 Predictivo", "05 Asistente"];
+    const ids = [".f1", ".f2", ".f3", ".f4", ".f5"];
+    let i = 0;
+    function present() { i = 0; show(); document.getElementById("overlay").classList.add("show"); }
+    function closePresent() { document.getElementById("overlay").classList.remove("show"); }
+    function step(d) { i = (i + d + 5) % 5; show(); }
+    function show() {
+      document.getElementById("ov-name").textContent = names[i];
+      document.getElementById("live").innerHTML = document.querySelector(ids[i]).innerHTML.replace(/<div class="frame-name">.*?<\/div>/, "");
+    }
+  </script>
+</body>
+</html>

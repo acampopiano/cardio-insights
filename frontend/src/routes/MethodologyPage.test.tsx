@@ -24,7 +24,8 @@ describe("MethodologyPage", () => {
 
     expect(await screen.findByText("Metodología de los modelos")).toBeInTheDocument()
     expect(screen.getByText("Curvas ROC")).toBeInTheDocument()
-    expect(screen.getAllByText("Aumentan el riesgo").length).toBeGreaterThan(0)
+    expect(screen.getAllByText("Asociados a mayor odds").length).toBeGreaterThan(0)
+    expect(screen.getAllByText("Asociados a menor odds").length).toBeGreaterThan(0)
     expect(screen.getByText("Clase NYHA: II")).toBeInTheDocument()
     expect(screen.getAllByText("Diabetes").length).toBeGreaterThan(0)
   })

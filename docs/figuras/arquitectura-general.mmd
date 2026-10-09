@@ -1,0 +1,26 @@
+flowchart TB
+  U["Usuario autorizado<br/>(navegador)"]
+  FE["Frontend<br/>React + TypeScript"]
+  BE["Backend — Python + FastAPI<br/><i>autoridad de ejecución</i>"]
+  MB["Metabase<br/>tableros embebidos"]
+  ML["Módulo predictivo<br/>modelos entrenados"]
+  GW["LLM Gateway<br/>interpretación de la pregunta"]
+  DB[("MySQL INCC<br/>solo lectura")]
+  LLM["Proveedor de modelo<br/>de lenguaje"]
+
+  U -->|HTTPS| FE
+  FE -->|"API REST + token"| BE
+  FE -.->|"iframe firmado"| MB
+  BE -->|"token de embedding"| MB
+  BE -->|"estimaciones"| ML
+  BE <-->|"pregunta / contrato"| GW
+  BE -->|"consultas de solo lectura"| DB
+  MB -->|"consultas del tablero"| DB
+  GW -->|"texto"| LLM
+
+  classDef equipo fill:#e8f3fb,stroke:#0d3b66,stroke-width:1.5px,color:#0d3b66
+  classDef tercero fill:#f1f5f9,stroke:#64748b,stroke-width:1.5px,color:#334155
+  classDef usuario fill:#ffffff,stroke:#0d3b66,stroke-width:2px,color:#0d3b66
+  class FE,BE,GW,ML equipo
+  class MB,DB,LLM tercero
+  class U usuario

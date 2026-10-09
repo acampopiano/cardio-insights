@@ -1,0 +1,37 @@
+flowchart TB
+  subgraph CLIENTE["Estación de trabajo del usuario"]
+    NAV["Navegador web<br/>aplicación Cardio Insights"]
+  end
+
+  subgraph SERVIDOR["Servidor de aplicación · contenedores Docker"]
+    WEB["Contenedor: servidor web<br/>build estático del frontend"]
+    BEC["Contenedor: backend<br/>FastAPI / Uvicorn · 8000"]
+    GWC["Contenedor: LLM Gateway<br/>interpretación de la pregunta"]
+    MBC["Contenedor: Metabase<br/>servidor de tableros · 3000"]
+    subgraph MYSQLN["Contenedor: MySQL 8.0 · 3306"]
+      DB1[("Esquema incc<br/>datos institucionales")]
+      DB2[("Esquema metabase_app_db<br/>configuración de tableros")]
+    end
+  end
+
+  LLMP["Proveedor de modelo de lenguaje<br/>servicio externo"]
+
+  NAV -->|"HTTPS"| WEB
+  NAV -->|"HTTPS · REST + JWT"| BEC
+  NAV -->|"HTTPS · iframe con token firmado"| MBC
+  BEC -->|"HTTP interno · contrato de consulta"| GWC
+  BEC -->|"usuario de solo lectura"| DB1
+  MBC -->|"consultas de tableros"| DB1
+  MBC -->|"configuración propia"| DB2
+  GWC -->|"HTTPS"| LLMP
+
+  classDef equipo fill:#e8f3fb,stroke:#0d3b66,stroke-width:1.5px,color:#0d3b66
+  classDef tercero fill:#f1f5f9,stroke:#64748b,stroke-width:1.5px,color:#334155
+  classDef datos fill:#ffffff,stroke:#64748b,stroke-width:1.5px,color:#334155
+  class NAV,WEB,BEC,GWC equipo
+  class MBC,LLMP tercero
+  class DB1,DB2 datos
+
+  style CLIENTE fill:#ffffff,stroke:#0d3b66,stroke-dasharray:5 4,color:#0d3b66
+  style SERVIDOR fill:#ffffff,stroke:#0d3b66,stroke-dasharray:5 4,color:#0d3b66
+  style MYSQLN fill:#fafbfc,stroke:#94a3b8,color:#475569

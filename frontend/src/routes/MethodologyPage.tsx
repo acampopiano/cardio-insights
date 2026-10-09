@@ -386,7 +386,7 @@ function FactorsBlock({ model }: { model: ModelInfo }) {
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
           <p className="mb-1 flex items-center gap-1 text-xs font-medium text-red-600">
-            <ArrowUp className="size-3.5" /> Aumentan el riesgo
+            <ArrowUp className="size-3.5" /> Asociados a mayor odds
           </p>
           <ul className="space-y-1">
             {up.map((x) => (
@@ -401,7 +401,7 @@ function FactorsBlock({ model }: { model: ModelInfo }) {
         </div>
         <div>
           <p className="mb-1 flex items-center gap-1 text-xs font-medium text-emerald-600">
-            <ArrowDown className="size-3.5" /> Reducen el riesgo
+            <ArrowDown className="size-3.5" /> Asociados a menor odds
           </p>
           <ul className="space-y-1">
             {down.map((x) => (
@@ -417,7 +417,9 @@ function FactorsBlock({ model }: { model: ModelInfo }) {
       </div>
       <p className="mt-2 text-[11px] text-muted-foreground">
         ×N = veces que se multiplican las probabilidades (odds) frente a un caso de referencia. En
-        variables numéricas, por cada incremento equivalente a su desvío estándar.
+        variables numéricas, por cada incremento equivalente a su desvío estándar. Un valor menor a
+        1 no implica protección clínica: es una asociación estadística, a veces paradójica por
+        selección o colinealidad (p. ej. tabaquismo o IRC).
       </p>
     </div>
   )

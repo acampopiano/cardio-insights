@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Bocetos — Dashboards de KPIs · Cardio Insights</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --deep: #0d3b66;
+      --primary: #2e8bce;
+      --soft: #e8f3fb;
+      --bg: #eef2f6;
+      --card: #fff;
+      --ink: #132033;
+      --muted: #64748b;
+      --line: #e2e8f0;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, sans-serif;
+      background: #d9e2ec;
+      color: var(--ink);
+    }
+    .banner {
+      background: #fff8e1;
+      border-bottom: 1px dashed #c9a227;
+      padding: 9px 22px;
+      font-size: 13px;
+      color: #6b5200;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .banner a { color: #6b5200; }
+    .wrap { max-width: 1220px; margin: 0 auto; padding: 24px 16px 72px; }
+    h1 { margin: 0 0 6px; font-size: 24px; color: var(--deep); }
+    .lead { margin: 0 0 22px; color: var(--muted); max-width: 760px; line-height: 1.5; font-size: 14px; }
+    .fig-cap { font-size: 12px; color: var(--muted); font-style: italic; margin: -4px 0 26px; }
+
+    .lamina {
+      background: #fff;
+      border-radius: 14px;
+      padding: 18px;
+      margin-bottom: 28px;
+      box-shadow: 0 8px 28px rgba(13,59,102,.08);
+    }
+    .lamina h2 { margin: 0 0 12px; font-size: 15px; color: var(--deep); }
+    .domains { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+    .domain { background: #f7fafc; border: 1px solid var(--line); border-radius: 10px; padding: 10px; }
+    .domain h3 {
+      margin: 0 0 8px; font-size: 11px; letter-spacing: .06em; text-transform: uppercase;
+      color: var(--primary); border-bottom: 1px solid var(--line); padding-bottom: 6px;
+    }
+    .domain .dash { background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 8px; margin-bottom: 8px; font-size: 11px; line-height: 1.35; }
+    .domain .dash:last-child { margin-bottom: 0; }
+    .domain .dash b { display: block; font-size: 12px; margin-bottom: 3px; color: var(--deep); }
+    .domain ul { margin: 0; padding-left: 14px; color: #475569; }
+    @media (max-width: 900px) { .domains { grid-template-columns: 1fr 1fr; } }
+
+    .device {
+      background: #fff;
+      border-radius: 14px;
+      overflow: hidden;
+      margin: 0 0 28px;
+      box-shadow: 0 10px 32px rgba(13,59,102,.12);
+    }
+    .device-tag {
+      background: var(--deep);
+      color: #fff;
+      font-size: 11px;
+      letter-spacing: .04em;
+      padding: 6px 14px;
+    }
+    .ui { display: flex; min-height: 560px; }
+    .sb {
+      width: 196px; background: var(--deep); color: #fff; flex-shrink: 0; padding: 14px 10px;
+    }
+    .sb-brand { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 13px; padding: 4px 8px 14px; }
+    .dot { width: 22px; height: 22px; border-radius: 6px; background: var(--primary); }
+    .sb a {
+      display: block; color: rgba(255,255,255,.78); text-decoration: none;
+      padding: 8px 10px; border-radius: 8px; font-size: 13px; margin-bottom: 2px;
+    }
+    .sb a.on { background: rgba(255,255,255,.14); color: #fff; }
+    .main { flex: 1; background: var(--bg); display: flex; flex-direction: column; min-width: 0; }
+    .top {
+      height: 52px; background: #fff; border-bottom: 1px solid var(--line);
+      display: flex; align-items: center; justify-content: space-between; padding: 0 16px; gap: 10px;
+    }
+    .top h2 { margin: 0; font-size: 14px; color: var(--deep); }
+    .chips { display: flex; gap: 6px; flex-wrap: wrap; }
+    .chip {
+      background: #f8fafc; border: 1px solid var(--line); border-radius: 8px;
+      padding: 5px 9px; font-size: 11px; color: #334155;
+    }
+    .page { padding: 14px 16px 18px; }
+    .grid { display: grid; gap: 10px; }
+    .c4 { grid-template-columns: repeat(4, 1fr); }
+    .c3 { grid-template-columns: repeat(3, 1fr); }
+    .c2 { grid-template-columns: 1fr 1fr; }
+    .c21 { grid-template-columns: 1.25fr .75fr; }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px;
+      min-height: 92px;
+    }
+    .card h3 { margin: 0 0 6px; font-size: 11px; font-weight: 600; color: var(--muted); line-height: 1.3; }
+    .val { font-size: 26px; font-weight: 700; color: var(--deep); letter-spacing: -.03em; line-height: 1; }
+    .val em { font-style: normal; font-size: 13px; color: var(--muted); font-weight: 500; margin-left: 4px; }
+    .delta { margin-top: 6px; font-size: 11px; color: #0f766e; }
+    .delta.down { color: #b45309; }
+    .chart { height: 92px; }
+    .chart svg { width: 100%; height: 100%; display: block; }
+    table.mini { width: 100%; border-collapse: collapse; font-size: 11px; }
+    table.mini th { text-align: left; color: var(--muted); font-weight: 600; padding: 3px 0; border-bottom: 1px solid var(--line); }
+    table.mini td { padding: 4px 0; border-bottom: 1px solid #f1f5f9; }
+    table.mini td:last-child, table.mini th:last-child { text-align: right; }
+    .cats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .cat {
+      background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 14px;
+    }
+    .cat b { display: block; color: var(--deep); font-size: 13px; margin-bottom: 4px; }
+    .cat span { font-size: 12px; color: var(--muted); line-height: 1.35; }
+    .ico {
+      width: 32px; height: 32px; border-radius: 8px; background: var(--soft);
+      color: var(--primary); display: grid; place-items: center; font-size: 11px; font-weight: 700; margin-bottom: 8px;
+    }
+    .note {
+      background: #eaf3fb; border-left: 3px solid var(--primary);
+      padding: 13px 14px; border-radius: 0 10px 10px 0; font-size: 13px; line-height: 1.5; color: #1a3348;
+    }
+    @media (max-width: 800px) {
+      .ui { display: block; }
+      .sb { width: auto; }
+      .c4, .c3, .c2, .c21, .cats { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="banner">
+    <span>Bocetos de media fidelidad — números y series ilustrativos, no son datos reales del INCC.</span>
+    <a href="index.html">Prototipo de navegación</a>
+  </div>
+
+  <div class="wrap">
+    <h1>Bocetos: KPIs agrupados en dashboards</h1>
+    <p class="lead">
+      Cada pantalla es un tablero de dominio. Los valores son de prototipo, para validar
+      agrupación, filtros (año, sede, facturación) y tipo de gráfico — no para citar en resultados.
+    </p>
+
+    <div class="lamina">
+      <h2>Agrupación: una pantalla = un dashboard</h2>
+      <div class="domains">
+        <div class="domain">
+          <h3>Actos</h3>
+          <div class="dash"><b>Volumen y origen</b><ul><li>Total de actos</li><li>Centros y médicos</li><li>Sede × facturación</li><li>Mapa</li></ul></div>
+          <div class="dash"><b>Por procedimiento</b><ul><li>CAT / PTCA</li><li>Cirugías, TAVI</li><li>Marcapasos, eco</li></ul></div>
+        </div>
+        <div class="domain">
+          <h3>Cirugía</h3>
+          <div class="dash"><b>Indicadores</b><ul><li>Volumen y Euroscore</li><li>Tiempos de espera</li><li>Evolución anual</li></ul></div>
+          <div class="dash"><b>Pacientes y reinterv.</b><ul><li>Mapa y edad</li><li>IOT / sangrado</li><li>Estadía</li></ul></div>
+          <div class="dash"><b>Perfil clínico</b><ul><li>Tops clínicos</li><li>Ecografías</li></ul></div>
+        </div>
+        <div class="domain">
+          <h3>Hemodinamia</h3>
+          <div class="dash"><b>Resumen</b><ul><li>CAT, PTCA, TAVI, MP</li><li>Stent con/sin droga</li><li>Mapa</li></ul></div>
+          <div class="dash"><b>Evolución</b><ul><li>Series anuales</li></ul></div>
+        </div>
+        <div class="domain">
+          <h3>Riesgo</h3>
+          <div class="dash"><b>Factores y complicaciones</b><ul><li>Factores angio / cirugía</li><li>% complicaciones</li></ul></div>
+        </div>
+        <div class="domain">
+          <h3>Mortalidad</h3>
+          <div class="dash"><b>Mortalidad</b><ul><li>30 días cirugía / PTCA</li><li>Series y causas</li></ul></div>
+        </div>
+      </div>
+    </div>
+    <p class="fig-cap">Figura — Agrupación de indicadores en dashboards. Los valores de las pantallas siguientes son ilustrativos.</p>
+
+    <section class="device">
+      <div class="device-tag">Pantalla 0 · Índice — el usuario elige un dashboard, no un KPI suelto</div>
+      <div class="ui">
+        <aside class="sb">
+          <div class="sb-brand"><span class="dot"></span> Cardio Insights</div>
+          <a href="#">Inicio</a>
+          <a class="on" href="#">KPIs</a>
+          <a href="#">Predicciones</a>
+          <a href="#">Asistente</a>
+        </aside>
+        <div class="main">
+          <div class="top"><h2>Indicadores del INCC</h2><span class="chip">DC · Clínico</span></div>
+          <div class="page">
+            <div class="cats">
+              <div class="cat"><div class="ico">A</div><b>Actos · Volumen y origen</b><span>Totales, procedencia, sede y facturación</span></div>
+              <div class="cat"><div class="ico">A</div><b>Actos · Por procedimiento</b><span>Series de CAT, cirugía, TAVI, MP y eco</span></div>
+              <div class="cat"><div class="ico">C</div><b>Cirugía · Indicadores</b><span>Volumen, Euroscore y tiempos de espera</span></div>
+              <div class="cat"><div class="ico">C</div><b>Cirugía · Pacientes</b><span>Mapa, reintervenciones, IOT y estadía</span></div>
+              <div class="cat"><div class="ico">C</div><b>Cirugía · Perfil clínico</b><span>Diagnósticos, procedimientos y ecografías</span></div>
+              <div class="cat"><div class="ico">H</div><b>Hemodinamia · Resumen</b><span>Totales del año, stents y mapa</span></div>
+              <div class="cat"><div class="ico">H</div><b>Hemodinamia · Evolución</b><span>Series anuales por procedimiento</span></div>
+              <div class="cat"><div class="ico">R</div><b>Factores de riesgo</b><span>Perfil y complicaciones asociadas</span></div>
+              <div class="cat"><div class="ico">M</div><b>Mortalidad</b><span>30 días post-cirugía / PTCA y causas</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="device">
+      <div class="device-tag">Pantalla 1 · Actos · Volumen y origen</div>
+      <div class="ui">
+        <aside class="sb">
+          <div class="sb-brand"><span class="dot"></span> Cardio Insights</div>
+          <a href="#">Inicio</a><a class="on" href="#">KPIs</a><a href="#">Predicciones</a><a href="#">Asistente</a>
+        </aside>
+        <div class="main">
+          <div class="top">
+            <h2>← Actos · Volumen y origen</h2>
+            <div class="chips"><span class="chip">Año 2025</span><span class="chip">Sede: todas</span><span class="chip">Facturación: todas</span></div>
+          </div>
+          <div class="page">
+            <div class="grid c4" style="margin-bottom:10px">
+              <div class="card"><h3>Total de actos (año)</h3><div class="val">8.420</div><div class="delta">+4,1% vs 2024</div></div>
+              <div class="card"><h3>Centros que envían</h3><div class="val">37</div><div class="delta">centros asistenciales</div></div>
+              <div class="card"><h3>Sede × facturación</h3>
+                <table class="mini"><tr><th></th><th>FNR</th><th>Otro</th></tr><tr><td>SMI</td><td>4.120</td><td>980</td></tr><tr><td>Británico</td><td>2.540</td><td>780</td></tr></table>
+              </div>
+              <div class="card"><h3>Pacientes por departamento</h3>
+                <svg class="chart" viewBox="0 0 160 70" aria-hidden="true">
+                  <rect x="8" y="18" width="14" height="44" rx="2" fill="#8ec0e6"/>
+                  <rect x="28" y="32" width="14" height="30" rx="2" fill="#2e8bce"/>
+                  <rect x="48" y="40" width="14" height="22" rx="2" fill="#8ec0e6"/>
+                  <rect x="68" y="36" width="14" height="26" rx="2" fill="#2e8bce"/>
+                  <rect x="88" y="48" width="14" height="14" rx="2" fill="#8ec0e6"/>
+                  <rect x="108" y="42" width="14" height="20" rx="2" fill="#2e8bce"/>
+                  <rect x="128" y="50" width="14" height="12" rx="2" fill="#8ec0e6"/>
+                </svg>
+              </div>
+            </div>
+            <div class="grid c2">
+              <div class="card"><h3>Actos por mes · centros asistenciales</h3>
+                <svg class="chart" viewBox="0 0 280 90">
+                  <polyline fill="none" stroke="#2e8bce" stroke-width="2.5" points="8,62 32,55 56,58 80,46 104,42 128,48 152,36 176,40 200,30 224,34 248,28 272,32"/>
+                  <polyline fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4 3" points="8,70 32,68 56,66 80,64 104,60 128,62 152,58 176,56 200,54 224,52 248,50 272,51"/>
+                </svg>
+              </div>
+              <div class="card"><h3>Actos por mes · médicos tratantes (top)</h3>
+                <table class="mini">
+                  <tr><th>Médico</th><th>Ene</th><th>…</th><th>Total</th></tr>
+                  <tr><td>Equipo A</td><td>42</td><td>…</td><td>510</td></tr>
+                  <tr><td>Equipo B</td><td>38</td><td>…</td><td>468</td></tr>
+                  <tr><td>Equipo C</td><td>29</td><td>…</td><td>390</td></tr>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="device">
+      <div class="device-tag">Pantalla 2 · Actos · Por procedimiento</div>
+      <div class="ui">
+        <aside class="sb">
+          <div class="sb-brand"><span class="dot"></span> Cardio Insights</div>
+          <a href="#">Inicio</a><a class="on" href="#">KPIs</a><a href="#">Predicciones</a><a href="#">Asistente</a>
+        </aside>
+        <div class="main">
+          <div class="top">
+            <h2>← Actos · Por procedimiento</h2>
+            <div class="chips"><span class="chip">Año 2025</span><span class="chip">Sede: todas</span><span class="chip">Facturación: todas</span></div>
+          </div>
+          <div class="page">
+            <div class="grid c3">
+              <div class="card"><h3>Cateterismos y angioplastias</h3>
+                <svg class="chart" viewBox="0 0 200 80"><polyline fill="none" stroke="#2e8bce" stroke-width="2.4" points="6,50 24,46 42,52 60,40 78,38 96,34 114,36 132,28 150,30 168,24 186,26"/><polyline fill="none" stroke="#0d3b66" stroke-width="2" points="6,62 24,60 42,58 60,56 78,54 96,50 114,52 132,48 150,46 168,44 186,45"/></svg>
+              </div>
+              <div class="card"><h3>Cirugías</h3>
+                <svg class="chart" viewBox="0 0 200 80"><polyline fill="none" stroke="#2e8bce" stroke-width="2.4" points="6,48 28,52 50,44 72,46 94,38 116,42 138,36 160,40 182,34"/></svg>
+              </div>
+              <div class="card"><h3>TAVI</h3>
+                <svg class="chart" viewBox="0 0 200 80"><polyline fill="none" stroke="#2e8bce" stroke-width="2.4" points="6,60 28,58 50,54 72,50 94,48 116,42 138,40 160,36 182,32"/></svg>
+              </div>
+              <div class="card"><h3>Marcapasos</h3>
+                <svg class="chart" viewBox="0 0 200 80"><polyline fill="none" stroke="#2e8bce" stroke-width="2.4" points="6,44 28,48 50,42 72,46 94,40 116,38 138,42 160,36 182,38"/></svg>
+              </div>
+              <div class="card"><h3>Ecografías</h3>
+                <svg class="chart" viewBox="0 0 200 80"><polyline fill="none" stroke="#2e8bce" stroke-width="2.4" points="6,40 28,36 50,38 72,30 94,28 116,32 138,26 160,24 182,22"/></svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="device">
+      <div class="device-tag">Pantalla 3 · Cirugía · Indicadores</div>
+      <div class="ui">
+        <aside class="sb">
+          <div class="sb-brand"><span class="dot"></span> Cardio Insights</div>
+          <a href="#">Inicio</a><a class="on" href="#">KPIs</a><a href="#">Predicciones</a><a href="#">Asistente</a>
+        </aside>
+        <div class="main">
+          <div class="top">
+            <h2>← Cirugía · Indicadores</h2>
+            <div class="chips"><span class="chip">Año 2025</span><span class="chip">Sede: todas</span><span class="chip">Facturación: todas</span></div>
+          </div>
+          <div class="page">
+            <div class="grid c4" style="margin-bottom:10px">
+              <div class="card"><h3>Total cirugías (año)</h3><div class="val">286</div><div class="delta">año seleccionado</div></div>
+              <div class="card"><h3>Total cirugías (hasta el año)</h3><div class="val">2.140</div><div class="delta">acumulado</div></div>
+              <div class="card"><h3>Promedio Euroscore</h3><div class="val">5,8<em>%</em></div><div class="delta down">riesgo estimado medio</div></div>
+              <div class="card"><h3>Reintervenciones (año)</h3><div class="val">19</div><div class="delta">conteo</div></div>
+            </div>
+            <div class="grid c3">
+              <div class="card"><h3>Cirugías por año</h3>
+                <svg class="chart" viewBox="0 0 200 80"><polyline fill="none" stroke="#2e8bce" stroke-width="2.4" points="10,58 40,54 70,50 100,44 130,40 160,36 190,32"/></svg>
+              </div>
+              <div class="card"><h3>Espera autorización → cirugía</h3>
+                <div class="val" style="font-size:22px;margin:8px 0 4px">18<em> días</em></div>
+                <svg class="chart" style="height:54px" viewBox="0 0 200 54"><polyline fill="none" stroke="#0d3b66" stroke-width="2" points="8,36 40,30 72,34 104,26 136,28 168,22 192,24"/></svg>
+              </div>
+              <div class="card"><h3>Espera trámite → autorización FNR</h3>
+                <div class="val" style="font-size:22px;margin:8px 0 4px">11<em> días</em></div>
+                <svg class="chart" style="height:54px" viewBox="0 0 200 54"><polyline fill="none" stroke="#2e8bce" stroke-width="2" points="8,32 40,34 72,28 104,30 136,24 168,26 192,20"/></svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="device">
+      <div class="device-tag">Pantalla 4 · Cirugía · Pacientes y reintervenciones</div>
+      <div class="ui">
+        <aside class="sb">
+          <div class="sb-brand"><span class="dot"></span> Cardio Insights</div>
+          <a href="#">Inicio</a><a class="on" href="#">KPIs</a><a href="#">Predicciones</a><a href="#">Asistente</a>
+        </aside>
+        <div class="main">
+          <div class="top">
+            <h2>← Cirugía · Pacientes y reintervenciones</h2>
+            <div class="chips"><span class="chip">Año 2025</span><span class="chip">Sede: todas</span></div>
+          </div>
+          <div class="page">
+            <div class="grid c21" style="margin-bottom:10px">
+              <div class="card"><h3>Mapa de pacientes (acumulado)</h3>
+                <svg viewBox="0 0 260 110" class="chart" style="height:110px">
+                  <ellipse cx="150" cy="58" rx="70" ry="42" fill="#d7ebf8" stroke="#2e8bce"/>
+                  <circle cx="168" cy="50" r="16" fill="#2e8bce" opacity=".85"/>
+                  <circle cx="128" cy="62" r="10" fill="#5fa8df"/>
+                  <circle cx="188" cy="70" r="7" fill="#8ec0e6"/>
+                  <text x="20" y="28" font-size="10" fill="#64748b">Montevideo</text>
+                  <text x="20" y="44" font-size="16" font-weight="700" fill="#0d3b66">61%</text>
+                  <text x="20" y="68" font-size="10" fill="#64748b">Canelones 12%</text>
+                  <text x="20" y="84" font-size="10" fill="#64748b">Interior 27%</text>
+                </svg>
+              </div>
+              <div class="card"><h3>Edad promedio (año)</h3><div class="val">67,4<em> años</em></div><div class="delta">perfil quirúrgico</div>
+                <h3 style="margin-top:16px">Promedio internación</h3><div class="val" style="font-size:22px">9,2<em> días</em></div>
+              </div>
+            </div>
+            <div class="grid c3">
+              <div class="card"><h3>Reintervenciones (año)</h3>
+                <svg class="chart" viewBox="0 0 200 80"><polyline fill="none" stroke="#c0392b" stroke-width="2.4" points="8,50 36,46 64,54 92,40 120,44 148,38 176,42 192,36"/></svg>
+              </div>
+              <div class="card"><h3>Horas de IOT (últimas 35)</h3>
+                <svg class="chart" viewBox="0 0 200 80">
+                  <rect x="10" y="30" width="12" height="40" fill="#8ec0e6"/><rect x="28" y="22" width="12" height="48" fill="#2e8bce"/>
+                  <rect x="46" y="36" width="12" height="34" fill="#8ec0e6"/><rect x="64" y="18" width="12" height="52" fill="#2e8bce"/>
+                  <rect x="82" y="28" width="12" height="42" fill="#8ec0e6"/><rect x="100" y="40" width="12" height="30" fill="#2e8bce"/>
+                  <rect x="118" y="24" width="12" height="46" fill="#8ec0e6"/><rect x="136" y="32" width="12" height="38" fill="#2e8bce"/>
+                </svg>
+              </div>
+              <div class="card"><h3>Reintervención por sangrado</h3>
+                <svg class="chart" viewBox="0 0 200 80">
+                  <rect x="16" y="48" width="18" height="22" fill="#f0b7b0"/><rect x="42" y="36" width="18" height="34" fill="#e07a6e"/>
+                  <rect x="68" y="52" width="18" height="18" fill="#f0b7b0"/><rect x="94" y="40" width="18" height="30" fill="#c0392b"/>
+                  <rect x="120" y="46" width="18" height="24" fill="#e07a6e"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="device">
+      <div class="device-tag">Pantalla 5 · Cirugía · Perfil clínico</div>
+      <div class="ui">
+        <aside class="sb">
+          <div class="sb-brand"><span class="dot"></span> Cardio Insights</div>
+          <a href="#">Inicio</a><a class="on" href="#">KPIs</a><a href="#">Predicciones</a><a href="#">Asistente</a>
+        </aside>
+        <div class="main">
+          <div class="top">
+            <h2>← Cirugía · Perfil clínico</h2>
+            <div class="chips"><span class="chip">Año 2025</span><span class="chip">Sede: todas</span></div>
+          </div>
+          <div class="page">
+            <div class="grid c2" style="margin-bottom:10px">
+              <div class="card"><h3>Ecografías por año</h3>
+                <svg class="chart" viewBox="0 0 240 80"><polyline fill="none" stroke="#2e8bce" stroke-width="2.4" points="8,58 40,52 72,48 104,42 136,38 168,34 200,30 228,28"/></svg>
+              </div>
+              <div class="card"><h3>Ecografías por tipo</h3>
+                <svg class="chart" viewBox="0 0 240 80">
+                  <rect x="20" y="18" width="28" height="52" fill="#2e8bce"/><rect x="58" y="30" width="28" height="40" fill="#5fa8df"/>
+                  <rect x="96" y="40" width="28" height="30" fill="#8ec0e6"/><rect x="134" y="48" width="28" height="22" fill="#b9d7ee"/>
+                </svg>
+              </div>
+            </div>
+            <div class="grid c3">
+              <div class="card"><h3>Diagnósticos más frecuentes (Top 10)</h3>
+                <table class="mini"><tr><th>Diagnóstico</th><th>%</th></tr><tr><td>Enf. coronaria</td><td>28</td></tr><tr><td>Valvular aórtica</td><td>16</td></tr><tr><td>Valvular mitral</td><td>11</td></tr></table>
+              </div>
+              <div class="card"><h3>Procedimientos más frecuentes (Top 10)</h3>
+                <table class="mini"><tr><th>Procedimiento</th><th>%</th></tr><tr><td>CRM</td><td>31</td></tr><tr><td>Reemplazo valvular</td><td>22</td></tr><tr><td>Combinado</td><td>14</td></tr></table>
+              </div>
+              <div class="card"><h3>Observaciones más comunes (Top 10)</h3>
+                <table class="mini"><tr><th>Observación</th><th>%</th></tr><tr><td>CEC</td><td>64</td></tr><tr><td>Reoperación</td><td>8</td></tr><tr><td>Urgencia</td><td>7</td></tr></table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="device">
+      <div class="device-tag">Pantalla 6 · Hemodinamia · Resumen</div>
+      <div class="ui">
+        <aside class="sb">
+          <div class="sb-brand"><span class="dot"></span> Cardio Insights</div>
+          <a href="#">Inicio</a><a class="on" href="#">KPIs</a><a href="#">Predicciones</a><a href="#">Asistente</a>
+        </aside>
+        <div class="main">
+          <div class="top">
+            <h2>← Hemodinamia · Resumen</h2>
+            <div class="chips"><span class="chip">Año 2025</span><span class="chip">Sede: todas</span><span class="chip">Facturación: todas</span></div>
+          </div>
+          <div class="page">
+            <div class="grid c4" style="margin-bottom:10px">
+              <div class="card"><h3>Cateterismos</h3><div class="val">1.980</div><div class="delta">año · acum. 14.200</div></div>
+              <div class="card"><h3>Angioplastias</h3><div class="val">1.240</div><div class="delta">año · acum. 9.860</div></div>
+              <div class="card"><h3>TAVI</h3><div class="val">86</div><div class="delta">año · acum. 410</div></div>
+              <div class="card"><h3>Marcapasos</h3><div class="val">214</div><div class="delta">año · acum. 1.520</div></div>
+            </div>
+            <div class="grid c2">
+              <div class="card"><h3>Stent con droga vs. sin droga (año)</h3>
+                <svg viewBox="0 0 240 90" class="chart">
+                  <circle cx="50" cy="46" r="32" fill="none" stroke="#e2e8f0" stroke-width="12"/>
+                  <circle cx="50" cy="46" r="32" fill="none" stroke="#2e8bce" stroke-width="12" stroke-dasharray="160 201" stroke-dashoffset="20" transform="rotate(-90 50 46)"/>
+                  <text x="50" y="50" text-anchor="middle" font-size="13" font-weight="700" fill="#0d3b66">82%</text>
+                  <text x="100" y="40" font-size="12" fill="#0d3b66">Con droga 82%</text>
+                  <text x="100" y="58" font-size="12" fill="#64748b">Sin droga 18%</text>
+                </svg>
+              </div>
+              <div class="card"><h3>Mapa de pacientes (acumulado)</h3>
+                <svg viewBox="0 0 240 90" class="chart">
+                  <ellipse cx="150" cy="48" rx="58" ry="34" fill="#d7ebf8" stroke="#2e8bce"/>
+                  <circle cx="164" cy="42" r="14" fill="#2e8bce"/>
+                  <circle cx="128" cy="52" r="8" fill="#5fa8df"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="device">
+      <div class="device-tag">Pantalla 7 · Hemodinamia · Evolución</div>
+      <div class="ui">
+        <aside class="sb">
+          <div class="sb-brand"><span class="dot"></span> Cardio Insights</div>
+          <a href="#">Inicio</a><a class="on" href="#">KPIs</a><a href="#">Predicciones</a><a href="#">Asistente</a>
+        </aside>
+        <div class="main">
+          <div class="top">
+            <h2>← Hemodinamia · Evolución</h2>
+            <div class="chips"><span class="chip">Año 2025</span><span class="chip">Sede: todas</span></div>
+          </div>
+          <div class="page">
+            <div class="grid c2">
+              <div class="card"><h3>CAT y PTCA por año</h3>
+                <svg class="chart" viewBox="0 0 240 90"><polyline fill="none" stroke="#2e8bce" stroke-width="2.4" points="10,70 50,62 90,58 130,48 170,42 220,36"/><polyline fill="none" stroke="#0d3b66" stroke-width="2" points="10,78 50,74 90,70 130,64 170,60 220,56"/></svg>
+              </div>
+              <div class="card"><h3>TAVI por año</h3>
+                <svg class="chart" viewBox="0 0 240 90"><polyline fill="none" stroke="#2e8bce" stroke-width="2.4" points="10,78 50,74 90,68 130,58 170,46 220,34"/></svg>
+              </div>
+              <div class="card"><h3>Marcapasos por año</h3>
+                <svg class="chart" viewBox="0 0 240 90"><polyline fill="none" stroke="#2e8bce" stroke-width="2.4" points="10,60 50,56 90,54 130,50 170,46 220,44"/></svg>
+              </div>
+              <div class="card"><h3>Desfibrilador por año</h3>
+                <svg class="chart" viewBox="0 0 240 90"><polyline fill="none" stroke="#2e8bce" stroke-width="2.4" points="10,72 50,70 90,66 130,62 170,58 220,54"/></svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="device">
+      <div class="device-tag">Pantalla 8 · Factores de riesgo y complicaciones</div>
+      <div class="ui">
+        <aside class="sb">
+          <div class="sb-brand"><span class="dot"></span> Cardio Insights</div>
+          <a href="#">Inicio</a><a class="on" href="#">KPIs</a><a href="#">Predicciones</a><a href="#">Asistente</a>
+        </aside>
+        <div class="main">
+          <div class="top">
+            <h2>← Factores de riesgo · Complicaciones</h2>
+            <div class="chips"><span class="chip">Año 2025</span><span class="chip">Sede: todas</span></div>
+          </div>
+          <div class="page">
+            <div class="grid c3" style="margin-bottom:10px">
+              <div class="card"><h3>Total angioplastias (hasta año)</h3><div class="val">9.860</div></div>
+              <div class="card"><h3>Total cirugías (hasta año)</h3><div class="val">2.140</div></div>
+              <div class="card"><h3>% complicaciones en cirugía</h3><div class="val">12,4<em>%</em></div><div class="delta down">sobre casos con dato</div></div>
+            </div>
+            <div class="grid c3">
+              <div class="card"><h3>Factores de riesgo · angioplastia</h3>
+                <table class="mini"><tr><th>Factor</th><th>%</th></tr><tr><td>HTA</td><td>68</td></tr><tr><td>Diabetes</td><td>32</td></tr><tr><td>Fumador actual</td><td>21</td></tr></table>
+              </div>
+              <div class="card"><h3>Factores de riesgo · cirugía</h3>
+                <table class="mini"><tr><th>Factor</th><th>%</th></tr><tr><td>HTA</td><td>71</td></tr><tr><td>Diabetes</td><td>29</td></tr><tr><td>ERC / falla renal</td><td>14</td></tr></table>
+              </div>
+              <div class="card"><h3>Complicaciones de cirugía</h3>
+                <table class="mini"><tr><th>Evento</th><th>%</th></tr><tr><td>FA postoperatoria</td><td>18</td></tr><tr><td>Falla renal aguda</td><td>6</td></tr><tr><td>Reop. por sangrado</td><td>4</td></tr></table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="device">
+      <div class="device-tag">Pantalla 9 · Mortalidad</div>
+      <div class="ui">
+        <aside class="sb">
+          <div class="sb-brand"><span class="dot"></span> Cardio Insights</div>
+          <a href="#">Inicio</a><a class="on" href="#">KPIs</a><a href="#">Predicciones</a><a href="#">Asistente</a>
+        </aside>
+        <div class="main">
+          <div class="top">
+            <h2>← Mortalidad</h2>
+            <div class="chips"><span class="chip">Año 2025</span><span class="chip">Sede: todas</span><span class="chip">Facturación: todas</span></div>
+          </div>
+          <div class="page">
+            <div class="grid c4" style="margin-bottom:10px">
+              <div class="card"><h3>Mortalidad cirugía 30d</h3><div class="val">3,1<em>%</em></div><div class="delta down">año seleccionado</div></div>
+              <div class="card"><h3>Muertes cirugía 30d</h3><div class="val">9</div><div class="delta">conteo</div></div>
+              <div class="card"><h3>Mortalidad PTCA 30d</h3><div class="val">1,4<em>%</em></div><div class="delta down">año seleccionado</div></div>
+              <div class="card"><h3>Muertes PTCA 30d</h3><div class="val">17</div><div class="delta">conteo</div></div>
+            </div>
+            <div class="grid c2">
+              <div class="card"><h3>Mortalidad 30d % por año · cirugía vs PTCA</h3>
+                <svg class="chart" viewBox="0 0 260 90"><polyline fill="none" stroke="#c0392b" stroke-width="2.4" points="10,40 55,44 100,38 145,42 190,36 240,34"/><polyline fill="none" stroke="#2e8bce" stroke-width="2.4" points="10,62 55,60 100,58 145,56 190,54 240,52"/></svg>
+              </div>
+              <div class="card"><h3>Muertes del año · por causa</h3>
+                <svg class="chart" viewBox="0 0 260 90">
+                  <rect x="20" y="28" width="22" height="50" fill="#c0392b"/><rect x="52" y="40" width="22" height="38" fill="#e07a6e"/>
+                  <rect x="84" y="50" width="22" height="28" fill="#f0b7b0"/><rect x="116" y="58" width="22" height="20" fill="#8ec0e6"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <p class="note">
+      <b>Para el informe.</b> En el cuerpo: la lámina de agrupación + 2 o 3 pantallas (Actos, Cirugía · Indicadores, Mortalidad).
+      Aclarar que los números son del boceto, no resultados medidos. Las capturas de Metabase van en la solución.
+    </p>
+  </div>
+</body>
+</html>

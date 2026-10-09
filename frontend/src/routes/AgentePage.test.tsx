@@ -7,7 +7,7 @@ import * as chatApi from "@/features/chat/chatApi"
 import { AgentePage } from "./AgentePage"
 
 describe("AgentePage", () => {
-  it("envia pregunta, muestra SQL y tabla", async () => {
+  it("envia pregunta y muestra tabla", async () => {
     vi.spyOn(chatApi, "askChat").mockResolvedValue({
       question: "q",
       answer: "Hubo 10 cirugias",
@@ -25,12 +25,13 @@ describe("AgentePage", () => {
     render(<AgentePage />)
 
     expect(screen.getByText("Preguntale a tus datos")).toBeInTheDocument()
+    expect(screen.getByText(/no un sistema de decisión clínica/)).toBeInTheDocument()
 
     await ue.type(screen.getByPlaceholderText("Escribí tu pregunta…"), "cuantas?")
     await ue.click(screen.getByRole("button", { name: "Enviar" }))
 
     expect(await screen.findByText("Hubo 10 cirugias")).toBeInTheDocument()
-    expect(screen.getByText("Ver consulta SQL")).toBeInTheDocument()
+    expect(screen.queryByText("Ver consulta SQL")).not.toBeInTheDocument()
     expect(screen.getByText(/Ver datos/)).toBeInTheDocument()
   })
 

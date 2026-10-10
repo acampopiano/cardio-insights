@@ -1,0 +1,69 @@
+# Production compose used by the CI/CD deploy job on the VPS.
+# Build contexts point at ./backend and ./frontend from the repo root.
+# Runtime secrets live in ./backend/.env on the server (never committed).
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        # Relative path: nginx proxies /api/ to the backend service.
+        VITE_API_URL: ${VITE_API_URL:-/api/v1}
+    container_name: cardio-insights-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: cardio-insights-backend
+    env_file:
+      - ./backend/.env
+    expose:
+      - "8000"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    restart: unless-stopped
+
+  mysql:
+    image: mysql:8.0
+    container_name: cardio-insights-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpassword}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-incc}
+      MYSQL_USER: ${MYSQL_USER:-cardio}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-cardio}
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./backend/db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "${MYSQL_USER:-cardio}", "-p${MYSQL_PASSWORD:-cardio}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  metabase:
+    image: metabase/metabase:latest
+    container_name: cardio-insights-metabase
+    environment:
+      MB_DB_TYPE: mysql
+      MB_DB_DBNAME: metabase_app_db
+      MB_DB_PORT: 3306
+      MB_DB_HOST: mysql
+      MB_DB_USER: ${MYSQL_USER:-cardio}
+      MB_DB_PASS: ${MYSQL_PASSWORD:-cardio}
+    ports:
+      - "3000:3000"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  mysql_data:
